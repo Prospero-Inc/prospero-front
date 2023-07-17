@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from 'react';
 import Head from 'next/head';
+import SidebarWithHeader from '../ui/SideBar';
 
 
 interface Props {
@@ -31,17 +32,18 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
                 {/* <Navbar /> */}
             </nav>
 
-            {/* <SideMenu /> */}
+            <SidebarWithHeader>
+                <main
+                    style={{
+                        margin: '80px auto',
+                        maxWidth: '1440px',
+                        padding: '30px',
+                    }}
+                >
+                    {children}
+                </main>
+            </SidebarWithHeader>
 
-            <main
-                style={{
-                    margin: '80px auto',
-                    maxWidth: '1440px',
-                    padding: '30px',
-                }}
-            >
-                {children}
-            </main>
 
             {/* Footer */}
             <footer>{/* TODO: mi custom footer */}</footer>
