@@ -13,12 +13,12 @@
     "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
-
   "settings": {
-    "react": { "version": "detect" }
+    "react": {
+      "version": "detect"
+    }
   },
   "overrides": [],
-
   "parserOptions": {
     "project": "./tsconfig.json",
     "ecmaVersion": "latest",
@@ -41,20 +41,46 @@
     "react/prop-types": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "object-curly-spacing": ["error", "always"],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": true
+      }
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
     "no-lone-blocks": "error",
     "no-else-return": "error",
-    "curly": ["error", "multi"],
+    "curly": [
+      "error",
+      "multi"
+    ],
     "no-unused-expressions": [
       "error",
-      { "allowShortCircuit": true, "allowTernary": true }
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true
+      }
     ],
     "import-helpers/order-imports": [
       "warn",
       {
         "newlinesBetween": "always", // new line between groups
-        "groups": ["module", ["parent", "sibling", "index"]],
-        "alphabetize": { "order": "asc", "ignoreCase": true }
+        "groups": [
+          "module",
+          [
+            "parent",
+            "sibling",
+            "index"
+          ]
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "ignoreCase": true
+        }
       }
     ]
   }
