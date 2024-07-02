@@ -6,15 +6,19 @@ import {
   Image,
   IconButton,
   Heading,
-  useBreakpointValue,
-  As
+  useBreakpointValue
 } from '@chakra-ui/react'
 
-import { TotalMoneyIcon } from '../icons/TotalMoneyIcon'
-
-export const WalletCard = ({
+export const AmountCard = ({
   totalAmount,
-  comparisonAmount
+  comparisonAmount,
+  image,
+  icon: Icon,
+  title,
+  bgColor,
+  breakpointsImage,
+  breakpointsLeftImage,
+  breakpointsTopImage
 }: WalletCardProps) => {
   const variantTotalAmount = useBreakpointValue(
     {
@@ -38,16 +42,6 @@ export const WalletCard = ({
     {
       base: 10,
       md: 12
-    },
-    {
-      fallback: 'md'
-    }
-  )
-  const variantWallet = useBreakpointValue(
-    {
-      base: '21.25em',
-      md: '18.75em',
-      sm: '18.75em'
     },
     {
       fallback: 'md'
@@ -80,19 +74,31 @@ export const WalletCard = ({
       fallback: 'md'
     }
   )
-  const variantLeftWallet = useBreakpointValue(
+  const variantImage = useBreakpointValue(
     {
-      base: 42,
-      md: 55.5
+      base: breakpointsImage.base,
+      md: breakpointsImage.md
     },
     {
       fallback: 'md'
     }
   )
-  const variantTopWallet = useBreakpointValue(
+
+  const variantLeftImage = useBreakpointValue(
     {
-      base: 10,
-      md: 4
+      base: breakpointsLeftImage.base,
+      md: breakpointsLeftImage.md,
+      lg: breakpointsLeftImage.lg
+    },
+    {
+      fallback: 'md'
+    }
+  )
+  const variantTopImage = useBreakpointValue(
+    {
+      base: breakpointsTopImage.base,
+      md: breakpointsTopImage.md,
+      lg: breakpointsTopImage.lg
     },
     {
       fallback: 'md'
@@ -100,24 +106,28 @@ export const WalletCard = ({
   )
   return (
     <Flex
-      bg="walletCard"
+      bg={bgColor}
       p={4}
       borderRadius="md"
       alignItems="center"
       gap={3}
       w={variantCard}
       h={variantCardH}
+      position="relative" // Asegúrate de que el contenedor sea relativo
     >
       <Box>
         <IconButton
+          flexDir={'row'}
+          justifyContent={'center'}
+          alignItems={'center'}
           aria-label="Money Icon"
           bg={'white'}
-          icon={<TotalMoneyIcon />}
+          icon={<Icon />}
         />
       </Box>
-      <Box>
+      <Box px={1}>
         <Text fontSize={variantTotalAmount} color="white" mb={variantSpaceText}>
-          Total
+          {title}
         </Text>
         <Heading
           fontSize={variantHeadingAmount}
@@ -132,16 +142,14 @@ export const WalletCard = ({
           <strong> ${comparisonAmount.toFixed(2)}</strong>
         </Text>
       </Box>
-      <Box>
-        <Image
-          src={'/assets/purse.svg'} // Reemplaza con tu imagen de cartera
-          alt="Cartera"
-          boxSize={variantWallet}
-          zIndex={1}
-          position="relative"
-          left={variantLeftWallet}
-          top={variantTopWallet}
-        />
+      <Box
+        position="absolute"
+        left={variantLeftImage}
+        top={variantTopImage}
+        boxSize={variantImage}
+        zIndex={1}
+      >
+        <Image src={image} alt="Cartera" />
       </Box>
     </Flex>
   )
