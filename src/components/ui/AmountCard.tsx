@@ -110,10 +110,9 @@ export const AmountCard = ({
       p={4}
       borderRadius="md"
       alignItems="center"
-      gap={3}
       w={variantCard}
       h={variantCardH}
-      position="relative" // Asegúrate de que el contenedor sea relativo
+      position="relative"
     >
       <Box>
         <IconButton
