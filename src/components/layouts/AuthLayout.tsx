@@ -1,31 +1,31 @@
-import { FC, PropsWithChildren } from 'react';
-import Head from 'next/head';
-import { Box } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react'
+import Head from 'next/head'
+import { FC, PropsWithChildren } from 'react'
 
 interface Props {
-    title: string;
+  title: string
 }
 
 export const AuthLayout: FC<PropsWithChildren<Props>> = ({
-    children,
-    title,
+  children,
+  title
 }) => {
-    return (
-        <>
-            <Head>
-                <title>{title}</title>
-            </Head>
+  return (
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
 
-            <main>
-                <Box
-                    display='flex'
-                    justifyContent='center'
-                    alignItems='center'
-                    height='calc(100vh - 200px)'
-                >
-                    {children}
-                </Box>
-            </main>
-        </>
-    );
-};
+      <main>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="calc(100vh - 200px)"
+        >
+          {children}
+        </Box>
+      </main>
+    </>
+  )
+}

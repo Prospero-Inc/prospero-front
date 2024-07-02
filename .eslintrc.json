@@ -6,8 +6,6 @@
   },
   "extends": [
     "plugin:react/recommended",
-    "standard-with-typescript",
-    "standard",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
@@ -41,16 +39,10 @@
     "react/prop-types": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "object-curly-spacing": ["error", "always"],
     "no-lone-blocks": "error",
     "no-else-return": "error",
-    "curly": [
-      "error",
-      "multi"
-    ],
+    "curly": ["error", "multi"],
     "no-unused-expressions": [
       "error",
       {
@@ -62,14 +54,7 @@
       "warn",
       {
         "newlinesBetween": "always", // new line between groups
-        "groups": [
-          "module",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ]
-        ],
+        "groups": ["module", ["parent", "sibling", "index"]],
         "alphabetize": {
           "order": "asc",
           "ignoreCase": true
