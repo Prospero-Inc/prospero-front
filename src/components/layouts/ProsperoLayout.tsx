@@ -1,3 +1,4 @@
+import { Container, useBreakpointValue } from '@chakra-ui/react'
 import Head from 'next/head'
 import { FC, PropsWithChildren } from 'react'
 
@@ -15,6 +16,13 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   pageDescription,
   imageFullUrl
 }) => {
+  const padding = useBreakpointValue({ base: '6', sm: '6', md: '8', lg: '10' })
+  const headingSize = useBreakpointValue({
+    base: 'lg',
+    sm: 'xl',
+    md: '2xl',
+    lg: '3xl'
+  })
   return (
     <>
       <Head>
@@ -31,15 +39,9 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
       <nav>{/* <Navbar /> */}</nav>
 
       <SidebarWithHeader>
-        <main
-          style={{
-            // margin: '0px auto',
-            maxWidth: '1440px',
-            padding: '20px'
-          }}
-        >
+        <Container p={padding} maxW="container.3xl" my={10}>
           {children}
-        </main>
+        </Container>
       </SidebarWithHeader>
 
       {/* Footer */}

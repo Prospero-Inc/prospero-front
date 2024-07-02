@@ -20,6 +20,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.11.0
         version: 11.11.5(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(react@18.2.0)
+      '@fontsource/montserrat':
+        specifier: ^5.0.18
+        version: 5.0.18
       '@next/font':
         specifier: 13.1.6
         version: 13.1.6
@@ -791,6 +794,9 @@ packages:
   '@eslint/js@8.44.0':
     resolution: {integrity: sha512-Ag+9YM4ocKQx9AarydN0KY2j0ErMHNIocPDrVo8zAE44xLTjEtz81OdR68/cydGtk6m6jDb5Za3r2useMzYmSw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  '@fontsource/montserrat@5.0.18':
+    resolution: {integrity: sha512-85JBs2rCdFK/VBdSb401e2lXk5gynVo2zi3Rh2Guem4WNtT2q52+V90o3KzjmajY3TPJvCZA/kI7R05ev7148g==}
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -4098,6 +4104,8 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.44.0': {}
+
+  '@fontsource/montserrat@5.0.18': {}
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

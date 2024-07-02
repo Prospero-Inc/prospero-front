@@ -6,6 +6,7 @@ export const colors = {
   walletCard: '#217EFD',
   expenditureCard: '#EA3A3D',
   primaryGray: '#A9A9A9',
+  entryCard: '#1AD598',
   primary: {
     50: '#EBEBFE',
     100: '#C8C8FC',

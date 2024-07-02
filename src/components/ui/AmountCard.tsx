@@ -41,7 +41,7 @@ export const AmountCard = ({
   const variantComparissio = useBreakpointValue(
     {
       base: 10,
-      md: 12
+      md: 14
     },
     {
       fallback: 'md'
@@ -125,7 +125,7 @@ export const AmountCard = ({
           icon={<Icon />}
         />
       </Box>
-      <Box px={1}>
+      <Box px={2}>
         <Text fontSize={variantTotalAmount} color="white" mb={variantSpaceText}>
           {title}
         </Text>
@@ -137,7 +137,12 @@ export const AmountCard = ({
         >
           ${totalAmount.toFixed(2)}
         </Heading>
-        <Text fontSize={variantComparissio} color="white" mb={variantSpaceText}>
+        <Text
+          maxW={'79%'}
+          fontSize={variantComparissio}
+          color="white"
+          mb={variantSpaceText}
+        >
           En comparación con con el mes pasado{' '}
           <strong> ${comparisonAmount.toFixed(2)}</strong>
         </Text>
@@ -147,7 +152,6 @@ export const AmountCard = ({
         left={variantLeftImage}
         top={variantTopImage}
         boxSize={variantImage}
-        zIndex={1}
       >
         <Image src={image} alt="Cartera" />
       </Box>

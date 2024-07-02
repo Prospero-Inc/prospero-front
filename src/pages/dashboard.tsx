@@ -1,8 +1,11 @@
-import { entryAsset, expendituresAsset, walletAsset } from '@/components/config'
 import { FlameIcon } from '@/components/icons/FlameIcon'
 import { TotalMoneyIcon } from '@/components/icons/TotalMoneyIcon'
 import { ProsperoLayout } from '@/components/layouts'
+import { GenericSection } from '@/components/layouts/GenericSection'
 import { AmountCard } from '@/components/ui/AmountCard'
+import CustomProgressBar from '@/components/ui/CustomProgressBar'
+import { GoalsSteps } from '@/components/ui/GoalsSteps'
+import { entryAsset, expendituresAsset, walletAsset } from '@/config'
 import { Flex } from '@chakra-ui/react'
 import React from 'react'
 
@@ -12,7 +15,7 @@ const dashboard = () => {
       title={'DashBoard'}
       pageDescription={'Pagina de inicio de Prospero'}
     >
-      <Flex gap={100} flexWrap={'wrap'}>
+      <Flex gap={10} flexWrap={'wrap'} justifyContent={'space-around'} mb={3}>
         <AmountCard
           bgColor="walletCard"
           title="Total"
@@ -40,7 +43,7 @@ const dashboard = () => {
           }}
         />
         <AmountCard
-          bgColor="walletCard"
+          bgColor="entryCard"
           title="Ingresos Mensuales"
           totalAmount={100}
           comparisonAmount={3}
@@ -59,7 +62,7 @@ const dashboard = () => {
             xl: '22.2em'
           }}
           breakpointsTopImage={{
-            base: '1.5em',
+            base: '0.2em',
             md: '1.5em',
             lg: '1.5em',
             xl: '1.5em'
@@ -85,13 +88,16 @@ const dashboard = () => {
             xl: '20.8em'
           }}
           breakpointsTopImage={{
-            base: '1.5em',
+            base: '3.5em',
             md: '4.5em',
             lg: '4.5em',
             xl: '4.5em'
           }}
         />
       </Flex>
+      <GenericSection title="">
+        <GoalsSteps />
+      </GenericSection>
     </ProsperoLayout>
   )
 }
