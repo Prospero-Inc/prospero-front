@@ -3,7 +3,6 @@ import Head from 'next/head'
 import { FC, PropsWithChildren } from 'react'
 
 import { AuthNav } from '../ui/AuthNav'
-import { GenericSection } from './GenericSection'
 
 interface Props {
   title: string

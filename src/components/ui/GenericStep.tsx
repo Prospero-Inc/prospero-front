@@ -2,9 +2,7 @@ import {
   Box,
   Icon,
   Step,
-  StepIcon,
   StepIndicator,
-  StepNumber,
   StepSeparator,
   StepStatus,
   StepTitle,
@@ -28,13 +26,7 @@ export const GenericStep = () => {
     index: 1,
     count: steps.length
   })
-  const map = {
-    '1': 'red',
-    '2': 'orange',
-    '3': 'yellow',
-    '4': 'green',
-    '5': 'blue'
-  }
+
   return (
     <Stepper index={activeStep}>
       {steps.map((step, index) => (
