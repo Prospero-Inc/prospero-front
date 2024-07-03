@@ -17,12 +17,7 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   imageFullUrl
 }) => {
   const padding = useBreakpointValue({ base: '6', sm: '6', md: '8', lg: '10' })
-  const headingSize = useBreakpointValue({
-    base: 'lg',
-    sm: 'xl',
-    md: '2xl',
-    lg: '3xl'
-  })
+
   return (
     <>
       <Head>
@@ -35,8 +30,6 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
 
         {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
       </Head>
-
-      <nav>{/* <Navbar /> */}</nav>
 
       <SidebarWithHeader>
         <Container p={padding} maxW="container.3xl" my={10}>

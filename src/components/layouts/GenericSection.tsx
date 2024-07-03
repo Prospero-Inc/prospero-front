@@ -1,10 +1,4 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  useBreakpointValue
-} from '@chakra-ui/react'
+import { Container, Heading, useBreakpointValue } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 
 interface SectionProps {

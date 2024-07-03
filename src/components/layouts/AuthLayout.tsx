@@ -2,30 +2,41 @@ import { Box } from '@chakra-ui/react'
 import Head from 'next/head'
 import { FC, PropsWithChildren } from 'react'
 
+import { AuthNav } from '../ui/AuthNav'
+import { GenericSection } from './GenericSection'
+
 interface Props {
   title: string
+  pageDescription: string
+  imageFullUrl?: string
 }
 
 export const AuthLayout: FC<PropsWithChildren<Props>> = ({
   children,
-  title
+  title,
+  pageDescription,
+  imageFullUrl
 }) => {
   return (
     <>
       <Head>
         <title>{title}</title>
-      </Head>
+        <meta name="description" content={pageDescription} />
 
-      <main>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="calc(100vh - 200px)"
-        >
-          {children}
-        </Box>
-      </main>
+        <meta name="og:title" content={title} />
+        <meta name="og:description" content={pageDescription} />
+        {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
+      </Head>
+      <AuthNav px={[5, 20]} py={[5, 20]} />
+      <Box
+        as="main"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        w={{ base: '100%', md: '85%' }}
+      >
+        {children}
+      </Box>
     </>
   )
 }
