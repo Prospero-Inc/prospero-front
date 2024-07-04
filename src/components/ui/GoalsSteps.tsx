@@ -1,7 +1,7 @@
 import { Heading } from '@chakra-ui/react'
 import React from 'react'
 
-import CustomProgressBar from './CustomProgressBar'
+import { GoalStepper } from './CustomProgressBar'
 
 export const GoalsSteps = () => {
   return (
@@ -9,7 +9,7 @@ export const GoalsSteps = () => {
       <Heading fontWeight={800} color={'grey'} my={10}>
         Meta: $500.00
       </Heading>
-      <CustomProgressBar />
+      <GoalStepper />
     </>
   )
 }

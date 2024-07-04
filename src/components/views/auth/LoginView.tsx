@@ -1,3 +1,4 @@
+import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import {
   Button,
   Flex,
@@ -8,14 +9,37 @@ import {
   Stack
 } from '@chakra-ui/react'
 import React from 'react'
-
+import { Controller, useForm } from 'react-hook-form'
+import * as yup from 'yup'
+const validationSchema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().required()
+})
 export const LoginView = () => {
+  const {
+    control,
+    formState: { errors },
+    handleSubmit
+  } = useForm({
+    resolver: useYupValidationResolver(validationSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
+
   return (
     <Flex alignItems={'center'} justifyContent={'center'} w="720px">
       <Stack w="100%">
         <FormControl my={2}>
           <FormLabel color={'gray'}>E-mail</FormLabel>
-          <Input placeholder="john@doe.com" />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <Input {...field} placeholder="john@doe.com" />
+            )}
+          />
         </FormControl>
         <FormControl my={2}>
           <FormLabel color={'gray'}>Password</FormLabel>

@@ -1,6 +1,5 @@
 import {
   Box,
-  Icon,
   Step,
   StepIndicator,
   StepSeparator,
@@ -32,10 +31,7 @@ export const GenericStep = () => {
       {steps.map((step, index) => (
         <Step key={index}>
           <StepIndicator>
-            <StepStatus
-              complete={<Icon as={GoalFlag} bg="red" />}
-              incomplete={null}
-            />
+            <StepStatus complete={<GoalFlag />} incomplete={null} />
           </StepIndicator>
 
           <Box flexShrink="1">

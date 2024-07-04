@@ -10,12 +10,13 @@ interface NavItemProps extends FlexProps {
 }
 export const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
   const router = useRouter()
+  const isActive = router.pathname === path
   return (
     <Link
       onClick={() => router.push(path)}
       style={{ textDecoration: 'none' }}
       _focus={{ boxShadow: 'none' }}
-      textColor={'primaryGray'}
+      textColor={isActive ? 'primary.500' : 'primaryGray'}
     >
       <Flex
         align="center"
