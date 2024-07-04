@@ -1,23 +1,26 @@
-import { Button, Input, InputGroup, InputRightElement } from '@chakra-ui/react'
+import {
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement
+} from '@chakra-ui/react'
 import { useState } from 'react'
-import { FiEye, FiEyeOff } from 'react-icons/fi'
+import { PiEyeLight, PiEyeSlash } from 'react-icons/pi'
 
 export function PasswordInput({ ...rest }) {
-  const [show, setShow] = useState(false)
-  const handleClick = () => setShow(!show)
+  const [showPassword, setShowPassword] = useState(false)
+  const handleClick = () => setShowPassword(!showPassword)
 
   return (
-    <InputGroup size="md">
-      <Input
-        {...rest}
-        pr="4.5rem"
-        type={show ? 'text' : 'password'}
-        placeholder="Enter password"
-      />
-      <InputRightElement width="4.5rem">
-        <Button h="1.90rem" top={[0, 0, 1]} size="sm" onClick={handleClick}>
-          {show ? <FiEyeOff /> : <FiEye />}
-        </Button>
+    <InputGroup>
+      <Input type={showPassword ? 'text' : 'password'} {...rest} />
+      <InputRightElement h="full">
+        <IconButton
+          aria-label="Toggle password visibility"
+          variant="ghost"
+          onClick={handleClick}
+          icon={showPassword ? <PiEyeSlash /> : <PiEyeLight />}
+        />
       </InputRightElement>
     </InputGroup>
   )

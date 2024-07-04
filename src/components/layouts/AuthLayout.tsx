@@ -28,7 +28,6 @@ export const AuthLayout: FC<PropsWithChildren<Props>> = ({
       </Head>
       <AuthNav px={[5, 20]} py={[5, 10]} mb={[10, 0]} />
       <Container
-        bg={'transparent'}
         maxW={'container.2xl'}
         as="main"
         display="flex"

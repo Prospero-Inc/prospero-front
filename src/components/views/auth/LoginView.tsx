@@ -10,6 +10,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -29,6 +30,7 @@ interface LoginViewProps {
   password: string
 }
 export const LoginView = () => {
+  const router = useRouter()
   const {
     control,
     formState: { errors },
@@ -41,10 +43,12 @@ export const LoginView = () => {
     }
   })
   const onSubmit = (data: LoginViewProps) => {
-    console.log(data)
+    alert(JSON.stringify(data))
+    router.push('/dashboard')
   }
   return (
     <Stack
+      maxW={'2xl'}
       as={'form'}
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}

@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     dependencies:
+      '@chakra-ui/anatomy':
+        specifier: ^2.2.2
+        version: 2.2.2
       '@chakra-ui/next-js':
         specifier: ^2.1.4
         version: 2.2.0(@chakra-ui/react@2.8.2(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(framer-motion@10.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(next@13.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)

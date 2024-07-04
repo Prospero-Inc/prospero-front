@@ -14,8 +14,8 @@ import {
   Text,
   Box
 } from '@chakra-ui/react'
+import NextLink from 'next/link'
 import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
-
 interface MobileProps extends FlexProps {
   onOpen: () => void
 }
@@ -85,7 +85,9 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem as={NextLink} href={'/auth/login'}>
+                Sign out
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>
