@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback } from 'react'
 import { FieldValues, Resolver } from 'react-hook-form'
 import * as yup from 'yup'
 
 export const useYupValidationResolver = <T extends FieldValues>(
   validationSchema: yup.ObjectSchema<T>
-) =>
+): Resolver<T> =>
   useCallback(
     async (data: T) => {
       try {
@@ -20,7 +21,10 @@ export const useYupValidationResolver = <T extends FieldValues>(
         return {
           values: {},
           errors: errors.inner.reduce(
-            (allErrors, currentError) => ({
+            (
+              allErrors: any,
+              currentError: { path: any; type: any; message: any }
+            ) => ({
               ...allErrors,
               [currentError.path]: {
                 type: currentError.type ?? 'validation',

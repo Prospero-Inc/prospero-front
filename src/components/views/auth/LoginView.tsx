@@ -1,3 +1,4 @@
+import { PasswordInput } from '@/components/ui'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import {
   Button,
@@ -6,15 +7,27 @@ import {
   FormLabel,
   Input,
   Link,
-  Stack
+  Stack,
+  Text
 } from '@chakra-ui/react'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 const validationSchema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup.string().required()
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters long')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+      'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot'
+    )
 })
+interface LoginViewProps {
+  email: string
+  password: string
+}
 export const LoginView = () => {
   const {
     control,
@@ -27,31 +40,56 @@ export const LoginView = () => {
       password: ''
     }
   })
-
+  const onSubmit = (data: LoginViewProps) => {
+    console.log(data)
+  }
   return (
-    <Flex alignItems={'center'} justifyContent={'center'} w="720px">
-      <Stack w="100%">
-        <FormControl my={2}>
-          <FormLabel color={'gray'}>E-mail</FormLabel>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <Input {...field} placeholder="john@doe.com" />
-            )}
-          />
-        </FormControl>
-        <FormControl my={2}>
-          <FormLabel color={'gray'}>Password</FormLabel>
-          <Input placeholder="***" type="password" />
-        </FormControl>
-        <Link ml="auto" href="/auth/forgot-password">
-          Olvidaste tu contraseña?
-        </Link>
-        <Button colorScheme="primary" my={2} type="submit" h={'4em'}>
-          Entrar
-        </Button>
-      </Stack>
-    </Flex>
+    <Stack
+      as={'form'}
+      onSubmit={handleSubmit(onSubmit)}
+      w={'full'}
+      justifyContent={'center'}
+    >
+      <FormControl my={2}>
+        <FormLabel color={'gray'} fontSize={['small', 'medium']}>
+          E-mail
+        </FormLabel>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <Input
+              size={['md', 'md', 'lg']}
+              {...field}
+              placeholder="john@doe.com"
+            />
+          )}
+        />
+        {errors.email && <Text color="red">{errors.email.message}</Text>}
+      </FormControl>
+      <FormControl my={2}>
+        <FormLabel color={'gray'} fontSize={['small', 'medium']}>
+          Password
+        </FormLabel>
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <PasswordInput size={['md', 'md', 'lg']} {...field} />
+          )}
+        />
+        {errors.password && <Text color="red">{errors.password.message}</Text>}
+      </FormControl>
+      <Link
+        fontSize={['small', 'medium']}
+        ml="auto"
+        href="/auth/forgot-password"
+      >
+        Olvidaste tu contraseña?
+      </Link>
+      <Button colorScheme="primary" my={2} type="submit" h={['3em', '4em']}>
+        Entrar
+      </Button>
+    </Stack>
   )
 }

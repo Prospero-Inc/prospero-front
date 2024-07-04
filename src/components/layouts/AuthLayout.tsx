@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react'
+import { Box, Container } from '@chakra-ui/react'
 import Head from 'next/head'
 import { FC, PropsWithChildren } from 'react'
 
@@ -26,16 +26,17 @@ export const AuthLayout: FC<PropsWithChildren<Props>> = ({
         <meta name="og:description" content={pageDescription} />
         {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
       </Head>
-      <AuthNav px={[5, 20]} py={[5, 20]} />
-      <Box
+      <AuthNav px={[5, 20]} py={[5, 10]} mb={[10, 0]} />
+      <Container
+        bg={'transparent'}
+        maxW={'container.2xl'}
         as="main"
         display="flex"
         justifyContent="center"
         alignItems="center"
-        w={{ base: '100%', md: '85%' }}
       >
         {children}
-      </Box>
+      </Container>
     </>
   )
 }
