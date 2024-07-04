@@ -17,6 +17,7 @@ export const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
       style={{ textDecoration: 'none' }}
       _focus={{ boxShadow: 'none' }}
       textColor={isActive ? 'primary.500' : 'primaryGray'}
+      fontWeight={isActive ? 'bold' : 'normal'}
     >
       <Flex
         align="center"
