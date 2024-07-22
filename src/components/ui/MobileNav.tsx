@@ -15,13 +15,15 @@ import {
   Box,
   Button
 } from '@chakra-ui/react'
-import { signOut } from 'next-auth/react'
-import NextLink from 'next/link'
+import { signOut, useSession } from 'next-auth/react'
 import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
 interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { data: session, status } = useSession()
+  if (status === 'loading') return null
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -69,10 +71,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">Justina Clark</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    Admin
-                  </Text>
+                  <Text fontSize="sm">{session?.user?.name}</Text>
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />

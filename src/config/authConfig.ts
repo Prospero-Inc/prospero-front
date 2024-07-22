@@ -56,6 +56,9 @@ export const config: AuthOptions = {
   pages: {
     signIn: '/auth/login',
     signOut: '/auth/signout'
+    // forgot password?
+
+    // reset password?
   },
   session: {
     strategy: 'jwt'

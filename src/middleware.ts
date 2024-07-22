@@ -6,7 +6,9 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   const isAuthPage =
-    pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')
+    pathname.startsWith('/auth/login') ||
+    pathname.startsWith('/auth/register') ||
+    pathname.startsWith('/auth/forgot-password')
   const isProtectedPage = !isAuthPage
 
   if (isAuthPage && token)

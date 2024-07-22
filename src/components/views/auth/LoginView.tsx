@@ -1,5 +1,6 @@
 import { PasswordInput } from '@/components/ui'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import language from '@/languages/es/login.json'
 import { useToast } from '@chakra-ui/react'
 import {
   Button,
@@ -85,7 +86,7 @@ export const LoginView = () => {
     >
       <FormControl my={2}>
         <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          E-mail
+          {language.labelEmail}
         </FormLabel>
         <Controller
           control={control}
@@ -102,7 +103,7 @@ export const LoginView = () => {
       </FormControl>
       <FormControl my={2}>
         <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          Password
+          {language.labelPassword}
         </FormLabel>
         <Controller
           name="password"
@@ -118,10 +119,10 @@ export const LoginView = () => {
         ml="auto"
         href="/auth/forgot-password"
       >
-        Olvidaste tu contraseña?
+        {language.forgotPassword}
       </Link>
       <Button colorScheme="primary" my={2} type="submit" h={['3em', '4em']}>
-        Entrar
+        {language.login}
       </Button>
     </Stack>
   )
