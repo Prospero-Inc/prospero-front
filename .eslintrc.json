@@ -16,7 +16,6 @@
       "version": "detect"
     }
   },
-  "overrides": [],
   "parserOptions": {
     "project": "./tsconfig.json",
     "ecmaVersion": "latest",
@@ -43,6 +42,7 @@
     "no-lone-blocks": "error",
     "no-else-return": "error",
     "curly": ["error", "multi"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "no-unused-expressions": [
       "error",
       {
@@ -51,7 +51,7 @@
       }
     ],
     "import-helpers/order-imports": [
-      "warn",
+      "error",
       {
         "newlinesBetween": "always", // new line between groups
         "groups": ["module", ["parent", "sibling", "index"]],
