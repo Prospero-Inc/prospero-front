@@ -59,8 +59,8 @@
   },
   "lint-staged": {
     "**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --config .eslintrc.json --fix-dry-run",
+      "prettier --config .prettierrc --check"
     ]
   }
 }

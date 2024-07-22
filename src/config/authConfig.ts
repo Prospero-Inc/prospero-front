@@ -1,6 +1,5 @@
 import { HttpMethod } from '@/enums'
 import apiService from '@/lib/apiService'
-import axios from 'axios'
 import { AuthOptions, User, PagesOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
