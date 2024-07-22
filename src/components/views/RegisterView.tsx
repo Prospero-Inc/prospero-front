@@ -1,4 +1,6 @@
+import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import apiService from '@/lib/apiService'
 import {
   Stack,
   Heading,
@@ -10,7 +12,8 @@ import {
   Image,
   Text,
   Container,
-  Link
+  Link,
+  useToast
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -31,15 +34,18 @@ const validationSchema = yup.object().shape({
       'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot'
     ),
   name: yup.string().required(),
-  lastName: yup.string().required()
+  lastName: yup.string().required(),
+  userName: yup.string().required()
 })
 interface RegisterViewProps {
   name: string
   lastName: string
   email: string
   password: string
+  userName: string
 }
 export const RegisterView = () => {
+  const toast = useToast()
   const router = useRouter()
   const {
     control,
@@ -51,13 +57,55 @@ export const RegisterView = () => {
       email: '',
       password: '',
       name: '',
-      lastName: ''
+      lastName: '',
+      userName: ''
     }
   })
 
-  const onSubmit = (data: RegisterViewProps) => {
-    alert(JSON.stringify(data, null, 2))
-    router.push('/dashboard')
+  const onSubmit = async ({
+    email,
+    lastName,
+    name: firstName,
+    password,
+    userName
+  }: RegisterViewProps) => {
+    try {
+      const promise = apiService.request({
+        method: HttpMethod.POST,
+        endPoint: '/auth/signup',
+        data: {
+          email,
+          lastName,
+          firstName,
+          password,
+          usernName: userName
+        }
+      })
+
+      toast.promise(promise, {
+        success: {
+          title: 'Cuenta creada',
+          description: 'Tu cuenta ha sido creada exitosamente'
+        },
+        loading: {
+          title: 'Creando cuenta',
+          description: 'Estamos creando tu cuenta, por favor espera',
+          colorScheme: 'primary'
+        },
+        error: {
+          title: 'Error',
+          description: 'Error al crear la cuenta'
+        }
+      })
+      router.push('/auth/login')
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Error al crear la cuenta',
+        status: 'error',
+        isClosable: true
+      })
+    }
   }
   return (
     <Container flex={1} p={2}>
@@ -87,7 +135,9 @@ export const RegisterView = () => {
             <Controller
               control={control}
               name="name"
-              render={({ field }) => <Input type="text" {...field} />}
+              render={({ field }) => (
+                <Input type="text" {...field} placeholder="John" />
+              )}
             />
             {errors.name && <Text color="red">{errors.name.message}</Text>}
           </FormControl>
@@ -96,9 +146,24 @@ export const RegisterView = () => {
             <Controller
               control={control}
               name="lastName"
-              render={({ field }) => <Input type="text" {...field} />}
+              render={({ field }) => (
+                <Input type="text" {...field} placeholder="Doe" />
+              )}
             />
 
+            {errors.lastName && (
+              <Text color="red">{errors.lastName.message}</Text>
+            )}
+          </FormControl>
+          <FormControl>
+            <FormLabel>nombre de usuario</FormLabel>
+            <Controller
+              control={control}
+              name="userName"
+              render={({ field }) => (
+                <Input type="text" {...field} placeholder="johnDoe" />
+              )}
+            />
             {errors.lastName && (
               <Text color="red">{errors.lastName.message}</Text>
             )}

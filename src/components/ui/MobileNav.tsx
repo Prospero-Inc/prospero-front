@@ -12,8 +12,10 @@ import {
   MenuItem,
   MenuDivider,
   Text,
-  Box
+  Box,
+  Button
 } from '@chakra-ui/react'
+import { signOut } from 'next-auth/react'
 import NextLink from 'next/link'
 import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
 interface MobileProps extends FlexProps {
@@ -85,7 +87,14 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem as={NextLink} href={'/auth/login'}>
+              <MenuItem
+                as={Button}
+                onClick={() =>
+                  signOut({
+                    redirect: true
+                  })
+                }
+              >
                 Sign out
               </MenuItem>
             </MenuList>

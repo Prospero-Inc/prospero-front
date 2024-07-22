@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios'
+import axios from 'axios'
 
 import axiosInstance from './axiosInstance'
 
@@ -24,7 +25,6 @@ const formattedEndpoint = (endPoint: string, params: TParams = {}): string => {
   return formattedEndpoint
 }
 
-// explain this class please
 /**
  * ApiService class is a singleton class that handles all the requests to the API.
  * It has a private methods object that contains the methods GET, POST, PUT, and DELETE.
@@ -74,6 +74,15 @@ class ApiService {
 
       return response.data
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(`API error: ${error.response?.data?.message}`)
+        throw new Error(
+          error.response?.data?.message ?? 'Error al iniciar sesion'
+        )
+      }
+
+      console.log('ERROR SERVER API SERVICE', error)
+
       console.error(`API error: ${error}`)
       throw error
     }

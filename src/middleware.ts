@@ -1,5 +1,23 @@
+import { getToken } from 'next-auth/jwt'
 import { NextRequest, NextResponse } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  NextResponse.next()
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  const { pathname } = req.nextUrl
+
+  const isAuthPage =
+    pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')
+  const isProtectedPage = !isAuthPage
+
+  if (isAuthPage && token)
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+
+  if (isProtectedPage && !token)
+    return NextResponse.redirect(new URL('/auth/login', req.url))
+
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: '/((?!api|static|.*\\..*|_next).*)'
 }

@@ -1,5 +1,6 @@
 import { PasswordInput } from '@/components/ui'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import { useToast } from '@chakra-ui/react'
 import {
   Button,
   FormControl,
@@ -9,6 +10,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { signIn, SignInResponse } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -30,6 +32,8 @@ interface LoginViewProps {
 }
 export const LoginView = () => {
   const router = useRouter()
+  const toast = useToast()
+
   const {
     control,
     formState: { errors },
@@ -41,9 +45,24 @@ export const LoginView = () => {
       password: ''
     }
   })
-  const onSubmit = (data: LoginViewProps) => {
-    alert(JSON.stringify(data))
-    router.push('/dashboard')
+  const onSubmit = async (data: LoginViewProps) => {
+    const resp: SignInResponse | undefined = await signIn('credentials', {
+      ...data,
+      redirect: false,
+      callbackUrl: '/dashboard'
+    })
+
+    console.log({ resp })
+    if (resp?.error)
+      return toast({
+        title: 'Error',
+        description: resp.error ?? 'Error signing in',
+        status: 'error',
+        duration: 5000,
+        isClosable: true
+      })
+
+    if (resp?.url) return router.replace('/dashboard')
   }
   return (
     <Stack

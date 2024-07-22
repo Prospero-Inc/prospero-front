@@ -10,7 +10,11 @@ export const theme = extendTheme({
   shadows,
   fonts,
   components: {
-    // Input: inputTheme
+    Toast: {
+      baseStyle: {
+        bg: 'primary.500'
+      }
+    }
   },
   styles: {
     global: {

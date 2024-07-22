@@ -6,6 +6,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import { SWRConfig } from 'swr'
+
 const options = {
   refreshInterval: 30000,
   fetcher
@@ -21,7 +22,17 @@ export function Providers({
     <SessionProvider session={session}>
       <CacheProvider>
         <SWRConfig value={options}>
-          <ChakraProvider theme={theme}>{children}</ChakraProvider>
+          <ChakraProvider
+            theme={theme}
+            toastOptions={{
+              defaultOptions: {
+                isClosable: true,
+                duration: 3000
+              }
+            }}
+          >
+            {children}
+          </ChakraProvider>
         </SWRConfig>
       </CacheProvider>
     </SessionProvider>
