@@ -56,5 +56,11 @@
   "engines": {
     "node": ">=18.x.x <=22.x.x",
     "pnpm": ">=9.4.0"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
