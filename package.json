@@ -63,10 +63,5 @@
       "eslint --config .eslintrc.json --fix",
       "prettier --config .prettierrc --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }
