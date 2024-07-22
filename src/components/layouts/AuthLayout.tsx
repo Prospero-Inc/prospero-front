@@ -33,6 +33,7 @@ export const AuthLayout: FC<PropsWithChildren<Props>> = ({
         display="flex"
         justifyContent="center"
         alignItems="center"
+        minH={['80vh', '90vh']}
       >
         {children}
       </Container>

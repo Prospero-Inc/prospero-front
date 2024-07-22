@@ -46,23 +46,34 @@ export const LoginView = () => {
     }
   })
   const onSubmit = async (data: LoginViewProps) => {
-    const resp: SignInResponse | undefined = await signIn('credentials', {
-      ...data,
-      redirect: false,
-      callbackUrl: '/dashboard'
-    })
-
-    console.log({ resp })
-    if (resp?.error)
-      return toast({
-        title: 'Error',
-        description: resp.error ?? 'Error signing in',
-        status: 'error',
-        duration: 5000,
-        isClosable: true
+    let toastId = null
+    try {
+      toastId = toast({
+        title: 'Signing in',
+        description: 'Please wait...',
+        status: 'loading',
+        colorScheme: 'primary'
+      })
+      const resp: SignInResponse | undefined = await signIn('credentials', {
+        ...data,
+        redirect: false,
+        callbackUrl: '/dashboard'
       })
 
-    if (resp?.url) return router.replace('/dashboard')
+      if (resp?.error)
+        return toast({
+          title: 'Error',
+          description: resp.error ?? 'Error signing in',
+          status: 'error',
+          isClosable: true
+        })
+
+      if (resp?.url) return router.replace('/dashboard')
+    } catch (error) {
+      console.log(error)
+    } finally {
+      toastId && toast.close(toastId)
+    }
   }
   return (
     <Stack

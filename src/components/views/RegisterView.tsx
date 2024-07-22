@@ -70,34 +70,39 @@ export const RegisterView = () => {
     userName
   }: RegisterViewProps) => {
     try {
-      const promise = apiService.request({
-        method: HttpMethod.POST,
-        endPoint: '/auth/signup',
-        data: {
-          email,
-          lastName,
-          firstName,
-          password,
-          usernName: userName
+      await toast.promise(
+        apiService.request({
+          method: HttpMethod.POST,
+          endPoint: '/auth/signup',
+          data: {
+            email,
+            lastName,
+            firstName,
+            password,
+            usernName: userName
+          }
+        }),
+        {
+          success: () => {
+            router.push('/auth/login')
+            return {
+              title: 'Cuenta creada',
+              description: 'Cuenta creada con exito',
+              status: 'success',
+              isClosable: true
+            }
+          },
+          loading: {
+            title: 'Creando cuenta',
+            description: 'Estamos creando tu cuenta, por favor espera',
+            colorScheme: 'primary'
+          },
+          error: {
+            title: 'Error',
+            description: 'Error al crear la cuenta'
+          }
         }
-      })
-
-      toast.promise(promise, {
-        success: {
-          title: 'Cuenta creada',
-          description: 'Tu cuenta ha sido creada exitosamente'
-        },
-        loading: {
-          title: 'Creando cuenta',
-          description: 'Estamos creando tu cuenta, por favor espera',
-          colorScheme: 'primary'
-        },
-        error: {
-          title: 'Error',
-          description: 'Error al crear la cuenta'
-        }
-      })
-      router.push('/auth/login')
+      )
     } catch (error) {
       toast({
         title: 'Error',
@@ -112,7 +117,7 @@ export const RegisterView = () => {
       <Image
         mt={['0em', '10em']}
         mx="auto"
-        height={'5em'}
+        height={['2em', '3.5em']}
         src="/assets/authBrand.svg"
         alt="Prospero Logo"
       />

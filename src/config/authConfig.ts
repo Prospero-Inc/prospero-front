@@ -7,6 +7,11 @@ interface UserExtended extends User {
   accessToken?: string
 }
 
+interface UserResponse {
+  user: User
+  accessToken: string
+}
+
 interface SignInCredentials {
   email: string
   password: string
@@ -27,10 +32,10 @@ export const config: AuthOptions = {
       authorize: async (
         credentials: SignInCredentials | undefined
       ): Promise<UserExtended | null> => {
-        if (!credentials) return null
+        if (!credentials) throw new Error('No credentials provided')
 
         const { email, password } = credentials
-        const response = await apiService.request<UserExtended>({
+        const response = await apiService.request<UserResponse>({
           endPoint: '/auth/login',
           method: HttpMethod.POST,
           data: {
@@ -38,13 +43,9 @@ export const config: AuthOptions = {
             password
           }
         })
-
         if (response)
           return {
-            id: response.id,
-            name: response.name,
-            email: response.email,
-            image: response.image,
+            ...response.user,
             accessToken: response.accessToken
           }
 

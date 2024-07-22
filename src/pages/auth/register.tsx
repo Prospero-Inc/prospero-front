@@ -1,32 +1,33 @@
-import { MotionDiv } from '@/components/ui'
 import { RegisterView } from '@/components/views/RegisterView'
-import { Container, Grid, GridItem, Image, Show } from '@chakra-ui/react'
+import { Grid, GridItem, Image, Show } from '@chakra-ui/react'
 import React from 'react'
 
 const register = () => {
   return (
-    <Container maxW={'container.1xl'}>
-      <Grid templateColumns="repeat(12, 1fr)" gap={2}>
-        <GridItem colSpan={[12, 12, 4]} display={'flex'}>
-          <RegisterView />
-        </GridItem>
-        <GridItem
-          colSpan={[12, 12, 8]}
-          display={'flex'}
-          justifyContent={'center'}
-        >
-          <Show above="md">
-            <MotionDiv>
-              <Image
-                position={'relative'}
-                src={'/assets/Saly-2.svg'}
-                alt="Sali-1"
-              />
-            </MotionDiv>
-          </Show>
-        </GridItem>
-      </Grid>
-    </Container>
+    <Grid templateColumns="repeat(12, 1fr)" h={'100%'} minH={'100vh'}>
+      <GridItem colSpan={[12, 12, 12, 6]} display={'flex'} p={6} zIndex={1}>
+        <RegisterView />
+      </GridItem>
+      <GridItem
+        colSpan={[12, 12, 12, 6]}
+        display={'flex'}
+        justifyContent={'center'}
+        alignContent={'center'}
+        bg={'gray.50'}
+      >
+        <Show above="lg">
+          <Image
+            position={'fixed'}
+            display={'block'}
+            height={'100%'}
+            right={['-4%', '-1%', '-2%']}
+            w={['90%', '60%', '62%', '75%']}
+            src={'/assets/Saly-2.svg'}
+            alt="Sali-1"
+          />
+        </Show>
+      </GridItem>
+    </Grid>
   )
 }
 
