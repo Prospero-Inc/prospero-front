@@ -1,0 +1,23 @@
+name: Delete Branch
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete-branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Delete branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.PROSPERO_SECRET }}
+      run: |
+        BRANCH_NAME=$(echo "${{ github.head_ref }}" | sed 's/refs\/heads\///')
+        echo "Deleting branch: $BRANCH_NAME"
+        curl -X DELETE -H "Authorization: token $PROSPERO_SECRET" \
+             "https://api.github.com/repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME"
