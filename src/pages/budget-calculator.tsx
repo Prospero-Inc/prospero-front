@@ -5,7 +5,7 @@ import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
 const index = () => {
   return (
     <ProsperoLayout title='Budge Calculator' pageDescription='Budge calculator is a calculator of distributions your salary'>
-      <Container>
+      <Container >
         <Stack>
           <Box
             border={"1px"}
@@ -27,13 +27,33 @@ const index = () => {
           </Button>
         </Stack>
 
-        <Stack my={'3rem'}>
-          <Card>
+        <Stack my={'2rem'}>
+          <Card mb="1rem">
             <CardBody>
               <Heading as={'h1'} size={"md"}>{budgeCalculator.fiftyCard.heading}</Heading>
-              <Text mb={'1.5rem'} mt="0.5rem">{budgeCalculator.fiftyCard.body}</Text>
+              <Text mb={'1.5rem'} size="sm" mt="0.5rem">{budgeCalculator.fiftyCard.body}</Text>
 
-              <Heading as="h2" textAlign={'center'} >
+              <Heading as="h2" size={"lg"} textAlign={'center'} >
+                $262.5
+              </Heading>
+            </CardBody>
+          </Card>
+          <Card mb={"1rem"}>
+            <CardBody>
+              <Heading as={'h1'} size={"md"}>{budgeCalculator.thirty.heading}</Heading>
+              <Text mb={'1.5rem'} size="sm" mt="0.5rem">{budgeCalculator.thirty.body}</Text>
+
+              <Heading as="h2" size={"lg"} textAlign={'center'} >
+                $262.5
+              </Heading>
+            </CardBody>
+          </Card>
+          <Card mb={"1rem"}>
+            <CardBody>
+              <Heading as={'h1'} size={"md"}>{budgeCalculator.twenty.heading}</Heading>
+              <Text mb={'1.5rem'} size={"sm"} mt="0.5rem">{budgeCalculator.twenty.body}</Text>
+
+              <Heading as="h2" size={"lg"} textAlign={'center'} >
                 $262.5
               </Heading>
             </CardBody>

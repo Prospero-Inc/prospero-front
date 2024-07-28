@@ -1,0 +1,17 @@
+{
+  "heading": "Create an Account",
+  "text": {
+    "one": "“Ahorrar nunca fue tan fácil, gestiona tus finanzas con estilo en",
+    "two": "Prospero",
+    "three": "”"
+  },
+  "form": {
+    "labelFirstName": "Nombre",
+    "labelLastName": "Apellido",
+    "labelUsername": "Nombre de usuario",
+    "labelEmail": "Correo",
+    "labelPassword": "Contraseña"
+  },
+  "backLink": "Ya tienes una cuenta?",
+  "submit": "Crear Cuenta"
+}

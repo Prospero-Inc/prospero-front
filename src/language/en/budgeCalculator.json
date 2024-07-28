@@ -4,5 +4,13 @@
   "fiftyCard": {
     "heading": "50% Needs",
     "body": "Allocate half of your income to cover basic needs such as rent, food, utilities and transportation."
+  },
+  "thirty": {
+    "heading": "30% Wants:",
+    "body": "Use 30% of your income for non-essential expenses or 'wants', such as entertainment, dining out, or personal purchases."
+  },
+  "twenty": {
+    "heading": "20% Savings and Debt",
+    "body": "Reserve the remaining 20% for saving or paying off debt. This includes contributions to emergency funds, savings for long-term goals, or additional debt payments."
   }
 }

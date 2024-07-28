@@ -1,0 +1,17 @@
+{
+  "heading": "Create an Account",
+  "text": {
+    "one": "\"Saving has never been easier, manage your finances in style at",
+    "two": "Prospero",
+    "three": "\""
+  },
+  "form": {
+    "labelFirstName": "First Name",
+    "labelLastName": "Last Name",
+    "labelUsername": "Username",
+    "labelEmail": "Email",
+    "labelPassword": "Password"
+  },
+  "backLink": "Already have an account?",
+  "submit": "Create Account"
+}

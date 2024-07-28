@@ -16,7 +16,7 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   pageDescription,
   imageFullUrl
 }) => {
-  const padding = useBreakpointValue({ base: '6', sm: '6', md: '8', lg: '10' })
+  const padding = useBreakpointValue({ base: '4', sm: '4', md: '6', lg: '8' })
 
   return (
     <>
@@ -32,7 +32,7 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
       </Head>
 
       <SidebarWithHeader>
-        <Container p={padding} maxW="container.3xl" my={10}>
+        <Container p={padding} maxW="container.2xl" my={5}>
           {children}
         </Container>
       </SidebarWithHeader>

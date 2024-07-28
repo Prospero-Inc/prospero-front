@@ -17,10 +17,10 @@ import {
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
-
+import registerJson from '@/languages/es/register.json'
 import { PasswordInput } from '../ui'
 
 const validationSchema = yup.object().shape({
@@ -45,6 +45,7 @@ interface RegisterViewProps {
   userName: string
 }
 export const RegisterView = () => {
+  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const router = useRouter()
   const {
@@ -70,7 +71,9 @@ export const RegisterView = () => {
     userName
   }: RegisterViewProps) => {
     try {
-      await toast.promise(
+      setIsLoading(true)
+
+      toast.promise(
         apiService.request({
           method: HttpMethod.POST,
           endPoint: '/auth/signup',
@@ -84,6 +87,7 @@ export const RegisterView = () => {
         }),
         {
           success: () => {
+            setIsLoading(false)
             router.push('/auth/login')
             return {
               title: 'Cuenta creada',
@@ -97,9 +101,12 @@ export const RegisterView = () => {
             description: 'Estamos creando tu cuenta, por favor espera',
             colorScheme: 'primary'
           },
-          error: {
-            title: 'Error',
-            description: 'Error al crear la cuenta'
+          error: (error) => {
+            setIsLoading(false)
+            return {
+              title: 'Error',
+              description: error?.message ?? 'Error al crear la cuenta'
+            }
           }
         }
       )
@@ -123,20 +130,20 @@ export const RegisterView = () => {
       />
       <Stack textAlign={'center'}>
         <Heading fontSize={['2xl', '4x', '6xl']} textAlign="center">
-          Create an Account
+          {registerJson.heading}
         </Heading>
         <Text fontSize={['md', 'lg']} color="gray.600">
-          “Ahorrar nunca fue tan fácil, gestiona tus finanzas con estilo en{' '}
+          {registerJson.text.one}{' '}
           <Text as="span" fontWeight="bold" color="primary.600">
-            Prospero
+            {registerJson.text.two}
           </Text>
-          ”
+          {registerJson.text.three}
         </Text>
       </Stack>
       <Box as="form" onSubmit={handleSubmit(onSubmit)} mt={4}>
         <Stack spacing={4}>
           <FormControl>
-            <FormLabel>Nombre</FormLabel>
+            <FormLabel>{registerJson.form.labelFirstName}</FormLabel>
             <Controller
               control={control}
               name="name"
@@ -147,7 +154,7 @@ export const RegisterView = () => {
             {errors.name && <Text color="red">{errors.name.message}</Text>}
           </FormControl>
           <FormControl id="lastName">
-            <FormLabel>Apellido</FormLabel>
+            <FormLabel>{registerJson.form.labelLastName}</FormLabel>
             <Controller
               control={control}
               name="lastName"
@@ -161,7 +168,7 @@ export const RegisterView = () => {
             )}
           </FormControl>
           <FormControl>
-            <FormLabel>nombre de usuario</FormLabel>
+            <FormLabel>{registerJson.form.labelUsername}</FormLabel>
             <Controller
               control={control}
               name="userName"
@@ -174,7 +181,7 @@ export const RegisterView = () => {
             )}
           </FormControl>
           <FormControl id="email">
-            <FormLabel>E-mail</FormLabel>
+            <FormLabel>{registerJson.form.labelEmail}</FormLabel>
             <Controller
               control={control}
               name="email"
@@ -185,7 +192,7 @@ export const RegisterView = () => {
             {errors.email && <Text color="red">{errors.email.message}</Text>}
           </FormControl>
           <FormControl id="password">
-            <FormLabel>Contraseña</FormLabel>
+            <FormLabel>{registerJson.form.labelPassword}</FormLabel>
             <Controller
               control={control}
               name="password"
@@ -203,7 +210,7 @@ export const RegisterView = () => {
             ml="auto"
             href="/auth/login"
           >
-            Ya tienes una cuenta?
+            {registerJson.backLink}
           </Link>
           <Stack spacing={6}>
             <Button
@@ -211,8 +218,9 @@ export const RegisterView = () => {
               bg="primary.400"
               color="white"
               _hover={{ bg: 'primary.500' }}
+              isLoading={isLoading}
             >
-              Crear cuenta
+              {registerJson.submit}
             </Button>
           </Stack>
         </Stack>

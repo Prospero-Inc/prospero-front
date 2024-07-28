@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { signIn, SignInResponse } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 const validationSchema = yup.object().shape({
@@ -34,7 +34,7 @@ interface LoginViewProps {
 export const LoginView = () => {
   const router = useRouter()
   const toast = useToast()
-
+  const [isLoading, setLoading] = useState(false)
   const {
     control,
     formState: { errors },
@@ -47,6 +47,7 @@ export const LoginView = () => {
     }
   })
   const onSubmit = async (data: LoginViewProps) => {
+    setLoading(true)
     let toastId = null
     try {
       toastId = toast({
@@ -73,6 +74,7 @@ export const LoginView = () => {
     } catch (error) {
       console.log(error)
     } finally {
+      setLoading(false)
       toastId && toast.close(toastId)
     }
   }
@@ -121,7 +123,7 @@ export const LoginView = () => {
       >
         {language.forgotPassword}
       </Link>
-      <Button colorScheme="primary" my={2} type="submit" h={['3em', '4em']}>
+      <Button colorScheme="primary" my={2} type="submit" h={['3em', '4em']} isLoading={isLoading}>
         {language.login}
       </Button>
     </Stack>
