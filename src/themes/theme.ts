@@ -4,6 +4,7 @@ import '@fontsource/montserrat'
 import { colors } from './colors'
 import { fonts } from './fonts'
 import { shadows } from './shadows'
+import { buttonTheme, inputTheme } from './sizes'
 
 export const theme = extendTheme({
   colors,
@@ -13,6 +14,13 @@ export const theme = extendTheme({
     Toast: {
       baseStyle: {
         bg: 'primary.500'
+      }
+    },
+    Button: buttonTheme,
+    Input: {
+      ...inputTheme,
+      sizes: {
+        ...inputTheme.sizes
       }
     }
   },

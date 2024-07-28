@@ -1,0 +1,8 @@
+{
+  "labelSalary": "Monthly income after taxes",
+  "buttoncalculate": "Calculate",
+  "fiftyCard": {
+    "heading": "50% Needs",
+    "body": "Allocate half of your income to cover basic needs such as rent, food, utilities and transportation."
+  }
+}
