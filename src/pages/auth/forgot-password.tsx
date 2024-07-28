@@ -6,7 +6,7 @@ import React from 'react'
 
 const forgotPassword = () => {
   return (
-    <AuthLayout title="Login" pageDescription="Login page">
+    <AuthLayout title="Forgot Password" pageDescription="Forgot password page">
       <Grid templateColumns="repeat(12, 1fr)" gap={2}>
         <GridItem
           mx={'auto'}
