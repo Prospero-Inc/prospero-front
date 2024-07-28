@@ -13,5 +13,19 @@
     "labelPassword": "Password"
   },
   "backLink": "Already have an account?",
-  "submit": "Create Account"
+  "submit": "Create Account",
+  "yupSchema": {
+    "email": {
+      "required": "Email is required",
+      "email": "Invalid Email"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters long",
+      "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
+    },
+    "firstName": "FirstName is required",
+    "lastName": "LastName is required",
+    "userName": "username is required"
+  }
 }

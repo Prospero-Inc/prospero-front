@@ -17,14 +17,17 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 const validationSchema = yup.object().shape({
-  email: yup.string().email().required(),
+  email: yup
+    .string()
+    .email(language.yupSchema.email.email)
+    .required(language.yupSchema.email.required),
   password: yup
     .string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters long')
+    .required(language.yupSchema.password.required)
+    .min(8, language.yupSchema.password.minLength)
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-      'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot'
+      language.yupSchema.password.matches
     )
 })
 interface LoginViewProps {
@@ -51,8 +54,8 @@ export const LoginView = () => {
     let toastId = null
     try {
       toastId = toast({
-        title: 'Signing in',
-        description: 'Please wait...',
+        title: language.toast.loading.title,
+        description: language.toast.loading.description,
         status: 'loading',
         colorScheme: 'primary'
       })
@@ -64,8 +67,8 @@ export const LoginView = () => {
 
       if (resp?.error)
         return toast({
-          title: 'Error',
-          description: resp.error ?? 'Error signing in',
+          title: language.toast.error.title,
+          description: resp.error ?? language.toast.error.description,
           status: 'error',
           isClosable: true
         })
@@ -119,11 +122,18 @@ export const LoginView = () => {
       <Link
         fontSize={['small', 'medium']}
         ml="auto"
+        variant={'brandPrimary'}
         href="/auth/forgot-password"
       >
         {language.forgotPassword}
       </Link>
-      <Button colorScheme="primary" my={2} type="submit" h={['3em', '4em']} isLoading={isLoading}>
+      <Button
+        colorScheme="primary"
+        my={2}
+        type="submit"
+        h={['3em', '4em']}
+        isLoading={isLoading}
+      >
         {language.login}
       </Button>
     </Stack>

@@ -3,6 +3,7 @@ import { extendTheme } from '@chakra-ui/react'
 import '@fontsource/montserrat'
 import { colors } from './colors'
 import { fonts } from './fonts'
+import { linkTheme } from './link'
 import { shadows } from './shadows'
 import { buttonTheme, inputTheme } from './sizes'
 
@@ -22,7 +23,8 @@ export const theme = extendTheme({
       sizes: {
         ...inputTheme.sizes
       }
-    }
+    },
+    Link: linkTheme
   },
   styles: {
     global: {

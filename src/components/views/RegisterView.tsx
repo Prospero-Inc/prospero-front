@@ -1,5 +1,7 @@
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import registerJson from '@/languages/es/register.json'
+import language from '@/languages/es/register.json'
 import apiService from '@/lib/apiService'
 import {
   Stack,
@@ -20,22 +22,25 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import registerJson from '@/languages/es/register.json'
+
 import { PasswordInput } from '../ui'
 
 const validationSchema = yup.object().shape({
-  email: yup.string().email().required(),
+  email: yup
+    .string()
+    .email(language.yupSchema.email.email)
+    .required(language.yupSchema.email.required),
   password: yup
     .string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters long')
+    .required(language.yupSchema.password.required)
+    .min(8, language.yupSchema.password.minLength)
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-      'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot'
+      language.yupSchema.password.matches
     ),
-  name: yup.string().required(),
-  lastName: yup.string().required(),
-  userName: yup.string().required()
+  name: yup.string().required(language.yupSchema.firstName),
+  lastName: yup.string().required(language.yupSchema.lastName),
+  userName: yup.string().required(language.yupSchema.userName)
 })
 interface RegisterViewProps {
   name: string
@@ -74,7 +79,7 @@ export const RegisterView = () => {
       setIsLoading(true)
 
       toast.promise(
-        apiService.request({
+        apiService.request<RegisterViewProps>({
           method: HttpMethod.POST,
           endPoint: '/auth/signup',
           data: {
@@ -101,7 +106,7 @@ export const RegisterView = () => {
             description: 'Estamos creando tu cuenta, por favor espera',
             colorScheme: 'primary'
           },
-          error: (error) => {
+          error: error => {
             setIsLoading(false)
             return {
               title: 'Error',
@@ -208,6 +213,7 @@ export const RegisterView = () => {
             as={NextLink}
             fontSize={['small', 'medium']}
             ml="auto"
+            variant={'brandPrimary'}
             href="/auth/login"
           >
             {registerJson.backLink}

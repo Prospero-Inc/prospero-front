@@ -2,5 +2,26 @@
   "labelEmail": "E-mail",
   "labelPassword": "Password",
   "forgotPassword": "Forgot password?",
-  "login": "SigIn"
+  "login": "SigIn",
+  "toast": {
+    "loading": {
+      "title": "Signing in",
+      "description": "Please wait..."
+    },
+    "error": {
+      "title": "Error",
+      "description": "Error signing in"
+    }
+  },
+  "yupSchema": {
+    "email": {
+      "required": "Email is required",
+      "email": "Invalid Email"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters long",
+      "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
+    }
+  }
 }
