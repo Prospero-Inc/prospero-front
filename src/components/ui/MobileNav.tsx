@@ -17,6 +17,8 @@ import {
 } from '@chakra-ui/react'
 import { signOut, useSession } from 'next-auth/react'
 import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
+
+import { SwitchLanguage } from './SwitchLanguage'
 interface MobileProps extends FlexProps {
   onOpen: () => void
 }
@@ -51,6 +53,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           aria-label="open menu"
           icon={<FiBell />}
         />
+        <SwitchLanguage />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

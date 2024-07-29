@@ -9,6 +9,8 @@ import {
 import { useRouter } from 'next/router'
 import React from 'react'
 
+import { SwitchLanguage } from './SwitchLanguage'
+
 export const AuthNav = ({ ...rest }) => {
   const router = useRouter()
   return (
@@ -35,6 +37,7 @@ export const AuthNav = ({ ...rest }) => {
         >
           <Flex alignItems={'center'}>
             <Stack direction="row" spacing={2} align="center">
+              <SwitchLanguage />
               <Button
                 colorScheme="primary"
                 variant="ghost"

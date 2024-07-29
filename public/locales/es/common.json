@@ -2,7 +2,7 @@
   "login": {
     "labelEmail": "Correo electrónico",
     "labelPassword": "Contraseña",
-    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordLink": "¿Olvidaste tu contraseña?",
     "sigIn": "Iniciar sesión",
     "toast": {
       "loading": {
