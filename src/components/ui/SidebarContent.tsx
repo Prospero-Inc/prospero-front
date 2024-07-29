@@ -12,12 +12,12 @@ import { IconType } from 'react-icons'
 import { BsStopCircle } from 'react-icons/bs'
 
 import { EntryIcon } from '../icons'
+import { BagIcon } from '../icons/BagIcon'
 import { EgressIcon } from '../icons/EgressIcon'
 import { GoalsIcon } from '../icons/GoalsIcon'
 import { SettingsIcon } from '../icons/SettingsIcon'
 import { Brand } from './Brand'
 import { NavItem } from './NavItem'
-import { BagIcon } from '../icons/BagIcon'
 interface LinkItemProps {
   name: string
   icon: IconType
@@ -28,9 +28,8 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Ingresos', icon: EntryIcon, route: '/entries' },
   { name: 'Egresos', icon: EgressIcon, route: '/expenditures' },
   { name: 'Metas', icon: GoalsIcon, route: '/goals' },
-  { name: "Calculadora 50/30/20", icon: BagIcon, route: "/budget-calculator" },
+  { name: 'Calculadora 50/30/20', icon: BagIcon, route: '/budget-calculator' },
   { name: 'Configuraciones', icon: SettingsIcon, route: '/settings' }
-
 ]
 interface SidebarProps extends BoxProps {
   onClose: () => void
