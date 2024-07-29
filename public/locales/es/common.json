@@ -1,0 +1,98 @@
+{
+  "login": {
+    "labelEmail": "Correo electrónico",
+    "labelPassword": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "sigIn": "Iniciar sesión",
+    "toast": {
+      "loading": {
+        "title": "Iniciando sesion",
+        "description": "Por favor espere..."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Ocurrio un error al iniciar sesion, intentelo mas tarde"
+      }
+    },
+    "yupSchema": {
+      "email": {
+        "required": "Correo es requerido",
+        "email": "Correo invalido"
+      },
+      "password": {
+        "required": "Contraseña es requerida",
+        "minLength": "Contraseña debe tener almenos 8 caracteres",
+        "matches": "Contraseña debe contener al menos una minuscula,una mayuscula,un digito,un caracter especial, y un punto"
+      }
+    }
+  },
+  "register": {
+    "heading": "Create an Account",
+    "text": {
+      "one": "“Ahorrar nunca fue tan fácil, gestiona tus finanzas con estilo en",
+      "two": "Prospero",
+      "three": "”"
+    },
+    "form": {
+      "labelFirstName": "Nombre",
+      "labelLastName": "Apellido",
+      "labelUsername": "Nombre de usuario",
+      "labelEmail": "Correo",
+      "labelPassword": "Contraseña"
+    },
+    "backLink": "Ya tienes una cuenta?",
+    "submit": "Crear Cuenta",
+    "yupSchema": {
+      "email": {
+        "required": "Correo es requerido",
+        "email": "Correo invalido"
+      },
+      "password": {
+        "required": "Contraseña es requerida",
+        "minLength": "Contraseña debe tener almenos 8 caracteres",
+        "matches": "Contraseña debe contener al menos una minuscula,una mayuscula,un digito,un caracter especial, y un punto"
+      },
+      "firstName": "Nombres es requerido",
+      "lastName": "Apellidos es requerido",
+      "userName": "Nombre de usuario es requerido"
+    }
+  },
+  "budgeCalculator": {
+    "labelSalary": "Ingresos mensuales después de impuestos",
+    "buttonCalculate": "Calcular",
+    "fiftyCard": {
+      "heading": "50% Necesidades:",
+      "body": "Destina la mitad de tus ingresos a cubrir necesidades básicas como alquiler, comida, servicios públicos y transporte."
+    },
+    "thirty": {
+      "heading": "30% Deseos:",
+      "body": "Usa el 30% de tus ingresos para gastos no esenciales o “deseos”,  como entretenimiento, comer fuera o compras personales."
+    },
+    "twenty": {
+      "heading": "20% Ahorro y Deudas",
+      "body": "Reserva el 20% restante para ahorrar o pagar deudas. Esto incluye aportaciones a fondos de emergencia, ahorros para metas a largo plazo o pagos adicionales de deudas."
+    }
+  },
+  "forgotPassword": {
+    "title": "¿Has olvidado tu contraseña?",
+    "descriptionBlockOne": "Ingrese la dirección de correo electrónico que utilizó cuando se unió y le enviaremos instrucciones para restablecer su contraseña.",
+    "descriptionBlockTwo": "Por razones de seguridad, NO almacenamos su contraseña, por lo que puede estar seguro de que nunca le enviaremos su contraseña por correo electrónico.",
+    "inputLabel": "Correo electrónico",
+    "submitButton": "Enviar",
+    "backToLogin": "Volver a iniciar sesión",
+    "toast": {
+      "success": {
+        "title": "¡Correo electrónico enviado!",
+        "description": "Hemos enviado un correo electrónico con instrucciones para restablecer su contraseña."
+      },
+      "error": {
+        "title": "¡Error!",
+        "description": "No pudimos encontrar una cuenta con ese correo electrónico."
+      },
+      "loading": {
+        "title": "Cargando...",
+        "description": "Estamos enviando un correo electrónico con instrucciones para restablecer su contraseña."
+      }
+    }
+  }
+}

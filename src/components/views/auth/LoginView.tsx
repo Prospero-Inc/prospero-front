@@ -1,6 +1,5 @@
 import { PasswordInput } from '@/components/ui'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import language from '@/languages/es/login.json'
 import { useToast } from '@chakra-ui/react'
 import {
   Button,
@@ -12,32 +11,37 @@ import {
   Text
 } from '@chakra-ui/react'
 import { signIn, SignInResponse } from 'next-auth/react'
+import { i18n, useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
-const validationSchema = yup.object().shape({
-  email: yup
-    .string()
-    .email(language.yupSchema.email.email)
-    .required(language.yupSchema.email.required),
-  password: yup
-    .string()
-    .required(language.yupSchema.password.required)
-    .min(8, language.yupSchema.password.minLength)
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-      language.yupSchema.password.matches
-    )
-})
+
 interface LoginViewProps {
   email: string
   password: string
 }
 export const LoginView = () => {
+  const { locale } = useRouter()
   const router = useRouter()
   const toast = useToast()
   const [isLoading, setLoading] = useState(false)
+  const { t } = useTranslation('common')
+
+  const validationSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email(t('login.yupSchema.email.email'))
+      .required(t('login.yupSchema.email.required')),
+    password: yup
+      .string()
+      .required(t('login.yupSchema.password.required'))
+      .min(8, t('login.yupSchema.password.minLength'))
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+        t('login.yupSchema.password.matches')
+      )
+  })
   const {
     control,
     formState: { errors },
@@ -49,13 +53,18 @@ export const LoginView = () => {
       password: ''
     }
   })
+  useEffect(() => {
+    console.log('locale', locale)
+    i18n?.changeLanguage(locale)
+  }, [locale])
+
   const onSubmit = async (data: LoginViewProps) => {
     setLoading(true)
     let toastId = null
     try {
       toastId = toast({
-        title: language.toast.loading.title,
-        description: language.toast.loading.description,
+        title: t('login.toast.loading.title'),
+        description: t('login.toast.loading.description'),
         status: 'loading',
         colorScheme: 'primary'
       })
@@ -67,8 +76,8 @@ export const LoginView = () => {
 
       if (resp?.error)
         return toast({
-          title: language.toast.error.title,
-          description: resp.error ?? language.toast.error.description,
+          title: t('login.toast.error.title'),
+          description: resp.error ?? t('login.toast.error.description'),
           status: 'error',
           isClosable: true
         })
@@ -91,7 +100,7 @@ export const LoginView = () => {
     >
       <FormControl my={2}>
         <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {language.labelEmail}
+          {t('login.labelEmail')}
         </FormLabel>
         <Controller
           control={control}
@@ -108,7 +117,7 @@ export const LoginView = () => {
       </FormControl>
       <FormControl my={2}>
         <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {language.labelPassword}
+          {t('login.labelPassword')}
         </FormLabel>
         <Controller
           name="password"
@@ -125,7 +134,7 @@ export const LoginView = () => {
         variant={'brandPrimary'}
         href="/auth/forgot-password"
       >
-        {language.forgotPassword}
+        {t('login.forgotPasswordLink')}
       </Link>
       <Button
         colorScheme="primary"
@@ -134,7 +143,7 @@ export const LoginView = () => {
         h={['3em', '4em']}
         isLoading={isLoading}
       >
-        {language.login}
+        {t('login.sigIn')}
       </Button>
     </Stack>
   )

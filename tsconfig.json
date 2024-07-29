@@ -26,6 +26,13 @@
       "@/languages/*": ["./src/language/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next.config.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next.config.ts",
+    "next-i18next.config.js",
+    "public/locales/**/*"
+  ],
   "exclude": ["node_modules"]
 }
