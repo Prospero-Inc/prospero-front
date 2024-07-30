@@ -6,6 +6,7 @@ import {
   Stack,
   Image
 } from '@chakra-ui/react'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React from 'react'
 
@@ -13,6 +14,7 @@ import { SwitchLanguage } from './SwitchLanguage'
 
 export const AuthNav = ({ ...rest }) => {
   const router = useRouter()
+  const { t } = useTranslation('common')
   return (
     <header>
       <Flex
@@ -44,7 +46,7 @@ export const AuthNav = ({ ...rest }) => {
                 fontSize={['small', 'small', 'medium']}
                 onClick={() => router.push('/auth/login')}
               >
-                Iniciar Sesion
+                {t('authLayout.signIn')}
               </Button>
               <Button
                 colorScheme="primary"
@@ -52,7 +54,7 @@ export const AuthNav = ({ ...rest }) => {
                 fontSize={['small', 'small', 'medium']}
                 onClick={() => router.push('/auth/register')}
               >
-                Registrarse
+                {t('authLayout.createAccount')}
               </Button>
             </Stack>
           </Flex>

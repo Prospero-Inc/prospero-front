@@ -1,6 +1,5 @@
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import language from '@/language/es/forgot-password.json'
 import apiService from '@/lib/apiService'
 import {
   Button,
@@ -14,6 +13,7 @@ import {
   Text,
   useToast
 } from '@chakra-ui/react'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -22,6 +22,7 @@ const validationSchema = yup.object().shape({
   email: yup.string().email().required()
 })
 export const ForgotPasswordView = () => {
+  const { t } = useTranslation('common')
   const router = useRouter()
   const [isLoading, setisLoading] = useState(false)
   const toast = useToast()
@@ -50,21 +51,21 @@ export const ForgotPasswordView = () => {
         }),
       {
         loading: {
-          title: language.toast.loading.title,
-          description: language.toast.loading.description
+          title: t('forgotPassword.toast.loading.title'),
+          description: t('forgotPassword.toast.loading.description')
         },
         success: () => {
           router.replace('/auth/login')
           return {
-            title: language.toast.success.title,
-            description: language.toast.success.description,
+            title: t('forgotPassword.toast.success.title'),
+            description: t('forgotPassword.toast.success.description'),
             status: 'success'
           }
         },
         error: () => {
           return {
-            title: language.toast.error.title,
-            description: language.toast.error.description,
+            title: t('forgotPassword.toast.error.title'),
+            description: t('forgotPassword.toast.error.description'),
             status: 'error'
           }
         }
@@ -80,12 +81,12 @@ export const ForgotPasswordView = () => {
       justifyContent={'center'}
     >
       <Image src={'/assets/authBrand.svg'} alt="Brannd " mb="5rem" />
-      <Heading>{language.title}</Heading>
-      <Text my={4}>{language.descriptionBlockOne}</Text>
-      <Text my={4}>{language.descriptionBlockTwo}</Text>
+      <Heading>{t('forgotPassword.title')}</Heading>
+      <Text my={4}>{t('forgotPassword.descriptionBlockOne')}</Text>
+      <Text my={4}>{t('forgotPassword.descriptionBlockTwo')}</Text>
       <FormControl my={2}>
         <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {language.inputLabel}
+          {t('forgotPassword.inputLabel')}
         </FormLabel>
         <Controller
           control={control}
@@ -107,7 +108,7 @@ export const ForgotPasswordView = () => {
         ml="auto"
         href="/auth/login"
       >
-        {language.backToLogin}
+        {t('forgotPassword.backToLogin')}
       </Link>
       <Button
         colorScheme="primary"
@@ -116,7 +117,7 @@ export const ForgotPasswordView = () => {
         h={['3em', '4em']}
         isLoading={isLoading}
       >
-        {language.submitButton}
+        {t('forgotPassword.submitButton')}
       </Button>
     </Stack>
   )

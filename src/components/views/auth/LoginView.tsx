@@ -11,9 +11,9 @@ import {
   Text
 } from '@chakra-ui/react'
 import { signIn, SignInResponse } from 'next-auth/react'
-import { i18n, useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
@@ -22,7 +22,6 @@ interface LoginViewProps {
   password: string
 }
 export const LoginView = () => {
-  const { locale } = useRouter()
   const router = useRouter()
   const toast = useToast()
   const [isLoading, setLoading] = useState(false)
@@ -53,10 +52,6 @@ export const LoginView = () => {
       password: ''
     }
   })
-  useEffect(() => {
-    console.log('locale', locale)
-    i18n?.changeLanguage(locale)
-  }, [locale])
 
   const onSubmit = async (data: LoginViewProps) => {
     setLoading(true)

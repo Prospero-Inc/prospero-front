@@ -2,6 +2,8 @@ import { AuthLayout } from '@/components/layouts'
 import { MotionDiv } from '@/components/ui'
 import { ForgotPasswordView } from '@/components/views/auth/ForgotPasswordView'
 import { Grid, GridItem, Image, Show } from '@chakra-ui/react'
+import { GetStaticProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 const forgotPassword = () => {
@@ -28,5 +30,11 @@ const forgotPassword = () => {
     </AuthLayout>
   )
 }
-
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, ['common']))
+    }
+  }
+}
 export default forgotPassword

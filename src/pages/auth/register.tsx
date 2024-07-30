@@ -1,5 +1,7 @@
-import { RegisterView } from '@/components/views/RegisterView'
+import { RegisterView } from '@/components/views/auth'
 import { Grid, GridItem, Image, Show } from '@chakra-ui/react'
+import { GetStaticProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 const register = () => {
@@ -30,5 +32,11 @@ const register = () => {
     </Grid>
   )
 }
-
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, ['common']))
+    }
+  }
+}
 export default register

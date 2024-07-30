@@ -1,4 +1,13 @@
 {
+  "authLayout": {
+    "signIn": "Sign In",
+    "createAccount": "Create Account"
+  },
+  "switchLanguage": {
+    "english": "English",
+    "spanish": "Spanish",
+    "text": "Language"
+  },
   "login": {
     "labelEmail": "E-mail",
     "labelPassword": "Password",

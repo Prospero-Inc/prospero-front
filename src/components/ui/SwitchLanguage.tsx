@@ -1,27 +1,29 @@
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Icon, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import React from 'react'
-
+import { HiMiniLanguage } from 'react-icons/hi2'
 export const SwitchLanguage = () => {
-  const { i18n } = useTranslation('common')
+  const router = useRouter()
+  const { t } = useTranslation('common')
+
   const handleChangeLanguage = (lang: string) => {
-    console.log(`Attempting to change language to: ${lang}`)
-    i18n
-      .changeLanguage(lang)
-      .then(() => {
-        console.log(`Language successfully changed to ${lang}`)
-      })
-      .catch(error => {
-        console.error(`Error changing language: ${error}`)
-      })
+    router.push(router.asPath, router.asPath, { locale: lang })
   }
   return (
     <Menu isLazy>
-      <MenuButton>Language</MenuButton>
+      <MenuButton>
+        <Icon as={HiMiniLanguage} mx="1" />
+        {t('switchLanguage.text')}
+      </MenuButton>
       <MenuList>
         {/* MenuItems are not rendered unless Menu is open */}
-        <MenuItem onClick={() => handleChangeLanguage('en')}>English</MenuItem>
-        <MenuItem onClick={() => handleChangeLanguage('es')}>Spanish</MenuItem>
+        <MenuItem onClick={() => handleChangeLanguage('en')}>
+          {t('switchLanguage.english')}
+        </MenuItem>
+        <MenuItem onClick={() => handleChangeLanguage('es')}>
+          {t('switchLanguage.spanish')}
+        </MenuItem>
       </MenuList>
     </Menu>
   )

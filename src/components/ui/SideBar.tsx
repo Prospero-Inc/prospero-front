@@ -10,6 +10,7 @@ export default function SidebarWithHeader({
   children: ReactNode
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   return (
     <Box minH="100vh">
       <SidebarContent

@@ -1,7 +1,7 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { MotionLi } from '@/components/ui/MotionLi'
 import { MotionUl } from '@/components/ui/MotionUl'
-import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
+// import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
 import {
   Box,
   Button,
@@ -15,7 +15,11 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { GetStaticProps } from 'next'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 const index = () => {
+  const { t } = useTranslation('budgetCalculator')
   return (
     <ProsperoLayout
       title="Budge Calculator"
@@ -33,7 +37,7 @@ const index = () => {
               mb="1.75rem"
             >
               <FormControl textAlign={'center'}>
-                <FormLabel>{budgeCalculator.labelSalary}</FormLabel>
+                <FormLabel>{t('labelSalary')}</FormLabel>
                 <Input
                   type="number"
                   placeholder="525"
@@ -43,7 +47,7 @@ const index = () => {
               </FormControl>
             </Box>
             <Button colorScheme="primary" size={'xl'} w="full">
-              {budgeCalculator.buttonCalculate}
+              {t('buttoncalculate')}
             </Button>
           </Stack>
           <Stack my={'2rem'}>
@@ -51,10 +55,10 @@ const index = () => {
               <Card mb="1rem">
                 <CardBody>
                   <Heading as={'h1'} size={'md'}>
-                    {budgeCalculator.fiftyCard.heading}
+                    {t('fiftyCard.heading')}
                   </Heading>
                   <Text mb={'1.5rem'} size="sm" mt="0.5rem">
-                    {budgeCalculator.fiftyCard.body}
+                    {t('fiftyCard.body')}
                   </Text>
 
                   <Heading as="h2" size={'lg'} textAlign={'center'}>
@@ -67,10 +71,10 @@ const index = () => {
               <Card mb={'1rem'}>
                 <CardBody>
                   <Heading as={'h1'} size={'md'}>
-                    {budgeCalculator.thirty.heading}
+                    {t('thirtyCard.heading')}
                   </Heading>
                   <Text mb={'1.5rem'} size="sm" mt="0.5rem">
-                    {budgeCalculator.thirty.body}
+                    {t('thirtyCard.body')}
                   </Text>
 
                   <Heading as="h2" size={'lg'} textAlign={'center'}>
@@ -84,10 +88,10 @@ const index = () => {
               <Card mb={'1rem'}>
                 <CardBody>
                   <Heading as={'h1'} size={'md'}>
-                    {budgeCalculator.twenty.heading}
+                    {t('twentyCard.heading')}
                   </Heading>
                   <Text mb={'1.5rem'} size={'sm'} mt="0.5rem">
-                    {budgeCalculator.twenty.body}
+                    {t('twentyCard.body')}
                   </Text>
 
                   <Heading as="h2" size={'lg'} textAlign={'center'}>
@@ -102,5 +106,16 @@ const index = () => {
     </ProsperoLayout>
   )
 }
-
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, [
+        'common',
+        'sidebar',
+        'mobileNav',
+        'budgetCalculator'
+      ]))
+    }
+  }
+}
 export default index
