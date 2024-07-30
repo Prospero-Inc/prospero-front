@@ -4,3 +4,4 @@ dist
 package*
 .env*
  **/*.json
+ next.config.js

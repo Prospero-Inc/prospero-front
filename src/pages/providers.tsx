@@ -1,4 +1,5 @@
-// app/providers.tsx
+'use-client'
+
 import fetcher from '@/lib/fetcher'
 import { theme } from '@/themes'
 import { CacheProvider } from '@chakra-ui/next-js'

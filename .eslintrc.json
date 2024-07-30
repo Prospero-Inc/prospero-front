@@ -21,7 +21,13 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "ignorePatterns": ["node_modules", ".next", "public", "**/*.json"],
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "public",
+    "**/*.json",
+    "next-i18next.config.js"
+  ],
   "plugins": [
     "react",
     "@typescript-eslint",

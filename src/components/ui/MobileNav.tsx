@@ -16,11 +16,15 @@ import {
   Button
 } from '@chakra-ui/react'
 import { signOut, useSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
+
+import { SwitchLanguage } from './SwitchLanguage'
 interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
   if (status === 'loading') return null
 
@@ -51,6 +55,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           aria-label="open menu"
           icon={<FiBell />}
         />
+        <SwitchLanguage />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton
@@ -82,9 +87,9 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
+              <MenuItem>{t('profile')}</MenuItem>
+              <MenuItem>{t('settings')}</MenuItem>
+              <MenuItem>{t('billing')}</MenuItem>
               <MenuDivider />
               <MenuItem
                 as={Button}
@@ -94,7 +99,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   })
                 }
               >
-                Sign out
+                {t('signOut')}
               </MenuItem>
             </MenuList>
           </Menu>

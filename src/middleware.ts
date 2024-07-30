@@ -9,7 +9,10 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/auth/login') ||
     pathname.startsWith('/auth/register') ||
     pathname.startsWith('/auth/forgot-password')
+
   const isProtectedPage = !isAuthPage
+  if (pathname === '/')
+    return NextResponse.redirect(new URL('/dashboard', req.url))
 
   if (isAuthPage && token)
     return NextResponse.redirect(new URL('/dashboard', req.url))
@@ -21,5 +24,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: '/((?!api|static|.*\\..*|_next).*)'
+  matcher: ['/((?!api|static|.*\\..*|_next).*)', '/']
 }

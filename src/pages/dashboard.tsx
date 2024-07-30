@@ -7,6 +7,8 @@ import { GoalsSteps } from '@/components/ui/GoalsSteps'
 import { MotionDiv } from '@/components/ui/MotionDiv'
 import { entryAsset, expendituresAsset, walletAsset } from '@/config'
 import { Flex } from '@chakra-ui/react'
+import { GetStaticProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 const dashboard = () => {
@@ -109,6 +111,17 @@ const dashboard = () => {
       </GenericSection>
     </ProsperoLayout>
   )
+}
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, [
+        'common',
+        'sidebar',
+        'mobileNav'
+      ]))
+    }
+  }
 }
 
 export default dashboard

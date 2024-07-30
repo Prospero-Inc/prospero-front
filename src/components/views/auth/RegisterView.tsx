@@ -1,7 +1,6 @@
+import { PasswordInput } from '@/components/ui'
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import registerJson from '@/languages/es/register.json'
-import language from '@/languages/es/register.json'
 import apiService from '@/lib/apiService'
 import {
   Stack,
@@ -17,31 +16,31 @@ import {
   Link,
   useToast
 } from '@chakra-ui/react'
+import { TFunction, useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
-import { PasswordInput } from '../ui'
-
-const validationSchema = yup.object().shape({
-  email: yup
-    .string()
-    .email(language.yupSchema.email.email)
-    .required(language.yupSchema.email.required),
-  password: yup
-    .string()
-    .required(language.yupSchema.password.required)
-    .min(8, language.yupSchema.password.minLength)
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-      language.yupSchema.password.matches
-    ),
-  name: yup.string().required(language.yupSchema.firstName),
-  lastName: yup.string().required(language.yupSchema.lastName),
-  userName: yup.string().required(language.yupSchema.userName)
-})
+const validationSchema = (t: TFunction) =>
+  yup.object().shape({
+    email: yup
+      .string()
+      .email(t('register.yupSchema.email.email'))
+      .required(t('register.yupSchema.email.required')),
+    password: yup
+      .string()
+      .required(t('register.yupSchema.password.required'))
+      .min(8, t('register.yupSchema.password.minLength'))
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+        t('register.yupSchema.password.matches')
+      ),
+    name: yup.string().required(t('register.yupSchema.firstName')),
+    lastName: yup.string().required(t('register.yupSchema.lastName')),
+    userName: yup.string().required(t('register.yupSchema.userName'))
+  })
 interface RegisterViewProps {
   name: string
   lastName: string
@@ -50,6 +49,7 @@ interface RegisterViewProps {
   userName: string
 }
 export const RegisterView = () => {
+  const { t } = useTranslation('common')
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const router = useRouter()
@@ -58,7 +58,7 @@ export const RegisterView = () => {
     formState: { errors },
     handleSubmit
   } = useForm({
-    resolver: useYupValidationResolver(validationSchema),
+    resolver: useYupValidationResolver(validationSchema(t)),
     defaultValues: {
       email: '',
       password: '',
@@ -135,20 +135,20 @@ export const RegisterView = () => {
       />
       <Stack textAlign={'center'}>
         <Heading fontSize={['2xl', '4x', '6xl']} textAlign="center">
-          {registerJson.heading}
+          {t('register.heading')}
         </Heading>
         <Text fontSize={['md', 'lg']} color="gray.600">
-          {registerJson.text.one}{' '}
+          {t('register.text.one')}{' '}
           <Text as="span" fontWeight="bold" color="primary.600">
-            {registerJson.text.two}
+            {t('register.text.two')}
           </Text>
-          {registerJson.text.three}
+          {t('register.text.three')}{' '}
         </Text>
       </Stack>
       <Box as="form" onSubmit={handleSubmit(onSubmit)} mt={4}>
         <Stack spacing={4}>
           <FormControl>
-            <FormLabel>{registerJson.form.labelFirstName}</FormLabel>
+            <FormLabel>{t('register.form.labelFirstName')}</FormLabel>
             <Controller
               control={control}
               name="name"
@@ -159,7 +159,7 @@ export const RegisterView = () => {
             {errors.name && <Text color="red">{errors.name.message}</Text>}
           </FormControl>
           <FormControl id="lastName">
-            <FormLabel>{registerJson.form.labelLastName}</FormLabel>
+            <FormLabel>{t('register.form.labelLastName')}</FormLabel>
             <Controller
               control={control}
               name="lastName"
@@ -173,7 +173,7 @@ export const RegisterView = () => {
             )}
           </FormControl>
           <FormControl>
-            <FormLabel>{registerJson.form.labelUsername}</FormLabel>
+            <FormLabel>{t('register.form.labelUsername')}</FormLabel>
             <Controller
               control={control}
               name="userName"
@@ -186,7 +186,7 @@ export const RegisterView = () => {
             )}
           </FormControl>
           <FormControl id="email">
-            <FormLabel>{registerJson.form.labelEmail}</FormLabel>
+            <FormLabel>{t('register.form.labelEmail')}</FormLabel>
             <Controller
               control={control}
               name="email"
@@ -197,7 +197,7 @@ export const RegisterView = () => {
             {errors.email && <Text color="red">{errors.email.message}</Text>}
           </FormControl>
           <FormControl id="password">
-            <FormLabel>{registerJson.form.labelPassword}</FormLabel>
+            <FormLabel>{t('register.form.labelPassword')}</FormLabel>
             <Controller
               control={control}
               name="password"
@@ -216,7 +216,7 @@ export const RegisterView = () => {
             variant={'brandPrimary'}
             href="/auth/login"
           >
-            {registerJson.backLink}
+            {t('register.backLink')}
           </Link>
           <Stack spacing={6}>
             <Button
@@ -226,7 +226,7 @@ export const RegisterView = () => {
               _hover={{ bg: 'primary.500' }}
               isLoading={isLoading}
             >
-              {registerJson.submit}
+              {t('register.submit')}
             </Button>
           </Stack>
         </Stack>

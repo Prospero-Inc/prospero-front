@@ -1,0 +1,107 @@
+{
+  "authLayout": {
+    "signIn": "Sign In",
+    "createAccount": "Create Account"
+  },
+  "switchLanguage": {
+    "english": "English",
+    "spanish": "Spanish",
+    "text": "Language"
+  },
+  "login": {
+    "labelEmail": "E-mail",
+    "labelPassword": "Password",
+    "forgotPasswordLink": "Forgot password?",
+    "sigIn": "Sig In",
+    "toast": {
+      "loading": {
+        "title": "Signing in",
+        "description": "Please wait..."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Error signing in"
+      }
+    },
+    "yupSchema": {
+      "email": {
+        "required": "Email is required",
+        "email": "Invalid Email"
+      },
+      "password": {
+        "required": "Password is required",
+        "minLength": "Password must be at least 8 characters long",
+        "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
+      }
+    }
+  },
+  "register": {
+    "heading": "Create an Account",
+    "text": {
+      "one": "\"Saving has never been easier, manage your finances in style at",
+      "two": "Prospero",
+      "three": "\""
+    },
+    "form": {
+      "labelFirstName": "First Name",
+      "labelLastName": "Last Name",
+      "labelUsername": "Username",
+      "labelEmail": "Email",
+      "labelPassword": "Password"
+    },
+    "backLink": "Already have an account?",
+    "submit": "Create Account",
+    "yupSchema": {
+      "email": {
+        "required": "Email is required",
+        "email": "Invalid Email"
+      },
+      "password": {
+        "required": "Password is required",
+        "minLength": "Password must be at least 8 characters long",
+        "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
+      },
+      "firstName": "FirstName is required",
+      "lastName": "LastName is required",
+      "userName": "username is required"
+    }
+  },
+  "budgeCalculator": {
+    "labelSalary": "Monthly income after taxes",
+    "buttoncalculate": "Calculate",
+    "fiftyCard": {
+      "heading": "50% Needs",
+      "body": "Allocate half of your income to cover basic needs such as rent, food, utilities and transportation."
+    },
+    "thirty": {
+      "heading": "30% Wants:",
+      "body": "Use 30% of your income for non-essential expenses or 'wants', such as entertainment, dining out, or personal purchases."
+    },
+    "twenty": {
+      "heading": "20% Savings and Debt",
+      "body": "Reserve the remaining 20% for saving or paying off debt. This includes contributions to emergency funds, savings for long-term goals, or additional debt payments."
+    }
+  },
+  "forgotPassword": {
+    "title": "Forgot your password?",
+    "descriptionBlockOne": "Enter the email address you used when you joined and we will send you instructions on how to reset your password.",
+    "descriptionBlockTwo": "For security reasons, we do NOT store your password, so you can be sure that we will never send you your password by e-mail.",
+    "inputLabel": "E-mail",
+    "submitButton": "Submit",
+    "backToLogin": "Back to login",
+    "toast": {
+      "success": {
+        "title": "Email Sent!",
+        "description": "We have sent an email with instructions to reset your password."
+      },
+      "error": {
+        "title": "Error!",
+        "description": "We could not find an account with that email address."
+      },
+      "loading": {
+        "title": "Loading...",
+        "description": "We are sending an email with instructions to reset your password."
+      }
+    }
+  }
+}

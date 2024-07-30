@@ -8,6 +8,7 @@ import {
   Box,
   Text
 } from '@chakra-ui/react'
+import { useTranslation } from 'next-i18next'
 import { IconType } from 'react-icons'
 import { BsStopCircle } from 'react-icons/bs'
 
@@ -24,18 +25,19 @@ interface LinkItemProps {
   route: string
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Dashboard', icon: BsStopCircle, route: '/dashboard' },
-  { name: 'Ingresos', icon: EntryIcon, route: '/entries' },
-  { name: 'Egresos', icon: EgressIcon, route: '/expenditures' },
-  { name: 'Metas', icon: GoalsIcon, route: '/goals' },
-  { name: 'Calculadora 50/30/20', icon: BagIcon, route: '/budget-calculator' },
-  { name: 'Configuraciones', icon: SettingsIcon, route: '/settings' }
+  { name: 'dashboard', icon: BsStopCircle, route: '/dashboard' },
+  { name: 'entries', icon: EntryIcon, route: '/entries' },
+  { name: 'expenditures', icon: EgressIcon, route: '/expenditures' },
+  { name: 'goals', icon: GoalsIcon, route: '/goals' },
+  { name: 'budgetCalculator', icon: BagIcon, route: '/budget-calculator' },
+  { name: 'settings', icon: SettingsIcon, route: '/settings' }
 ]
 interface SidebarProps extends BoxProps {
   onClose: () => void
 }
 
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { t } = useTranslation('sidebar')
   const variant = useBreakpointValue(
     {
       base: 'center',
@@ -67,7 +69,7 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       </Flex>
       {LinkItems.map(link => (
         <NavItem key={link.name} icon={link.icon} path={link.route}>
-          {link.name}
+          {t(`${link.name}`)}
         </NavItem>
       ))}
     </Box>
