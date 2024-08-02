@@ -47,7 +47,8 @@ const index = () => {
               </FormControl>
             </Box>
             <Button colorScheme="primary" size={'xl'} w="full">
-              {t('buttoncalculate')}
+              {t('buttonCalculate')}
+
             </Button>
           </Stack>
           <Stack my={'2rem'}>
