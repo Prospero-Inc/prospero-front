@@ -1,19 +1,15 @@
 import { ProsperoLayout } from '@/components/layouts'
-import { MotionLi } from '@/components/ui/MotionLi'
 import { MotionUl } from '@/components/ui/MotionUl'
+import { BudgetCard } from '@/components/views/budgetCalculator'
 // import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
 import {
   Box,
   Button,
-  Card,
-  CardBody,
   Container,
   FormControl,
   FormLabel,
-  Heading,
   Input,
-  Stack,
-  Text
+  Stack
 } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -48,59 +44,25 @@ const index = () => {
             </Box>
             <Button colorScheme="primary" size={'xl'} w="full">
               {t('buttonCalculate')}
-
             </Button>
           </Stack>
           <Stack my={'2rem'}>
-            <MotionLi>
-              <Card mb="1rem">
-                <CardBody>
-                  <Heading as={'h1'} size={'md'}>
-                    {t('fiftyCard.heading')}
-                  </Heading>
-                  <Text mb={'1.5rem'} size="sm" mt="0.5rem">
-                    {t('fiftyCard.body')}
-                  </Text>
+            <BudgetCard
+              heading={t('fiftyCard.heading')}
+              body={t('fiftyCard.body')}
+              amount={262.5}
+            />
+            <BudgetCard
+              heading={t('thirtyCard.heading')}
+              body={t('thirtyCard.body')}
+              amount={100}
+            />
 
-                  <Heading as="h2" size={'lg'} textAlign={'center'}>
-                    $262.5
-                  </Heading>
-                </CardBody>
-              </Card>
-            </MotionLi>
-            <MotionLi>
-              <Card mb={'1rem'}>
-                <CardBody>
-                  <Heading as={'h1'} size={'md'}>
-                    {t('thirtyCard.heading')}
-                  </Heading>
-                  <Text mb={'1.5rem'} size="sm" mt="0.5rem">
-                    {t('thirtyCard.body')}
-                  </Text>
-
-                  <Heading as="h2" size={'lg'} textAlign={'center'}>
-                    $262.5
-                  </Heading>
-                </CardBody>
-              </Card>
-            </MotionLi>
-
-            <MotionLi>
-              <Card mb={'1rem'}>
-                <CardBody>
-                  <Heading as={'h1'} size={'md'}>
-                    {t('twentyCard.heading')}
-                  </Heading>
-                  <Text mb={'1.5rem'} size={'sm'} mt="0.5rem">
-                    {t('twentyCard.body')}
-                  </Text>
-
-                  <Heading as="h2" size={'lg'} textAlign={'center'}>
-                    $262.5
-                  </Heading>
-                </CardBody>
-              </Card>
-            </MotionLi>
+            <BudgetCard
+              heading={t('twentyCard.heading')}
+              body={t('twentyCard.body')}
+              amount={50}
+            />
           </Stack>
         </MotionUl>
       </Container>

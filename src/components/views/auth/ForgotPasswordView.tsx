@@ -1,6 +1,6 @@
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import apiService from '@/lib/apiService'
+import { localApiService } from '@/lib/apiService'
 import {
   Button,
   FormControl,
@@ -40,7 +40,7 @@ export const ForgotPasswordView = () => {
   const onSubmit = async (data: { email: string }) => {
     setisLoading(true)
     toast.promise(
-      apiService
+      localApiService
         .request<{ email: string }>({
           method: HttpMethod.PATCH,
           data,
