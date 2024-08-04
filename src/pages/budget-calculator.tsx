@@ -1,6 +1,8 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { MotionUl } from '@/components/ui/MotionUl'
 import { BudgetCard } from '@/components/views/budgetCalculator'
+import { HttpMethod } from '@/enums'
+import { localApiService } from '@/lib'
 // import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
 import {
   Box,
@@ -10,7 +12,8 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -20,6 +23,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 const index = () => {
   const { t } = useTranslation('budgetCalculator')
+  const toast = useToast()
   const [amounts, setAmounts] = useState({
     fifty: 0,
     thirty: 0,
@@ -29,19 +33,31 @@ const index = () => {
     handleSubmit,
     formState: { errors },
     control
-  } = useForm({
-    defaultValues: {
-      salary: 0
-    }
-  })
+  } = useForm<{ salary: number }>({})
 
-  const onSubmit = (data: { salary: number }) => {
-    const salary = data.salary
-    setAmounts({
-      fifty: salary * 0.5,
-      thirty: salary * 0.3,
-      twenty: salary * 0.2
-    })
+  const onSubmit = async ({ salary }: { salary: number }) => {
+    try {
+      const response = await localApiService.request({
+        endPoint: '/proxy/budget-calculator',
+        method: HttpMethod.GET,
+        data: salary
+      })
+      setAmounts({
+        fifty: 0,
+        thirty: 0,
+        twenty: 0
+      })
+      console.log({ response })
+    } catch (error) {
+      if (error instanceof Error)
+        toast({
+          title: 'Error',
+          description: error?.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true
+        })
+    }
   }
   return (
     <ProsperoLayout

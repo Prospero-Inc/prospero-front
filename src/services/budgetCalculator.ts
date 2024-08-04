@@ -3,8 +3,8 @@ import { externalApiService } from '@/lib'
 
 const budgetCalculator = async (amount: number): Promise<unknown> => {
   return await externalApiService.request({
-    method: HttpMethod.POST,
-    endPoint: '/salary/distribute/fifty-thirty-twenty',
+    method: HttpMethod.GET,
+    endPoint: '/salary/distribute/preview',
     query: { amount }
   })
 }

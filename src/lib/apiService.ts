@@ -84,8 +84,8 @@ class ApiService {
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.log(error.cause)
         const errorMessage = error.response?.data?.message
-
         // Handle message if it's a string or an array of strings
         const formattedErrorMessage =
           typeof errorMessage === 'string'
@@ -99,7 +99,7 @@ class ApiService {
       }
 
       // Handle non-Axios errors
-      console.error('ERROR SERVER API SERVICE', error)
+      console.error('ERROR SERVER API SERVICE', error?.cause)
       throw new Error('An unexpected error occurred. Please try again.')
     }
   }
