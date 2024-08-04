@@ -1,6 +1,7 @@
 {
   "labelSalary": "Salary",
   "buttonCalculate": "Calculate",
+  "requiredField": "This field is required",
   "fiftyCard": {
     "heading": "50% Needs:",
     "body": "Allocate half of your income to cover basic needs such as rent, food, utilities, and transportation."

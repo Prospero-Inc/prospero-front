@@ -28,6 +28,7 @@
     "framer-motion": "^10.12.22",
     "i18next": "^23.12.2",
     "joi": "^17.13.3",
+    "js-cookie": "^3.0.5",
     "next": "13.1.6",
     "next-auth": "^4.24.7",
     "next-i18next": "^15.3.0",
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@commitlint/cli": "17.4.2",
     "@commitlint/config-conventional": "17.4.2",
+    "@types/js-cookie": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "5.0.0",
     "@typescript-eslint/parser": "^7.16.1",
     "eslint": "8.45.0",

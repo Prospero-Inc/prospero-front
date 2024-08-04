@@ -86,9 +86,6 @@ class ApiService {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message
 
-        // Log the entire error response for debugging
-        console.error('API error response:', error.response)
-
         // Handle message if it's a string or an array of strings
         const formattedErrorMessage =
           typeof errorMessage === 'string'

@@ -9,7 +9,7 @@ interface Props {
 }
 export const BudgetCard = ({ amount, body, heading }: Props) => {
   return (
-    <MotionLi>
+    <MotionLi key={amount}>
       <Card mb="1rem">
         <CardBody>
           <Heading as={'h1'} size={'md'}>
@@ -20,7 +20,7 @@ export const BudgetCard = ({ amount, body, heading }: Props) => {
           </Text>
 
           <Heading as="h2" size={'lg'} textAlign={'center'}>
-            ${amount}
+            ${amount.toFixed(4)}
           </Heading>
         </CardBody>
       </Card>

@@ -1,6 +1,7 @@
 {
   "labelSalary": "Salario",
   "buttonCalculate": "Calcular",
+  "requiredField": "Este campo es obligatorio",
   "fiftyCard": {
     "heading": "50% Necesidades:",
     "body": "Destina la mitad de tus ingresos a cubrir necesidades básicas como alquiler, comida, servicios públicos y transporte."

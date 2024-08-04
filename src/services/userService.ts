@@ -12,4 +12,15 @@ const registerUser = async (user: RegisterViewProps): Promise<User> => {
   return response
 }
 
-export { registerUser }
+const forgotPassword = async ({
+  email
+}: {
+  email: string
+}): Promise<unknown> => {
+  return await externalApiService.request({
+    method: HttpMethod.PATCH,
+    endPoint: 'auth/request-reset-password',
+    data: { email }
+  })
+}
+export { registerUser, forgotPassword }
