@@ -1,6 +1,7 @@
-import { HttpMethod } from '@/enums'
+import { CookiesEnum, HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import { localApiService } from '@/lib/apiService'
+import { cookiesPlugin } from '@/plugins'
 import {
   Button,
   FormControl,
@@ -39,10 +40,14 @@ export const ForgotPasswordView = () => {
 
   const onSubmit = async (data: { email: string }) => {
     setisLoading(true)
+    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
     toast.promise(
       localApiService
         .request<{ email: string }>({
           method: HttpMethod.PATCH,
+          headers: {
+            'x-lang': `${lang}`
+          },
           data,
           endPoint: '/proxy/request-reset-password'
         })
