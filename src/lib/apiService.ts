@@ -99,7 +99,7 @@ class ApiService {
       }
 
       // Handle non-Axios errors
-      console.error('ERROR SERVER API SERVICE', error?.cause)
+      console.error('ERROR SERVER API SERVICE', error)
       throw new Error('An unexpected error occurred. Please try again.')
     }
   }
