@@ -12,10 +12,6 @@ interface UserResponse {
   accessToken: string
 }
 
-interface SignInCredentials {
-  email: string
-  password: string
-}
 export const config: AuthOptions = {
   secret: process.env.AUTH_SECRET,
   providers: [
@@ -27,20 +23,24 @@ export const config: AuthOptions = {
           type: 'email',
           placeholder: 'example@example.com'
         },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
+        lang: { label: 'Language', type: 'text' }
       },
       authorize: async (
-        credentials: SignInCredentials | undefined
+        credentials: Record<'email' | 'password' | 'lang', string> | undefined
       ): Promise<UserExtended | null> => {
         if (!credentials) throw new Error('No credentials provided')
-
-        const { email, password } = credentials
+        const { email, password, lang } = credentials
+        console.log({ credentials })
         const response = await externalApiService.request<UserResponse>({
           endPoint: '/auth/login',
           method: HttpMethod.POST,
           data: {
             email,
             password
+          },
+          headers: {
+            'x-lang': lang
           }
         })
         if (response)

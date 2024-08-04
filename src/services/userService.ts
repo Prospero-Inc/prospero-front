@@ -12,11 +12,15 @@ const registerUser = async (user: RegisterViewProps): Promise<User> => {
   return response
 }
 
-const forgotPassword = async ({
-  email
-}: {
-  email: string
-}): Promise<unknown> => {
+const forgotPassword = async (
+  {
+    email
+  }: {
+    email: string
+  },
+  ...params: any[]
+): Promise<unknown> => {
+  console.log({ params })
   return await externalApiService.request({
     method: HttpMethod.PATCH,
     endPoint: 'auth/request-reset-password',

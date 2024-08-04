@@ -1,5 +1,7 @@
 import { PasswordInput } from '@/components/ui'
+import { CookiesEnum } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import { cookiesPlugin } from '@/plugins'
 import { useToast } from '@chakra-ui/react'
 import {
   Button,
@@ -54,6 +56,7 @@ export const LoginView = () => {
   })
 
   const onSubmit = async (data: LoginViewProps) => {
+    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
     setLoading(true)
     let toastId = null
     try {
@@ -64,7 +67,9 @@ export const LoginView = () => {
         colorScheme: 'primary'
       })
       const resp: SignInResponse | undefined = await signIn('credentials', {
-        ...data,
+        email: data.email,
+        password: data.password,
+        lang,
         redirect: false,
         callbackUrl: '/dashboard'
       })

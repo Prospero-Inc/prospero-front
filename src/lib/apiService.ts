@@ -74,6 +74,14 @@ class ApiService {
     query = {},
     headers = {}
   }: IRequest): Promise<T> {
+    console.log({
+      method,
+      endPoint,
+      data,
+      params,
+      query,
+      headers
+    })
     try {
       const url = formattedEndpoint(endPoint, params)
       let response: AxiosResponse

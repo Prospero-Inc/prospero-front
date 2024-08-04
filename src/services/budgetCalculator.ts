@@ -2,20 +2,26 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 
 type Params = {
-  [key: string]: unknown
+  [key: string]: string
 }
 const budgetCalculator = async (
-  amount: number,
-  { lang }: Params
+  _amount: number,
+  params: (Params & { amount: number }) | unknown
 ): Promise<unknown> => {
-  return await externalApiService.request({
-    method: HttpMethod.GET,
-    endPoint: '/salary/distribute/preview',
-    headers: {
-      'x-lang': `${lang}`
-    },
-    query: { amount }
-  })
+  const { lang, authorization, amount } = params as Params
+  return await externalApiService
+    .request({
+      method: HttpMethod.GET,
+      endPoint: '/salary/distribute/preview',
+      headers: {
+        'x-lang': `${lang}`,
+        Authorization: authorization
+      },
+      query: { amount }
+    })
+    .catch(error => {
+      console.log(error)
+    })
 }
 
 export { budgetCalculator }

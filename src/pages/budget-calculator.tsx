@@ -1,8 +1,10 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { MotionUl } from '@/components/ui/MotionUl'
 import { BudgetCard } from '@/components/views/budgetCalculator'
-import { HttpMethod } from '@/enums'
+import { CookiesEnum, HttpMethod } from '@/enums'
+import { IBudgetResponse } from '@/interfaces/budgetCalculator'
 import { localApiService } from '@/lib'
+import { cookiesPlugin } from '@/plugins'
 // import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
 import {
   Box,
@@ -16,13 +18,16 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 const index = () => {
+  const { data } = useSession()
   const { t } = useTranslation('budgetCalculator')
+
   const toast = useToast()
   const [amounts, setAmounts] = useState({
     fifty: 0,
@@ -36,18 +41,27 @@ const index = () => {
   } = useForm<{ salary: number }>({})
 
   const onSubmit = async ({ salary }: { salary: number }) => {
+    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
     try {
-      const response = await localApiService.request({
+      console.log({
+        salary
+      })
+      const {
+        distribution: { fixedExpenses, savings, variableExpenses }
+      } = await localApiService.request<IBudgetResponse>({
         endPoint: '/proxy/budget-calculator',
         method: HttpMethod.GET,
-        data: salary
+        headers: {
+          'x-lang': `${lang}`,
+          Authorization: `Bearer ${data?.accessToken}`
+        },
+        query: { amount: +salary }
       })
       setAmounts({
-        fifty: 0,
-        thirty: 0,
-        twenty: 0
+        fifty: fixedExpenses,
+        thirty: variableExpenses,
+        twenty: savings
       })
-      console.log({ response })
     } catch (error) {
       if (error instanceof Error)
         toast({

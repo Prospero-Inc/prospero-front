@@ -15,8 +15,8 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const changelanguage = async () => {
     const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
 
-    await i18n.changeLanguage(lang)
-    router.push(router.asPath, router.asPath, { locale: lang })
+    await i18n.changeLanguage(lang ?? 'en')
+    router.push(router.asPath, router.asPath, { locale: lang ?? 'en' })
   }
   useEffect(() => {
     changelanguage()
