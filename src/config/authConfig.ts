@@ -1,5 +1,5 @@
 import { HttpMethod } from '@/enums'
-import apiService from '@/lib/apiService'
+import { externalApiService } from '@/lib/apiService'
 import { AuthOptions, User } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
@@ -35,7 +35,7 @@ export const config: AuthOptions = {
         if (!credentials) throw new Error('No credentials provided')
 
         const { email, password } = credentials
-        const response = await apiService.request<UserResponse>({
+        const response = await externalApiService.request<UserResponse>({
           endPoint: '/auth/login',
           method: HttpMethod.POST,
           data: {

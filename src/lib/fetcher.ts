@@ -1,6 +1,6 @@
 import { HttpMethod } from '@/enums'
 
-import apiService, { IRequest } from './apiService'
+import { IRequest, externalApiService } from './apiService'
 
 type FetcherParams = IRequest
 
@@ -18,7 +18,7 @@ const fetcher = async <T>({
         ? params
         : undefined
 
-    return await apiService.request<T>({
+    return await externalApiService.request<T>({
       method,
       endPoint: url,
       data,

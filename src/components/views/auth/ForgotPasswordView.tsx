@@ -1,6 +1,6 @@
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import apiService from '@/lib/apiService'
+import { localApiService } from '@/lib/apiService'
 import {
   Button,
   FormControl,
@@ -40,11 +40,11 @@ export const ForgotPasswordView = () => {
   const onSubmit = async (data: { email: string }) => {
     setisLoading(true)
     toast.promise(
-      apiService
+      localApiService
         .request<{ email: string }>({
           method: HttpMethod.PATCH,
           data,
-          endPoint: '/auth/request-reset-password'
+          endPoint: '/proxy/request-reset-password'
         })
         .finally(() => {
           setisLoading(false)
@@ -52,7 +52,8 @@ export const ForgotPasswordView = () => {
       {
         loading: {
           title: t('forgotPassword.toast.loading.title'),
-          description: t('forgotPassword.toast.loading.description')
+          description: t('forgotPassword.toast.loading.description'),
+          colorScheme: 'primary'
         },
         success: () => {
           router.replace('/auth/login')
@@ -62,7 +63,8 @@ export const ForgotPasswordView = () => {
             status: 'success'
           }
         },
-        error: () => {
+        error: error => {
+          console.log(error)
           return {
             title: t('forgotPassword.toast.error.title'),
             description: t('forgotPassword.toast.error.description'),

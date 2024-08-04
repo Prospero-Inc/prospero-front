@@ -1,7 +1,8 @@
 import { PasswordInput } from '@/components/ui'
 import { HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import apiService from '@/lib/apiService'
+import { RegisterViewProps } from '@/interfaces'
+import { localApiService } from '@/lib/apiService'
 import {
   Stack,
   Heading,
@@ -41,13 +42,7 @@ const validationSchema = (t: TFunction) =>
     lastName: yup.string().required(t('register.yupSchema.lastName')),
     userName: yup.string().required(t('register.yupSchema.userName'))
   })
-interface RegisterViewProps {
-  name: string
-  lastName: string
-  email: string
-  password: string
-  userName: string
-}
+
 export const RegisterView = () => {
   const { t } = useTranslation('common')
   const [isLoading, setIsLoading] = useState(false)
@@ -79,9 +74,9 @@ export const RegisterView = () => {
       setIsLoading(true)
 
       toast.promise(
-        apiService.request<RegisterViewProps>({
+        localApiService.request<RegisterViewProps>({
           method: HttpMethod.POST,
-          endPoint: '/auth/signup',
+          endPoint: '/proxy/form',
           data: {
             email,
             lastName,

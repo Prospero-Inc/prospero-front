@@ -6,3 +6,7 @@ export enum HttpMethod {
   PATCH = 'PATCH',
   DELETE = 'DELETE'
 }
+
+export enum CookiesEnum {
+  NEXT_LOCALE = 'NEXT_LOCALE'
+}
