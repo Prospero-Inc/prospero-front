@@ -1,4 +1,4 @@
-FROM node:18-alpine as base
+FROM node:18-alpine AS base
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_AUTH_URL
 ARG NEXT_AUTH_SECRET
@@ -8,18 +8,19 @@ COPY package*.json ./
 EXPOSE 3000
 
 
-FROM base as builder
+FROM base AS builder
 WORKDIR /usr/src/app
 COPY . .
 RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm build
 
-FROM base as production
+FROM base AS production
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
-RUN pnpm install --prod
+RUN npm install -g pnpm
+RUN pnpm install --prod --ignore-scripts --prefer-frozen-lockfile
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001

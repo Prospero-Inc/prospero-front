@@ -12,7 +12,7 @@ const options = {
   refreshInterval: 30000,
   fetcher
 }
-export function Providers({
+export default function Providers({
   children,
   session
 }: {

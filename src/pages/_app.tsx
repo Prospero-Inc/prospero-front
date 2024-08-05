@@ -7,7 +7,7 @@ import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { Providers } from './providers'
+import Providers from './providers'
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const { i18n } = useTranslation('common')

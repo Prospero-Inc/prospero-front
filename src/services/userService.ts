@@ -18,9 +18,9 @@ const forgotPassword = async (
   }: {
     email: string
   },
-  ...params: any[]
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ..._: unknown[]
 ): Promise<unknown> => {
-  console.log({ params })
   return await externalApiService.request({
     method: HttpMethod.PATCH,
     endPoint: 'auth/request-reset-password',
