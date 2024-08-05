@@ -1,8 +1,6 @@
 services:
   app:
     image: prospero-app
-    env_file:
-      - .env.production
     build:
       context: ./
       dockerfile: Dockerfile
