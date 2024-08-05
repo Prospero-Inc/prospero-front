@@ -15,16 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t prospero-frontend:latest .
-
       - name: Stop existing container
         run: |
-          docker stop prospero-frontend || true
-          docker rm prospero-frontend || true
+        docker compose down
 
       - name: Deploy Docker container
         run: |
-          docker run -d -p 3000:3000 --name prospero-frontend \
-          prospero-frontend:latest \
-          pnpm start
+          docker compose up
