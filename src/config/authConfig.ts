@@ -31,7 +31,6 @@ export const config: AuthOptions = {
       ): Promise<UserExtended | null> => {
         if (!credentials) throw new Error('No credentials provided')
         const { email, password, lang } = credentials
-        console.log({ credentials })
         const response = await externalApiService.request<UserResponse>({
           endPoint: '/auth/login',
           method: HttpMethod.POST,

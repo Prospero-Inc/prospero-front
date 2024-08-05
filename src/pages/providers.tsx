@@ -4,8 +4,10 @@ import fetcher from '@/lib/fetcher'
 import { theme } from '@/themes'
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
+import { GetStaticProps } from 'next'
 import { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { SWRConfig } from 'swr'
 
 const options = {
@@ -38,4 +40,16 @@ export default function Providers({
       </CacheProvider>
     </SessionProvider>
   )
+}
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, [
+        'common',
+        'sidebar',
+        'mobileNav'
+      ]))
+    }
+  }
 }
