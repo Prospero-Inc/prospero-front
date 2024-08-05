@@ -15,6 +15,6 @@ jobs:
         with:
           type: now
           from_branch: main
-          message: '[auto-merge] Sync main -> main (${{ github.sha }})'
+          message: '[auto-merge] Sync main -> develop (${{ github.sha }})'
           target_branch: main
           github_token: ${{ secrets.SYNC_TOKEN }}
