@@ -1,0 +1,27 @@
+name: Deploy Prospero Frontend
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+    strategy:
+      matrix:
+        node-version: [18.16.0]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Docker container
+        run: |
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > .env.production
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.production
+          docker compose up --build --force-recreate -d
+
+      - name: Stop existing container
+        run: |
+          docker compose down
