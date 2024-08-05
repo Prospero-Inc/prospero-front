@@ -1,31 +1,42 @@
-import { FC, PropsWithChildren } from 'react';
-import Head from 'next/head';
-import { Box } from '@chakra-ui/react';
+import { Container } from '@chakra-ui/react'
+import Head from 'next/head'
+import { FC, PropsWithChildren } from 'react'
+
+import { AuthNav } from '../ui/AuthNav'
 
 interface Props {
-    title: string;
+  title: string
+  pageDescription: string
+  imageFullUrl?: string
 }
 
 export const AuthLayout: FC<PropsWithChildren<Props>> = ({
-    children,
-    title,
+  children,
+  title,
+  pageDescription,
+  imageFullUrl
 }) => {
-    return (
-        <>
-            <Head>
-                <title>{title}</title>
-            </Head>
+  return (
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="description" content={pageDescription} />
 
-            <main>
-                <Box
-                    display='flex'
-                    justifyContent='center'
-                    alignItems='center'
-                    height='calc(100vh - 200px)'
-                >
-                    {children}
-                </Box>
-            </main>
-        </>
-    );
-};
+        <meta name="og:title" content={title} />
+        <meta name="og:description" content={pageDescription} />
+        {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
+      </Head>
+      <AuthNav px={[5, 20]} py={[5, 10]} mb={[10, 0]} />
+      <Container
+        maxW={'container.2xl'}
+        as="main"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minH={['80vh', '91vh']}
+      >
+        {children}
+      </Container>
+    </>
+  )
+}

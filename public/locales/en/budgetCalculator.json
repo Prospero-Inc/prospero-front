@@ -1,0 +1,17 @@
+{
+  "labelSalary": "Salary",
+  "buttonCalculate": "Calculate",
+  "requiredField": "This field is required",
+  "fiftyCard": {
+    "heading": "50% Needs:",
+    "body": "Allocate half of your income to cover basic needs such as rent, food, utilities, and transportation."
+  },
+  "thirtyCard": {
+    "heading": "30% Wants:",
+    "body": "Use 30% of your income for non-essential expenses or 'wants,' such as entertainment, dining out, or personal purchases."
+  },
+  "twentyCard": {
+    "heading": "20% Savings and Debt:",
+    "body": "Allocate the remaining 20% to savings or debt repayment. This includes contributions to emergency funds, savings for long-term goals, or additional debt payments."
+  }
+}

@@ -6,8 +6,6 @@
   },
   "extends": [
     "plugin:react/recommended",
-    "standard-with-typescript",
-    "standard",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
@@ -18,12 +16,18 @@
       "version": "detect"
     }
   },
-  "overrides": [],
   "parserOptions": {
     "project": "./tsconfig.json",
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "public",
+    "**/*.json",
+    "next-i18next.config.js"
+  ],
   "plugins": [
     "react",
     "@typescript-eslint",
@@ -41,23 +45,11 @@
     "react/prop-types": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "@typescript-eslint/consistent-type-imports": [
-      "error",
-      {
-        "prefer": "type-imports",
-        "disallowTypeAnnotations": true
-      }
-    ],
-    "object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "object-curly-spacing": ["error", "always"],
     "no-lone-blocks": "error",
     "no-else-return": "error",
-    "curly": [
-      "error",
-      "multi"
-    ],
+    "curly": ["error", "multi"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "no-unused-expressions": [
       "error",
       {
@@ -66,17 +58,10 @@
       }
     ],
     "import-helpers/order-imports": [
-      "warn",
+      "error",
       {
         "newlinesBetween": "always", // new line between groups
-        "groups": [
-          "module",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ]
-        ],
+        "groups": ["module", ["parent", "sibling", "index"]],
         "alphabetize": {
           "order": "asc",
           "ignoreCase": true

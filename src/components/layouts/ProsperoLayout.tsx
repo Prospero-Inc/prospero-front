@@ -1,50 +1,44 @@
-import { FC, PropsWithChildren } from 'react';
-import Head from 'next/head';
+import { Container, useBreakpointValue } from '@chakra-ui/react'
+import Head from 'next/head'
+import { FC, PropsWithChildren } from 'react'
 
+import SidebarWithHeader from '../ui/SideBar'
 
 interface Props {
-    title: string;
-    pageDescription: string;
-    imageFullUrl?: string;
+  title: string
+  pageDescription: string
+  imageFullUrl?: string
 }
 
 export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
-    children,
-    title,
-    pageDescription,
-    imageFullUrl,
+  children,
+  title,
+  pageDescription,
+  imageFullUrl
 }) => {
-    return (
-        <>
-            <Head>
-                <title>{title}</title>
+  const padding = useBreakpointValue({ base: '4', sm: '4', md: '6', lg: '8' })
 
-                <meta name='description' content={pageDescription} />
+  return (
+    <>
+      <Head>
+        <title>{title}</title>
 
-                <meta name='og:title' content={title} />
-                <meta name='og:description' content={pageDescription} />
+        <meta name="description" content={pageDescription} />
 
-                {imageFullUrl && <meta name='og:image' content={imageFullUrl} />}
-            </Head>
+        <meta name="og:title" content={title} />
+        <meta name="og:description" content={pageDescription} />
 
-            <nav>
-                {/* <Navbar /> */}
-            </nav>
+        {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
+      </Head>
 
-            {/* <SideMenu /> */}
+      <SidebarWithHeader>
+        <Container p={padding} maxW="container.2xl" my={5}>
+          {children}
+        </Container>
+      </SidebarWithHeader>
 
-            <main
-                style={{
-                    margin: '80px auto',
-                    maxWidth: '1440px',
-                    padding: '30px',
-                }}
-            >
-                {children}
-            </main>
-
-            {/* Footer */}
-            <footer>{/* TODO: mi custom footer */}</footer>
-        </>
-    );
-};
+      {/* Footer */}
+      <footer>{/* TODO: mi custom footer */}</footer>
+    </>
+  )
+}
