@@ -1,7 +1,10 @@
+
 FROM node:18-alpine AS base
+
 ARG NEXT_PUBLIC_API_URL
-ARG NEXT_AUTH_URL
-ARG NEXT_AUTH_SECRET
+ARG NEXTAUTH_URL
+ARG NEXTAUTH_SECRET
+
 RUN apk add --no-cache g++ make py3-pip libc6-compat
 WORKDIR /usr/src/app
 COPY package*.json ./
@@ -28,8 +31,8 @@ USER nextjs
 
 
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_AUTH_URL=$NEXTAUTH_URL
-ENV NEXT_AUTH_SECRET=$NEXTAUTH_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
 
 COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/node_modules ./node_modules

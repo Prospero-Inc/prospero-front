@@ -9,8 +9,8 @@ services:
       args:
         - NODE_ENV=production
         - NEXT_PUBLIC_API_URL
-        - NEXT_PUBLIC_API_KEY
-        - NEXT_AUTH_SECRET
+        - NEXTAUTH_URL
+        - NEXTAUTH_SECRET
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
