@@ -66,6 +66,7 @@ export const LoginView = () => {
         status: 'loading',
         colorScheme: 'primary'
       })
+      console.log({ lang })
       const resp: SignInResponse | undefined = await signIn('credentials', {
         email: data.email,
         password: data.password,
