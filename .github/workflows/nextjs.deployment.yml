@@ -21,10 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy Docker container
-        run: |
-          docker compose up --build --force-recreate -d
-
       - name: Stop existing container
         run: |
           docker compose down
+
+      - name: Deploy Docker container
+        run: |
+          docker compose up --build --force-recreate -d
