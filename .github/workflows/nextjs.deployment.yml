@@ -23,7 +23,8 @@ jobs:
 
       - name: Stop existing container
         run: |
-          docker compose down
+          docker compose down \
+          docker image prune -f
 
       - name: Deploy Docker container
         run: |
