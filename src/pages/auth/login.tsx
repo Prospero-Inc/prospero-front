@@ -9,20 +9,20 @@ import React from 'react'
 const login = () => {
   return (
     <AuthLayout title="Login" pageDescription="Login page">
-      <Grid templateColumns="repeat(12, 1fr)" gap={2}>
-        <GridItem
-          colSpan={[12, 12, 6]}
-          display={'flex'}
-          justifyContent={'center'}
-          mt={'2em'}
-        >
-          <Show above="md">
+      <Grid templateColumns="repeat(12, 1fr)" h={'100%'} minH={'100vh'}>
+        <Show above="md">
+          <GridItem
+            colSpan={[12, 12, 6]}
+            display={'flex'}
+            justifyContent={'center'}
+            mt={'2em'}
+          >
             <MotionDiv>
               <Image src={'/assets/Saly-1.svg'} alt="Sali-1" />
             </MotionDiv>
-          </Show>
-        </GridItem>
-        <GridItem colSpan={[12, 12, 6]} display={'flex'}>
+          </GridItem>
+        </Show>
+        <GridItem colSpan={[12, 12, 12, 6]} display={'flex'}>
           <LoginView />
         </GridItem>
       </Grid>
