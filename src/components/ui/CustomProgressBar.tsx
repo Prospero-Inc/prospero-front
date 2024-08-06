@@ -10,6 +10,7 @@ import {
   StepStatus,
   StepTitle,
   Stepper,
+  useBreakpointValue,
   useSteps
 } from '@chakra-ui/react'
 
@@ -24,31 +25,44 @@ const steps = [
 ]
 
 export function GoalStepper() {
+  const stepperSize =
+    useBreakpointValue({ base: 'sm', md: 'md', lg: 'lg' }) ?? 'md'
+  const stepIndicatorSize = useBreakpointValue({
+    base: '20px',
+    md: '24px',
+    lg: '32px'
+  })
   const { activeStep } = useSteps({
     index: 1,
     count: steps.length
   })
 
   return (
-    <Stepper colorScheme="primary" index={activeStep} size={['sm', 'lg']}>
-      {steps.map((step, index) => (
-        <Step key={index}>
-          <StepIndicator>
-            <StepStatus
-              complete={<StepIcon />}
-              incomplete={<StepNumber />}
-              active={<Icon as={TotalMoneyIcon} />}
-            />
-          </StepIndicator>
+    <Box overflowX="auto" py={4}>
+      {' '}
+      {/* Add horizontal scroll */}
+      <Stepper colorScheme="primary" index={activeStep} size={stepperSize}>
+        {steps.map((step, index) => (
+          <Step key={index}>
+            <StepIndicator>
+              <StepStatus
+                complete={<StepIcon />}
+                incomplete={<StepNumber />}
+                active={
+                  <Icon as={TotalMoneyIcon} boxSize={stepIndicatorSize} />
+                }
+              />
+            </StepIndicator>
 
-          <Box flexShrink="0">
-            <StepTitle>{step.title}</StepTitle>
-            <StepDescription>{step.description}</StepDescription>
-          </Box>
+            <Box flexShrink="0">
+              <StepTitle>{step.title}</StepTitle>
+              <StepDescription>{step.description}</StepDescription>
+            </Box>
 
-          <StepSeparator />
-        </Step>
-      ))}
-    </Stepper>
+            <StepSeparator />
+          </Step>
+        ))}
+      </Stepper>
+    </Box>
   )
 }

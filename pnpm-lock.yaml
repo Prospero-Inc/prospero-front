@@ -12,16 +12,16 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       '@chakra-ui/next-js':
-        specifier: ^2.1.4
+        specifier: ^2.2.0
         version: 2.2.0(@chakra-ui/react@2.8.2(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(framer-motion@10.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(next@13.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
       '@chakra-ui/react':
-        specifier: ^2.7.1
+        specifier: ^2.8.2
         version: 2.8.2(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(framer-motion@10.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@emotion/react':
-        specifier: ^11.11.1
+        specifier: ^11.11.4
         version: 11.11.4(@types/react@18.0.27)(react@18.2.0)
       '@emotion/styled':
-        specifier: ^11.11.0
+        specifier: ^11.11.5
         version: 11.11.5(@emotion/react@11.11.4(@types/react@18.0.27)(react@18.2.0))(@types/react@18.0.27)(react@18.2.0)
       '@fontsource/montserrat':
         specifier: ^5.0.18
@@ -45,7 +45,7 @@ importers:
         specifier: 13.1.6
         version: 13.1.6(eslint@8.45.0)(typescript@5.5.3)
       framer-motion:
-        specifier: ^10.12.22
+        specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       i18next:
         specifier: ^23.12.2

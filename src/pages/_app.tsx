@@ -2,7 +2,6 @@ import '@/styles/globals.css'
 import { CookiesEnum } from '@/enums'
 import { cookiesPlugin } from '@/plugins'
 import { theme } from '@/themes'
-import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation } from 'next-i18next'
@@ -27,21 +26,19 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   }, [])
 
   return (
-    <CacheProvider>
-      <ChakraProvider
-        theme={theme}
-        toastOptions={{
-          defaultOptions: {
-            isClosable: true,
-            duration: 3000
-          }
-        }}
-      >
-        <SessionProvider session={session}>
-          <Component {...pageProps} />
-        </SessionProvider>
-      </ChakraProvider>
-    </CacheProvider>
+    <ChakraProvider
+      theme={theme}
+      toastOptions={{
+        defaultOptions: {
+          isClosable: true,
+          duration: 3000
+        }
+      }}
+    >
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </ChakraProvider>
   )
 }
 

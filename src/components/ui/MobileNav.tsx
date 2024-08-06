@@ -13,21 +13,27 @@ import {
   MenuDivider,
   Text,
   Box,
-  Button
+  Button,
+  useColorMode
 } from '@chakra-ui/react'
 import { signOut, useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
+import { FiMenu, FiChevronDown } from 'react-icons/fi'
+import { GoSun, GoMoon } from 'react-icons/go'
 
 import { SwitchLanguage } from './SwitchLanguage'
 interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
   if (status === 'loading') return null
 
+  const handleChangeColorMode = () => {
+    toggleColorMode()
+  }
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -53,7 +59,8 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           size="lg"
           variant="ghost"
           aria-label="open menu"
-          icon={<FiBell />}
+          icon={colorMode === 'light' ? <GoSun /> : <GoMoon />}
+          onClick={handleChangeColorMode}
         />
         <SwitchLanguage />
         <Flex alignItems={'center'}>

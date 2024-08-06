@@ -6,15 +6,13 @@ interface SectionProps {
   children: ReactNode
   showHeader?: boolean
   my?: number | string
-  bg?: string
 }
 
 export const GenericSection = ({
   title,
   children,
   showHeader,
-  my = 10,
-  bg = 'white'
+  my = 10
 }: SectionProps) => {
   const padding = useBreakpointValue({ base: '4', sm: '6', md: '8', lg: '10' })
   const headingSize = useBreakpointValue({
@@ -25,7 +23,7 @@ export const GenericSection = ({
   })
 
   return (
-    <Container p={padding} maxW="container.2xl" my={my} bg={bg}>
+    <Container p={padding} maxW="container.2xl" my={my}>
       {showHeader && (
         <Heading as="h2" size={headingSize} mb={4}>
           {title}
