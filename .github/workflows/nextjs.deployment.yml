@@ -23,7 +23,7 @@ jobs:
 
       - name: Stop existing container
         run: |
-          docker compose down --rmi all
+          docker compose down
 
       - name: Deploy Docker container
         run: |
