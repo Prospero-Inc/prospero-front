@@ -15,3 +15,8 @@ services:
       - /usr/src/app/.next
     ports:
       - '4000:3000'
+    networks:
+      - prospero
+networks:
+  prospero:
+    external: true
