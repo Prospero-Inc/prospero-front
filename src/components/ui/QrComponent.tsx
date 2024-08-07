@@ -6,12 +6,18 @@ export const QrComponent = () => {
   const controls = useAnimation()
 
   useEffect(() => {
-    controls.start({
-      scaleY: 1,
-      y: '100%',
-      transition: { repeat: Infinity, repeatType: 'reverse', duration: 2 }
-    })
-    console.log({ controls, 'controls.start': controls.start })
+    controls
+      .start({
+        scaleY: 1,
+        y: '100%',
+        transition: { repeat: Infinity, repeatType: 'reverse', duration: 2 }
+      })
+      .then(resp => {
+        console.log({ resp })
+      })
+      .catch(err => {
+        console.log({ err })
+      })
   }, [controls])
   return (
     <motion.div>
@@ -40,12 +46,12 @@ export const QrComponent = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(83, 82, 237, 0.5)', // Color de la capa de degradado
+            // backgroundColor: 'rgba(83, 82, 237, 0.5)', // Color de la capa de degradado
             opacity: 0.5 // Opacidad de la capa
           }}
         />
 
-        {/* <motion.div
+        <motion.div
           initial={{ scaleY: 0 }} // Start with a thin line at the top
           animate={{ scaleY: 1, y: '18rem' }} // Grow vertically to cover the whole image
           transition={{ repeat: Infinity, repeatType: 'reverse', duration: 2 }}
@@ -54,11 +60,10 @@ export const QrComponent = () => {
             top: 0,
             left: 0,
             width: '100%', // Adjust line width as needed
-            height: '2%', // Initial height of 0%
+            height: '3%', // Initial height of 0%
             backgroundColor: 'rgba(83, 82, 237, 0.5)'
-            // backgroundColor: 'rgba(0, 0, 0, 0.5)'
           }}
-        /> */}
+        />
       </Box>
     </motion.div>
   )
