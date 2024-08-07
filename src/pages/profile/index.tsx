@@ -1,5 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
-import { Heading } from '@chakra-ui/react'
+import { PersonalInformation, Security } from '@/components/views/profile'
+import { Container } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
@@ -7,7 +8,10 @@ import React from 'react'
 const index = () => {
   return (
     <ProsperoLayout pageDescription="Profile Page" title="Profile">
-      <Heading as="h1">HOLA</Heading>
+      <Container maxW={'container.xl'}>
+        <PersonalInformation />
+        <Security />
+      </Container>
     </ProsperoLayout>
   )
 }
