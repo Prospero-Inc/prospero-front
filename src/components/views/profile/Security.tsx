@@ -1,21 +1,28 @@
-import { ChemicalStructure, CustomStat, QrComponent } from '@/components/ui'
-import {
-  Flex,
-  Heading,
-  Stack,
-  Text,
-  Divider,
-  Container,
-  Button
-} from '@chakra-ui/react'
+import { CustomStat } from '@/components/ui'
+import { Heading, Text, Button, Box, useColorModeValue } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import React from 'react'
-import { IoHelpBuoyOutline } from 'react-icons/io5'
 
 export const Security = () => {
+  const colorText = useColorModeValue('gray.400', 'gray.500')
+  const router = useRouter()
+
+  const switchRoute = () => {
+    router.push('/profile/2fa')
+  }
   return (
     <CustomStat>
-      <Heading as="h1">Security </Heading>
-      <Container>
+      <Box display={'flex'} justifyContent={'space-between'} my={'1.8rem'}>
+        <Heading as="h2" size={'md'}>
+          Security{' '}
+        </Heading>
+        <Text color={colorText}>Activado</Text>
+      </Box>
+      <Button colorScheme="primary" variant={'ghost'} onClick={switchRoute}>
+        Desactivar
+      </Button>
+
+      {/* <Container>
         <Flex justify={'center'} mb="3.188rem">
           <Heading as="h2">2FA Setup</Heading>
         </Flex>
@@ -41,7 +48,7 @@ export const Security = () => {
           </Button>
           <Button colorScheme="primary">Continue</Button>
         </Flex>
-      </Container>
+      </Container> */}
     </CustomStat>
   )
 }

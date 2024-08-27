@@ -5,7 +5,9 @@ import React from 'react'
 export const PersonalInformation = () => {
   return (
     <CustomStat>
-      <Heading>Personal Information</Heading>
+      <Heading as="h2" size={'md'}>
+        Personal Information
+      </Heading>
     </CustomStat>
   )
 }

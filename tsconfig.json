@@ -23,7 +23,8 @@
       "@/utils/*": ["./src/utils/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/lib/*": ["./src/lib/*"],
-      "@/languages/*": ["./src/language/*"]
+      "@/languages/*": ["./src/language/*"],
+      "@/types/*": ["./src/types/*"]
     }
   },
   "include": [
