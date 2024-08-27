@@ -2,14 +2,13 @@ import { PasswordInput } from '@/components/ui'
 import { CookiesEnum } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import { cookiesPlugin } from '@/plugins'
-import { useToast } from '@chakra-ui/react'
+import { Stack, useToast } from '@chakra-ui/react'
 import {
   Button,
   FormControl,
   FormLabel,
   Input,
   Link,
-  Stack,
   Text
 } from '@chakra-ui/react'
 import { signIn, SignInResponse } from 'next-auth/react'
@@ -92,16 +91,16 @@ export const LoginView = () => {
     }
   }
   return (
+    // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
+      maxW={'2xl'}
       as={'form'}
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}
       justifyContent={'center'}
     >
       <FormControl my={2}>
-        <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {t('login.labelEmail')}
-        </FormLabel>
+        <FormLabel color={'gray'}>{t('login.labelEmail')}</FormLabel>
         <Controller
           control={control}
           name="email"
@@ -116,9 +115,7 @@ export const LoginView = () => {
         {errors.email && <Text color="red">{errors.email.message}</Text>}
       </FormControl>
       <FormControl my={2}>
-        <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {t('login.labelPassword')}
-        </FormLabel>
+        <FormLabel color={'gray'}>{t('login.labelPassword')}</FormLabel>
         <Controller
           name="password"
           control={control}
@@ -128,21 +125,10 @@ export const LoginView = () => {
         />
         {errors.password && <Text color="red">{errors.password.message}</Text>}
       </FormControl>
-      <Link
-        fontSize={['small', 'medium']}
-        ml="auto"
-        variant={'brandPrimary'}
-        href="/auth/forgot-password"
-      >
+      <Link ml="auto" variant={'brandPrimary'} href="/auth/forgot-password">
         {t('login.forgotPasswordLink')}
       </Link>
-      <Button
-        colorScheme="primary"
-        my={2}
-        type="submit"
-        h={['3em', '4em']}
-        isLoading={isLoading}
-      >
+      <Button colorScheme="primary" my={2} type="submit" isLoading={isLoading}>
         {t('login.sigIn')}
       </Button>
     </Stack>
