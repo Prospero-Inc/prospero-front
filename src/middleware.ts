@@ -5,7 +5,7 @@ import { HttpMethod } from './enums'
 
 const allowedOrigins = ['http://31.220.97.169:4000/', 'http://localhost:3000']
 
-// Opciones de CORS
+// Opciones de CORS Comentario
 const corsOptions = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
