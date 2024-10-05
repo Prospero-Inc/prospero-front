@@ -2,22 +2,23 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 import { Params } from '@/types'
 
-const activate2FA = async (_ignore: unknown, params: Params | unknown) => {
+const requestProfile = async (
+  _ignoreData: unknown,
+  params: Params | unknown
+): Promise<unknown> => {
   const { lang, authorization } = params as Params
-
   return await externalApiService
     .request({
       method: HttpMethod.GET,
-      endPoint: '/auth/enable-2fa',
+      endPoint: '/auth/profile',
       headers: {
         'x-lang': `${lang}`,
         Authorization: authorization
       }
     })
-    .catch((error: unknown) => {
+    .catch(error => {
       console.log(error)
-      throw error
     })
 }
 
-export { activate2FA }
+export { requestProfile }

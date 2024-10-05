@@ -1,7 +1,8 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { ChemicalStructure, CustomStat, QrComponent } from '@/components/ui'
-import { HttpMethod } from '@/enums'
+import { CookiesEnum, HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
+import { cookiesPlugin } from '@/plugins'
 import {
   Button,
   Container,
@@ -14,20 +15,32 @@ import {
 } from '@chakra-ui/react'
 import { isAxiosError } from 'axios'
 import { GetStaticProps } from 'next'
+import { useSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 import { IoHelpBuoyOutline } from 'react-icons/io5'
 
 const TwoFA = () => {
   const toast = useToast()
+  const { data } = useSession()
   const handleSubmit = async () => {
     try {
-      const response = await localApiService.request({
+      const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
+      const _response = await localApiService.request({
         method: HttpMethod.GET,
-        endPoint: '/proxy/activate-2fa'
+        endPoint: '/proxy/activate-2fa',
+        headers: {
+          'x-lang': `${lang}`,
+          Authorization: `Bearer ${data?.accessToken}`
+        }
       })
-
-      console.log(response)
+      toast({
+        title: '2FA activated successfully',
+        status: 'success',
+        description: _response as string,
+        duration: 9000,
+        isClosable: true
+      })
     } catch (error) {
       if (error instanceof Error)
         toast({

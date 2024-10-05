@@ -74,14 +74,6 @@ class ApiService {
     query = {},
     headers = {}
   }: IRequest): Promise<T> {
-    console.log({
-      method,
-      endPoint,
-      data,
-      params,
-      query,
-      headers
-    })
     try {
       const url = formattedEndpoint(endPoint, params)
       let response: AxiosResponse
@@ -92,7 +84,6 @@ class ApiService {
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.cause)
         const errorMessage = error.response?.data?.message
         // Handle message if it's a string or an array of strings
         const formattedErrorMessage =
