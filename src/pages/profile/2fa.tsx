@@ -3,6 +3,7 @@ import { ChemicalStructure, CustomStat, QrComponent } from '@/components/ui'
 import { CookiesEnum, HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import { cookiesPlugin } from '@/plugins'
+import { activate2FA } from '@/services'
 import {
   Button,
   Container,
@@ -14,8 +15,8 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { isAxiosError } from 'axios'
-import { GetStaticProps } from 'next'
-import { useSession } from 'next-auth/react'
+import { GetServerSideProps } from 'next'
+import { getSession, useSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 import { IoHelpBuoyOutline } from 'react-icons/io5'
@@ -103,15 +104,36 @@ const TwoFA = () => {
 }
 
 export default TwoFA
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'budgetCalculator'
-      ]))
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  locale
+}) => {
+  try {
+    const session = await getSession({ req })
+    const data = await activate2FA(
+      {},
+      {
+        lang: locale as string,
+        authorization: `Bearer ${session?.accessToken}`
+      }
+    )
+    console.log({ data })
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav',
+          'budgetCalculator'
+        ]))
+      }
+    }
+  } catch (error) {
+    return {
+      redirect: {
+        destination: '/profile',
+        permanent: false
+      }
     }
   }
 }

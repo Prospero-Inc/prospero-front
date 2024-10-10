@@ -6,13 +6,15 @@ interface InfoLayoutProps {
   onEdit?: () => void
   children: React.ReactNode
   showEdit?: boolean
+  buttonLabel?: string
 }
 
 export const InfoLayout: React.FC<InfoLayoutProps> = ({
   title,
   onEdit,
   children,
-  showEdit = true
+  showEdit = true,
+  buttonLabel = 'Edit'
 }) => {
   return (
     <Flex
@@ -33,7 +35,7 @@ export const InfoLayout: React.FC<InfoLayoutProps> = ({
       {/* Botón de acción */}
       {showEdit && onEdit && (
         <Button onClick={onEdit} alignSelf="flex-start">
-          Edit
+          {buttonLabel}
         </Button>
       )}
     </Flex>

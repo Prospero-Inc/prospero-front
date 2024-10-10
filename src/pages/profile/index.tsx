@@ -43,7 +43,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     if (profile === undefined) profile = null
   }
-  console.log({ qlito: profile })
 
   return {
     props: {
