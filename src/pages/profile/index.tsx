@@ -50,7 +50,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'common',
         'sidebar',
         'mobileNav',
-        'budgetCalculator'
+        'budgetCalculator',
+        'profile'
       ])),
       profile: profile?.user ?? null
     }

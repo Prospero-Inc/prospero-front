@@ -6,8 +6,10 @@ import { useToast } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const Security = ({ enable2FA }: Partial<Profile>) => {
+  const { t } = useTranslation('profile')
   const router = useRouter()
   const { data } = useSession()
   const toast = useToast()
@@ -48,13 +50,15 @@ export const Security = ({ enable2FA }: Partial<Profile>) => {
   return (
     <CustomStat>
       <InfoLayout
-        title="Security"
+        title={t('securitySection.title')}
         onEdit={exectue2FA}
-        buttonLabel={enable2FA ? 'Disable 2FA' : 'Enable 2FA'}
+        buttonLabel={t(
+          `securitySection.buttonAction.${enable2FA ? 'disable' : 'enable'}`
+        )}
       >
         <InfoSection
-          label="Two-Factor Authentication"
-          value={enable2FA ? 'Enabled' : 'Disabled'}
+          label={t('securitySection.twoFactorAuth')}
+          value={t(`securitySection.${enable2FA ? 'enabled' : 'disabled'}`)}
           useBadge={true}
         />
       </InfoLayout>
