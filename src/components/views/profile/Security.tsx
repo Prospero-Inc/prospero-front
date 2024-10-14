@@ -1,3 +1,4 @@
+'use client'
 import { InfoLayout, InfoSection } from '@/components/layouts'
 import { CustomStat } from '@/components/ui'
 import { Profile } from '@/interfaces'
@@ -5,7 +6,7 @@ import { localApiService } from '@/lib'
 import { useToast } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export const Security = ({ enable2FA }: Partial<Profile>) => {
@@ -13,12 +14,17 @@ export const Security = ({ enable2FA }: Partial<Profile>) => {
   const router = useRouter()
   const { data } = useSession()
   const toast = useToast()
+
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const switchRoute = () => {
     router.push('/profile/2fa')
   }
   const desactivate2FA = () => {
-    console.log('Desactivando 2FA')
-
     toast.promise(
       localApiService.request({
         method: 'GET',
@@ -46,6 +52,9 @@ export const Security = ({ enable2FA }: Partial<Profile>) => {
     if (enable2FA) desactivate2FA()
     else switchRoute()
   }
+
+  // Asegurarse de que el contenido solo se renderice en el cliente
+  if (!mounted) return null // O mostrar un fallback como un spinner
 
   return (
     <CustomStat>

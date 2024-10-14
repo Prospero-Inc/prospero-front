@@ -1,9 +1,20 @@
-import { Box, Image } from '@chakra-ui/react'
+import { Box, Image, Text } from '@chakra-ui/react'
 import { motion, useAnimation } from 'framer-motion'
-import { useEffect } from 'react'
+import { toDataURL } from 'qrcode'
+import { FC, useEffect, useState } from 'react'
 
-export const QrComponent = () => {
+type Props = {
+  qr: string
+}
+export const QrComponent: FC<Props> = ({ qr }) => {
   const controls = useAnimation()
+  const [qrCode, setQrCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    toDataURL(qr).then((url: string) => {
+      setQrCode(url)
+    })
+  }, [qr])
 
   useEffect(() => {
     controls
@@ -19,6 +30,9 @@ export const QrComponent = () => {
         console.log({ err })
       })
   }, [controls])
+
+  if (!qrCode) return <Text>Generating Qr</Text>
+
   return (
     <motion.div>
       <Box
@@ -32,7 +46,7 @@ export const QrComponent = () => {
         <Image
           p={4}
           zIndex={-1}
-          src="https://www.lightenpic.pro/images/qr-example.avif" // Replace with your QR code image
+          src={qrCode}
           objectFit="contain"
           position="absolute"
           top="50%"

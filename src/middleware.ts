@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { HttpMethod } from './enums'
 
-const allowedOrigins = ['http://31.220.97.169:4000/', 'http://localhost:3000']
+const allowedOrigins = ['http://31.220.97.169:3000/', 'http://localhost:3000']
 
 // Opciones de CORS
 const corsOptions = {
