@@ -8,13 +8,12 @@ import {
   Flex,
   Heading,
   Stack,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react'
-import { isAxiosError } from 'axios'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { IoHelpBuoyOutline } from 'react-icons/io5'
 
@@ -26,29 +25,9 @@ type Props = {
 }
 
 const TwoFA: FC<Props> = ({ data: { qr, secret } }) => {
-  const toast = useToast()
+  const router = useRouter()
   const handleSubmit = async () => {
-    try {
-      alert('2FA activated')
-    } catch (error) {
-      if (error instanceof Error)
-        toast({
-          title: 'An error occurred.',
-          description: error?.message,
-          status: 'error',
-          duration: 9000,
-          isClosable: true
-        })
-
-      if (isAxiosError(error))
-        toast({
-          title: 'An error occurred.',
-          description: error.response?.data?.message,
-          status: 'error',
-          duration: 9000,
-          isClosable: true
-        })
-    }
+    router.push('/profile/verify-2fa')
   }
   return (
     <ProsperoLayout

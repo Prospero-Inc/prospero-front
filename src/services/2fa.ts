@@ -37,4 +37,29 @@ const disable2FA = async (_ignore: unknown, params: Params | unknown) => {
       throw error
     })
 }
-export { activate2FA, disable2FA }
+
+const validateToken = async (
+  data: { token: string },
+  params: Params | unknown
+) => {
+  const { lang, authorization } = params as Params
+  const { token } = data
+  return await externalApiService
+    .request({
+      method: HttpMethod.POST,
+      endPoint: '/auth/validate-2fa',
+      headers: {
+        'x-lang': `${lang}`,
+        Authorization: authorization
+      },
+      data: {
+        token
+      }
+    })
+    .catch((error: unknown) => {
+      console.log(error)
+      throw error
+    })
+}
+
+export { activate2FA, disable2FA, validateToken }

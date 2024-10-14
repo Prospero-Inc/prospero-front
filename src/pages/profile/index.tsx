@@ -2,7 +2,7 @@ import { ProsperoLayout } from '@/components/layouts'
 import { PersonalInformation, Security } from '@/components/views/profile'
 import { Profile } from '@/interfaces'
 import { requestProfile } from '@/services/request-profile'
-import { Container, Heading } from '@chakra-ui/react'
+import { Container } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -15,7 +15,6 @@ const index = ({ profile }: ProfileProps) => {
   return (
     <ProsperoLayout pageDescription="Profile Page" title="Profile">
       <Container maxW={'container.xl'}>
-        <Heading>GOLA PERRO</Heading>
         <PersonalInformation {...profile} />
         <Security enable2FA={profile.enable2FA} />
       </Container>
