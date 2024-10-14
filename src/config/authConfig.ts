@@ -13,7 +13,8 @@ interface UserResponse {
 }
 
 export const config: AuthOptions = {
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
   providers: [
     CredentialsProvider({
       name: 'Credentials',

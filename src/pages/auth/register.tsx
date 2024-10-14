@@ -1,5 +1,11 @@
 import { RegisterView } from '@/components/views/auth'
-import { Grid, GridItem, Image, Show } from '@chakra-ui/react'
+import {
+  Grid,
+  GridItem,
+  Image,
+  Show,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
@@ -15,7 +21,7 @@ const register = () => {
         display={'flex'}
         justifyContent={'center'}
         alignContent={'center'}
-        bg={'gray.50'}
+        bg={useColorModeValue('gray.50', 'gray.700')}
       >
         <Show above="lg">
           <Image

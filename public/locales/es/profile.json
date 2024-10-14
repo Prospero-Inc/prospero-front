@@ -1,0 +1,22 @@
+{
+  "userSection": {
+    "title": "Información del Usuario",
+    "username": "Nombre de Usuario",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo Electrónico",
+    "buttonAction": {
+      "edit": "Editar"
+    }
+  },
+  "securitySection": {
+    "title": "Security",
+    "twoFactorAuth": "Autenticación de Dos Factores",
+    "enabled": "Activado",
+    "disabled": "Desactivado",
+    "buttonAction": {
+      "enable": "Activar 2FA",
+      "disable": "Desactivar 2FA"
+    }
+  }
+}

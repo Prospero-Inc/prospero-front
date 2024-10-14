@@ -1,0 +1,24 @@
+services:
+  app:
+    container_name: prospero-frontend
+    image: prospero-app
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        - NODE_ENV=development
+    env_file:
+      - .env.local
+    volumes:
+      - .:/usr/src/app #? Volumen para el código fuente
+      - /usr/src/app/node_modules #? Evitar problemas con los módulos de node
+      # - /usr/src/app/.next #? Evitar problemas con la carpeta de Next.js
+    ports:
+      - '4000:3000' #? Mapear el puerto del host al puerto del contenedor
+    networks:
+      - prospero
+    command: ['pnpm', 'dev'] #? Comando para iniciar en modo desarrollo
+
+networks:
+  prospero:
+    driver: bridge

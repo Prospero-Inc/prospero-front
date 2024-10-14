@@ -1,12 +1,12 @@
 import {
   BoxProps,
   useBreakpointValue,
-  useColorModeValue,
   Flex,
   Icon,
   CloseButton,
   Box,
-  Text
+  Text,
+  useColorMode
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import { IconType } from 'react-icons'
@@ -37,6 +37,7 @@ interface SidebarProps extends BoxProps {
 }
 
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { colorMode } = useColorMode()
   const { t } = useTranslation('sidebar')
   const variant = useBreakpointValue(
     {
@@ -52,10 +53,10 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   )
   return (
     <Box
-      transition="3s ease"
-      bg={useColorModeValue('white', 'gray.900')}
+      // transition="2s ease"
+      // bg={colorMode === 'dark' ? 'gray.900' : 'white'}
       borderRight="1px"
-      borderRightColor={useColorModeValue('gray.200', 'gray.700')}
+      borderRightColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
       w={{ base: 'full', md: 60 }}
       pos="fixed"
       h="full"

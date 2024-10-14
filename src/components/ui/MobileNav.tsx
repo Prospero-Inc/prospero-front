@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { signOut, useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import { FiMenu, FiChevronDown } from 'react-icons/fi'
 import { GoSun, GoMoon } from 'react-icons/go'
 
@@ -26,6 +27,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const router = useRouter()
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
@@ -33,6 +35,9 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 
   const handleChangeColorMode = () => {
     toggleColorMode()
+  }
+  const handleClick = () => {
+    router.push('/profile')
   }
   return (
     <Flex
@@ -94,7 +99,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>{t('profile')}</MenuItem>
+              <MenuItem onClick={handleClick}>{t('profile')}</MenuItem>
               <MenuItem>{t('settings')}</MenuItem>
               <MenuItem>{t('billing')}</MenuItem>
               <MenuDivider />
