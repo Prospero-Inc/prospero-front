@@ -2,24 +2,25 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 import { Params } from '@/types'
 
-const budgetCalculator = async (
-  _amount: number,
-  params: (Params & { amount: number }) | unknown
+const requestProfile = async (
+  _ignoreData: unknown,
+  params: Params | unknown
 ): Promise<unknown> => {
-  const { lang, authorization, amount } = params as Params
+  console.log('params', params)
+  const { lang, authorization } = params as Params
+
   return await externalApiService
     .request({
       method: HttpMethod.GET,
-      endPoint: '/salary/distribute/preview',
+      endPoint: '/auth/profile',
       headers: {
         'x-lang': `${lang}`,
         Authorization: authorization
-      },
-      query: { amount }
+      }
     })
     .catch(error => {
       console.log(error)
     })
 }
 
-export { budgetCalculator }
+export { requestProfile }

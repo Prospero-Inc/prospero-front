@@ -27,7 +27,7 @@ import { Controller, useForm } from 'react-hook-form'
 const index = () => {
   const { data } = useSession()
   const { t } = useTranslation('budgetCalculator')
-
+  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const [amounts, setAmounts] = useState({
     fifty: 0,
@@ -43,9 +43,7 @@ const index = () => {
   const onSubmit = async ({ salary }: { salary: number }) => {
     const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
     try {
-      console.log({
-        salary
-      })
+      setIsLoading(true)
       const {
         distribution: { fixedExpenses, savings, variableExpenses }
       } = await localApiService.request<IBudgetResponse>({
@@ -71,6 +69,8 @@ const index = () => {
           duration: 5000,
           isClosable: true
         })
+    } finally {
+      setIsLoading(false)
     }
   }
   return (
@@ -117,6 +117,7 @@ const index = () => {
               colorScheme="primary"
               size={'xl'}
               w="full"
+              isLoading={isLoading}
             >
               {t('buttonCalculate')}
             </Button>

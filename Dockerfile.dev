@@ -1,0 +1,33 @@
+FROM node:18-alpine AS base
+
+# Instalación de dependencias necesarias
+RUN apk add --no-cache g++ make py3-pip libc6-compat
+
+# Directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copia de los archivos de dependencias
+COPY package*.json ./
+
+# Exposición del puerto
+EXPOSE 3000
+
+# Etapa de desarrollo
+FROM base AS development
+
+# Establecer la variable de entorno para desarrollo
+ENV NODE_ENV=development
+
+# Instalación global de pnpm y las dependencias del proyecto
+RUN npm install -g pnpm
+RUN pnpm install
+
+# Copia del código fuente al contenedor
+COPY . .
+
+# Instalación de las dependencias para desarrollo
+RUN pnpm install
+
+
+# Comando para iniciar la aplicación en modo desarrollo
+CMD ["pnpm", "dev"]

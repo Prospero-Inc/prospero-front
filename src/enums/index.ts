@@ -4,7 +4,8 @@ export enum HttpMethod {
   POST = 'POST',
   PUT = 'PUT',
   PATCH = 'PATCH',
-  DELETE = 'DELETE'
+  DELETE = 'DELETE',
+  OPTIONS = 'OPTIONS'
 }
 
 export enum CookiesEnum {

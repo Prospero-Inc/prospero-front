@@ -11,6 +11,10 @@ export const theme = extendTheme({
   colors,
   shadows,
   fonts,
+  config: {
+    initialColorMode: 'system',
+    useSystemColorMode: true
+  },
   components: {
     Toast: {
       baseStyle: {

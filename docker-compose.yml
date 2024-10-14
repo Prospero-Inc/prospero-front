@@ -1,19 +1,23 @@
 services:
   app:
+    container_name: prospero-frontend
     image: prospero-app
-    env_file:
-      - .env.production
     build:
       context: ./
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
-        - NEXT_PUBLIC_API_URL
-        - NEXTAUTH_URL
-        - NEXTAUTH_SECRET
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXTAUTH_URL=${NEXTAUTH_URL}
+        - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
       - /usr/src/app/.next
     ports:
       - '4000:3000'
+    networks:
+      - prospero
+networks:
+  prospero:
+    driver: bridge
