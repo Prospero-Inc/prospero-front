@@ -93,7 +93,6 @@ export const LoginView = () => {
   return (
     // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
-      maxW={'2xl'}
       as={'form'}
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}

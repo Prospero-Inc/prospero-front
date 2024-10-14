@@ -20,4 +20,4 @@ services:
       - prospero
 networks:
   prospero:
-    driver: bridge
+    external: true
