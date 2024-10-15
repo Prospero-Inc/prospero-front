@@ -15,7 +15,6 @@ const activate2FA = async (_ignore: unknown, params: Params | unknown) => {
       }
     })
     .catch((error: unknown) => {
-      console.log(error)
       throw error
     })
 }
@@ -33,7 +32,6 @@ const disable2FA = async (_ignore: unknown, params: Params | unknown) => {
       }
     })
     .catch((error: unknown) => {
-      console.log(error)
       throw error
     })
 }
@@ -57,7 +55,6 @@ const validateToken = async (
       }
     })
     .catch((error: unknown) => {
-      console.log(error)
       throw error
     })
 }

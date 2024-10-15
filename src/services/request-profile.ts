@@ -6,7 +6,6 @@ const requestProfile = async (
   _ignoreData: unknown,
   params: Params | unknown
 ): Promise<unknown> => {
-  console.log('params', params)
   const { lang, authorization } = params as Params
 
   return await externalApiService

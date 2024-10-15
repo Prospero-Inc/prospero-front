@@ -42,6 +42,10 @@ const index = () => {
 
   const onSubmit = async ({ salary }: { salary: number }) => {
     const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
+    console.log({
+      lang,
+      accessToken: data?.accessToken
+    })
     try {
       setIsLoading(true)
       const {

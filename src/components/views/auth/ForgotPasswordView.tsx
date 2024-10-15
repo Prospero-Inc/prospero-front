@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { CookiesEnum, HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import { localApiService } from '@/lib/apiService'
@@ -68,8 +69,7 @@ export const ForgotPasswordView = () => {
             status: 'success'
           }
         },
-        error: error => {
-          console.log(error)
+        error: _error => {
           return {
             title: t('forgotPassword.toast.error.title'),
             description: t('forgotPassword.toast.error.description'),

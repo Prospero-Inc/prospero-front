@@ -84,7 +84,6 @@ class ApiService {
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log('QLO', error)
         const errorMessage = error.response?.data?.message
         const errorArr = error.response?.data?.errors
         // Handle message if it's a string or an array of strings

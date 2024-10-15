@@ -84,14 +84,18 @@ export const LoginView = () => {
 
       if (resp?.url) return router.replace('/dashboard')
     } catch (error) {
-      console.log(error)
+      toast({
+        title: t('login.toast.error.title'),
+        description: t('login.toast.error.description'),
+        status: 'error',
+        isClosable: true
+      })
     } finally {
       setLoading(false)
       toastId && toast.close(toastId)
     }
   }
   return (
-    // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
       as={'form'}
       onSubmit={handleSubmit(onSubmit)}
