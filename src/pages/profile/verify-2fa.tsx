@@ -57,6 +57,7 @@ export default function VerifyEmailForm() {
           description: 'Please wait while we verify your 2FA'
         },
         success: _data => {
+          console.dir(_data)
           router.replace('/profile')
           return {
             title: '2FA Verified',
