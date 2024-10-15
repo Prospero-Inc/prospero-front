@@ -43,6 +43,7 @@ export const config: AuthOptions = {
             'x-lang': lang
           }
         })
+
         if (response)
           return {
             ...response.user,

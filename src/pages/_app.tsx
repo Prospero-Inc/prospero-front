@@ -4,11 +4,19 @@ import { cookiesPlugin } from '@/plugins'
 import { theme } from '@/themes'
 import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
-import { appWithTranslation } from 'next-i18next'
+import { appWithTranslation, UserConfig } from 'next-i18next'
 import { useTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+
+import nextI18NextConfig from '../../next-i18next.config'
+const emptyInitialI18NextConfig: UserConfig = {
+  i18n: {
+    defaultLocale: nextI18NextConfig.i18n.defaultLocale,
+    locales: nextI18NextConfig.i18n.locales
+  }
+}
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const { i18n } = useTranslation('common')
@@ -42,4 +50,4 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   )
 }
 
-export default appWithTranslation(App)
+export default appWithTranslation(App, emptyInitialI18NextConfig)
