@@ -2,6 +2,7 @@
   "dashboard": "Dashboard",
   "entries": "Entradas",
   "expenditures": "Gastos",
+  "fixedExpenses": "Gastos fijos",
   "goals": "Metas",
   "budgetCalculator": "Calculadora de presupuesto",
   "settings": "Configuración"

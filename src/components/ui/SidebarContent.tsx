@@ -15,6 +15,7 @@ import { BsStopCircle } from 'react-icons/bs'
 import { EntryIcon } from '../icons'
 import { BagIcon } from '../icons/BagIcon'
 import { EgressIcon } from '../icons/EgressIcon'
+import { FixedExpenseIcon } from '../icons/FixedExpenseIcon'
 import { GoalsIcon } from '../icons/GoalsIcon'
 import { SettingsIcon } from '../icons/SettingsIcon'
 import { Brand } from './Brand'
@@ -28,6 +29,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'dashboard', icon: BsStopCircle, route: '/dashboard' },
   { name: 'entries', icon: EntryIcon, route: '/entries' },
   { name: 'expenditures', icon: EgressIcon, route: '/expenditures' },
+  { name: 'fixedExpenses', icon: FixedExpenseIcon, route: '/fixed-expenses' },
   { name: 'goals', icon: GoalsIcon, route: '/goals' },
   { name: 'budgetCalculator', icon: BagIcon, route: '/budget-calculator' },
   { name: 'settings', icon: SettingsIcon, route: '/settings' }

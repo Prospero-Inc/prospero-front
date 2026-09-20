@@ -1,0 +1,51 @@
+{
+  "title": "Fixed Expenses",
+  "form": {
+    "labelAmount": "Amount",
+    "labelName": "Name",
+    "labelBudgetCategory": "Distribution",
+    "labelDueDate": "Billing day",
+    "labelReminder": "Remind me",
+    "labelDescription": "Note (optional)",
+    "submit": "Save fixed expense",
+    "submitEdit": "Update fixed expense",
+    "cancel": "Cancel"
+  },
+  "categories": {
+    "Necesidad": "Needs",
+    "Deseo": "Wants",
+    "Ahorro": "Savings"
+  },
+  "list": {
+    "title": "Your fixed expenses",
+    "empty": "You haven't registered any fixed expenses yet.",
+    "paid": "Paid this cycle",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "pay": "Mark as paid"
+    }
+  },
+  "toast": {
+    "success": {
+      "title": "Fixed expense saved",
+      "description": "The fixed expense was saved successfully"
+    },
+    "deleted": {
+      "title": "Fixed expense deleted",
+      "description": "The fixed expense was deleted successfully"
+    },
+    "paid": {
+      "title": "Marked as paid",
+      "description": "The corresponding movement was recorded"
+    },
+    "alreadyPaid": {
+      "title": "Already paid",
+      "description": "This fixed expense was already marked as paid for this cycle"
+    },
+    "error": {
+      "title": "Error",
+      "description": "We could not save the fixed expense"
+    }
+  }
+}

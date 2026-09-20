@@ -1,0 +1,51 @@
+{
+  "title": "Gastos fijos",
+  "form": {
+    "labelAmount": "Monto",
+    "labelName": "Nombre",
+    "labelBudgetCategory": "Distribución",
+    "labelDueDate": "Día de cobro",
+    "labelReminder": "Recordarme",
+    "labelDescription": "Nota (opcional)",
+    "submit": "Guardar gasto fijo",
+    "submitEdit": "Actualizar gasto fijo",
+    "cancel": "Cancelar"
+  },
+  "categories": {
+    "Necesidad": "Necesidad",
+    "Deseo": "Deseo",
+    "Ahorro": "Ahorro"
+  },
+  "list": {
+    "title": "Tus gastos fijos",
+    "empty": "Todavía no registraste ningún gasto fijo.",
+    "paid": "Pagado este ciclo",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "pay": "Marcar como pagado"
+    }
+  },
+  "toast": {
+    "success": {
+      "title": "Gasto fijo guardado",
+      "description": "El gasto fijo se guardó con éxito"
+    },
+    "deleted": {
+      "title": "Gasto fijo eliminado",
+      "description": "El gasto fijo se eliminó con éxito"
+    },
+    "paid": {
+      "title": "Gasto marcado como pagado",
+      "description": "Se registró el movimiento correspondiente"
+    },
+    "alreadyPaid": {
+      "title": "Ya estaba pagado",
+      "description": "Este gasto fijo ya se había marcado como pagado en este ciclo"
+    },
+    "error": {
+      "title": "Error",
+      "description": "No pudimos guardar el gasto fijo"
+    }
+  }
+}

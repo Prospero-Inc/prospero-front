@@ -78,15 +78,17 @@ call happens:
 ### Structure
 
 - `src/pages/` — routed pages: `auth/*` (login/register/forgot-password/verify-2fa),
-  `dashboard`, `entries` (income), `expenditures` (transactions), `goals` (placeholder — the
-  spec marks detailed savings goals as post-MVP), `settings`, `budget-calculator`, `profile/*`
-  (incl. 2FA setup/verify flows). All except `goals` and the `auth/*` pages use
-  `getServerSideProps` (needed for the auth token + per-user data).
+  `dashboard`, `entries` (income), `expenditures` (transactions), `fixed-expenses` (recurring
+  costs — CRUD plus a "mark as paid" action that generates a `Transaction`, see
+  `prospero-backend/CLAUDE.md`'s `fixed-expenses` module), `goals` (placeholder — the spec marks
+  detailed savings goals as post-MVP), `settings`, `budget-calculator`, `profile/*` (incl. 2FA
+  setup/verify flows). All except `goals` and the `auth/*` pages use `getServerSideProps`
+  (needed for the auth token + per-user data).
 - `src/components/views/` — page-level feature components (`auth`, `budgetCalculator`,
   `profile`), separate from `components/ui` (design-system primitives) and `components/layouts`.
 - `src/services/` — backend-calling functions, either wrapped by a proxy route or called
   directly from `getServerSideProps`: `2fa.ts`, `budgetCalculator.ts`, `userService.ts`,
-  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`.
+  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`.
 - `src/hooks`, `src/interfaces`, `src/types`, `src/enums` — shared frontend-only types/enums
   (e.g. `HttpMethod`) and hooks.
 
