@@ -15,7 +15,10 @@ EXPOSE 3000
 FROM base AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install -g pnpm
+# pnpm 10+ blocks postinstall build scripts by default and breaks the
+# install (core-js/sharp) — pin to the major that already works, same
+# fix Dockerfile.dev has.
+RUN npm install -g pnpm@9
 RUN pnpm install
 RUN pnpm build
 
@@ -23,7 +26,10 @@ FROM base AS production
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
-RUN npm install -g pnpm
+# pnpm 10+ blocks postinstall build scripts by default and breaks the
+# install (core-js/sharp) — pin to the major that already works, same
+# fix Dockerfile.dev has.
+RUN npm install -g pnpm@9
 RUN pnpm install --prod --ignore-scripts --prefer-frozen-lockfile
 
 RUN addgroup -g 1001 -S nodejs
