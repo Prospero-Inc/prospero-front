@@ -6,7 +6,19 @@
     "lastName": "Last Name",
     "email": "Email",
     "buttonAction": {
-      "edit": "Edit"
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "success": {
+        "title": "Profile updated",
+        "description": "Your information was saved successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "We could not update your profile"
+      }
     }
   },
   "securitySection": {

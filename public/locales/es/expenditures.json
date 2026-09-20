@@ -1,0 +1,40 @@
+{
+  "title": "Gastos",
+  "form": {
+    "labelAmount": "Monto",
+    "labelCategory": "Categoría",
+    "labelType": "Tipo",
+    "labelDate": "Fecha",
+    "labelDescription": "Nota (opcional)",
+    "submit": "Guardar gasto",
+    "submitEdit": "Actualizar gasto",
+    "cancel": "Cancelar"
+  },
+  "types": {
+    "FixedExpense": "Gasto fijo",
+    "VariableExpense": "Gasto variable",
+    "Savings": "Ahorro"
+  },
+  "list": {
+    "title": "Movimientos",
+    "empty": "Todavía no registraste ningún gasto.",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "toast": {
+    "success": {
+      "title": "Gasto guardado",
+      "description": "El movimiento se guardó con éxito"
+    },
+    "deleted": {
+      "title": "Gasto eliminado",
+      "description": "El movimiento se eliminó con éxito"
+    },
+    "error": {
+      "title": "Error",
+      "description": "No pudimos guardar el movimiento"
+    }
+  }
+}

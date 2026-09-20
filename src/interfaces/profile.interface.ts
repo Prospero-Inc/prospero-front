@@ -3,10 +3,15 @@ export interface Profile {
   username: string
   isActive: boolean
   isGoogleAccount: boolean
-  activationToken: string | null
   enable2FA: boolean
-  twoFASecret: string | null
   email: string
   lastName: string
   firstName: string
+  createdAt: string
+}
+
+export interface UpdateProfileData {
+  firstName?: string
+  lastName?: string
+  username?: string
 }

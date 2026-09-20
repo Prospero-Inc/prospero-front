@@ -30,7 +30,8 @@ export async function middleware(req: NextRequest) {
   const isAuthPage =
     pathname.startsWith('/auth/login') ||
     pathname.startsWith('/auth/register') ||
-    pathname.startsWith('/auth/forgot-password')
+    pathname.startsWith('/auth/forgot-password') ||
+    pathname.startsWith('/auth/verify-2fa')
 
   const isProtectedPage = !isAuthPage
   if (pathname === '/')

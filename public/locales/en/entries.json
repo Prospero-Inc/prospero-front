@@ -1,0 +1,23 @@
+{
+  "title": "Entries",
+  "form": {
+    "labelAmount": "Income amount",
+    "submit": "Register entry"
+  },
+  "list": {
+    "title": "This month's income",
+    "empty": "You haven't registered an income this month yet.",
+    "amount": "Amount",
+    "distribution": "Distribution (fixed / variable / savings)"
+  },
+  "toast": {
+    "success": {
+      "title": "Entry registered",
+      "description": "Your income was saved successfully"
+    },
+    "error": {
+      "title": "Error",
+      "description": "We could not register the entry"
+    }
+  }
+}

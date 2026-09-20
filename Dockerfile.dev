@@ -18,8 +18,9 @@ FROM base AS development
 # Establecer la variable de entorno para desarrollo
 ENV NODE_ENV=development
 
-# Instalación global de pnpm y las dependencias del proyecto
-RUN npm install -g pnpm
+# Instalación global de pnpm (fijado a la major que pide package.json#engines.pnpm;
+# pnpm 10+ bloquea scripts de build por defecto y rompe la instalación)
+RUN npm install -g pnpm@9
 RUN pnpm install
 
 # Copia del código fuente al contenedor

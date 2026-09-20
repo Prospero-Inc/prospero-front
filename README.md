@@ -1,41 +1,60 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Prospero — Frontend
+
+App principal de **Prospero** (finanzas personales / control de presupuesto). Next.js (Pages
+Router) + Chakra UI, autenticación vía NextAuth contra `prospero-backend`.
 
 ![Github Actions](https://github.com/Prospero-Inc/prospero-front/actions/workflows/nextjs.deployment.yml/badge.svg)
 
+## Requisitos
 
-## Getting Started
+- Node.js 18–22
+- pnpm >= 9.4.0 (**no uses pnpm 10+**: bloquea scripts de build por defecto y rompe la
+  instalación de este proyecto)
+- `prospero-backend` corriendo (ver ese repo, o levantar todo junto con Docker Compose más abajo)
 
-First, run the development server:
+## Levantar en local (pnpm)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+pnpm install
+cp .env.example .env.local   # completar los valores (ver notas abajo)
+pnpm dev                      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variables de entorno
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Ver `.env.example`. La que más confunde: `NEXTAUTH_URL_INTERNAL` — solo hace falta si el puerto
+público de la app (el que ve el navegador) es distinto del puerto en el que realmente escucha
+Next.js (típicamente al correr detrás de Docker con mapeo de puertos). Sin eso, cualquier página
+que dependa de `getServerSideProps` para leer la sesión (dashboard, entries, expenditures,
+settings, profile) no va a ver al usuario logueado del lado servidor.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Levantar todo el stack con Docker (recomendado para probar de punta a punta)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Este repo es parte de un workspace con `prospero-backend` y `prosper-change-password`. Si los
+tenés clonados como hermanos en el mismo directorio, un solo comando levanta Postgres, una
+bandeja de correo falsa (Mailpit) y las tres apps, ya con los env vars correctos:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+cd .. # a la carpeta que contiene los tres repos
+docker compose up --build
+```
 
-## Learn More
+Ver `docker-compose.yml` y `docs/testing-guide.md` en la raíz del workspace para el detalle
+completo (URLs, credenciales de la DB, qué probar paso a paso).
 
-To learn more about Next.js, take a look at the following resources:
+## Comandos
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm build       # build de producción
+pnpm start       # correr el build
+pnpm lint        # eslint
+pnpm lint:fix    # eslint --fix + prettier
+pnpm format      # prettier --check
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+No hay test runner configurado en este repo todavía.
 
-## Deploy on Vercel
+## Más detalle de arquitectura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Ver `CLAUDE.md` en este repo (patrón de proxy a la API, flujo de login/2FA, estructura de
+páginas y servicios).

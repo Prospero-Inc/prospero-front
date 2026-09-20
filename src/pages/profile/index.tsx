@@ -8,7 +8,7 @@ import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 type ProfileProps = {
-  profile: Profile
+  profile: Profile | null
 }
 
 const index = ({ profile }: ProfileProps) => {
@@ -16,7 +16,7 @@ const index = ({ profile }: ProfileProps) => {
     <ProsperoLayout pageDescription="Profile Page" title="Profile">
       <Container maxW={'container.xl'}>
         <PersonalInformation {...profile} />
-        <Security enable2FA={profile.enable2FA} />
+        <Security enable2FA={profile?.enable2FA} />
       </Container>
     </ProsperoLayout>
   )

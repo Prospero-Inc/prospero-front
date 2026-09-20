@@ -1,5 +1,6 @@
 import { HttpMethod } from '@/enums'
-import axios, { HttpStatusCode } from 'axios'
+import { HttpError } from '@/lib/apiService'
+import { HttpStatusCode } from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface HandlerFunction<T, R> {
@@ -29,12 +30,14 @@ const createHandler =
       })
       return res.status(HttpStatusCode.Ok).json(data)
     } catch (error) {
-      if (axios.isAxiosError(error))
-        return res
-          .status(HttpStatusCode.InternalServerError)
-          .json({ error: error.message })
+      if (error instanceof HttpError)
+        return res.status(error.status).json({ message: error.message })
 
-      return res.status(HttpStatusCode.InternalServerError).json({ error })
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred. Please try again.'
+      return res.status(HttpStatusCode.InternalServerError).json({ message })
     }
   }
 

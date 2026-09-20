@@ -12,6 +12,11 @@ interface UserResponse {
   accessToken: string
 }
 
+type CredentialsInput = Record<
+  'email' | 'password' | 'lang' | 'accessToken' | 'user',
+  string
+>
+
 export const config: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,
@@ -25,12 +30,24 @@ export const config: AuthOptions = {
           placeholder: 'example@example.com'
         },
         password: { label: 'Password', type: 'password' },
-        lang: { label: 'Language', type: 'text' }
+        lang: { label: 'Language', type: 'text' },
+        // Populated instead of email/password once the login (and, when
+        // required, the 2FA challenge) has already been resolved against
+        // the backend by the login pages — see LoginView / verify-2fa.tsx.
+        accessToken: { label: 'Access Token', type: 'text' },
+        user: { label: 'User', type: 'text' }
       },
       authorize: async (
-        credentials: Record<'email' | 'password' | 'lang', string> | undefined
+        credentials: Partial<CredentialsInput> | undefined
       ): Promise<UserExtended | null> => {
         if (!credentials) throw new Error('No credentials provided')
+
+        if (credentials.accessToken && credentials.user)
+          return {
+            ...(JSON.parse(credentials.user) as User),
+            accessToken: credentials.accessToken
+          }
+
         const { email, password, lang } = credentials
         const response = await externalApiService.request<UserResponse>({
           endPoint: '/auth/login',
@@ -40,7 +57,7 @@ export const config: AuthOptions = {
             password
           },
           headers: {
-            'x-lang': lang
+            'x-lang': `${lang}`
           }
         })
         if (response)

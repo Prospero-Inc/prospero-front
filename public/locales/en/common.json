@@ -82,6 +82,18 @@
       "body": "Reserve the remaining 20% for saving or paying off debt. This includes contributions to emergency funds, savings for long-term goals, or additional debt payments."
     }
   },
+  "verifyTwoFactor": {
+    "heading": "Verify your 2 Factor Authentication",
+    "text": "Enter the 6 digit code of your authenticator app",
+    "required": "This field is required",
+    "submit": "Verify",
+    "toast": {
+      "error": {
+        "title": "Error",
+        "description": "An error occurred while verifying your 2FA code"
+      }
+    }
+  },
   "forgotPassword": {
     "title": "Forgot your password?",
     "descriptionBlockOne": "Enter the email address you used when you joined and we will send you instructions on how to reset your password.",

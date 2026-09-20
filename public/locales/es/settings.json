@@ -1,0 +1,12 @@
+{
+  "title": "Configuración",
+  "account": {
+    "title": "Cuenta",
+    "email": "Correo electrónico",
+    "username": "Nombre de usuario"
+  },
+  "language": {
+    "title": "Idioma"
+  },
+  "logout": "Cerrar sesión"
+}

@@ -1,0 +1,40 @@
+{
+  "title": "Expenditures",
+  "form": {
+    "labelAmount": "Amount",
+    "labelCategory": "Category",
+    "labelType": "Type",
+    "labelDate": "Date",
+    "labelDescription": "Note (optional)",
+    "submit": "Save expense",
+    "submitEdit": "Update expense",
+    "cancel": "Cancel"
+  },
+  "types": {
+    "FixedExpense": "Fixed expense",
+    "VariableExpense": "Variable expense",
+    "Savings": "Savings"
+  },
+  "list": {
+    "title": "Movements",
+    "empty": "You haven't registered any expenses yet.",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "toast": {
+    "success": {
+      "title": "Expense saved",
+      "description": "The movement was saved successfully"
+    },
+    "deleted": {
+      "title": "Expense deleted",
+      "description": "The movement was deleted successfully"
+    },
+    "error": {
+      "title": "Error",
+      "description": "We could not save the movement"
+    }
+  }
+}

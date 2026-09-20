@@ -27,6 +27,15 @@ const formattedEndpoint = (endPoint: string, params: TParams = {}): string => {
   return formattedEndpoint
 }
 
+export class HttpError extends Error {
+  status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
+  }
+}
+
 class ApiService {
   private static externalInstance: ApiService
   private static localInstance: ApiService
@@ -84,11 +93,11 @@ class ApiService {
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log('QLO', error)
+        const status = error.response?.status ?? 500
         const errorMessage = error.response?.data?.message
         const errorArr = error.response?.data?.errors
         // Handle message if it's a string or an array of strings
-        if (errorArr) throw new Error(errorArr.join(', '))
+        if (errorArr) throw new HttpError(errorArr.join(', '), status)
 
         const formattedErrorMessage =
           typeof errorMessage === 'string'
@@ -98,12 +107,15 @@ class ApiService {
             : 'An error occurred. Please try again.'
 
         console.error(`API error: ${formattedErrorMessage}`)
-        throw new Error(formattedErrorMessage)
+        throw new HttpError(formattedErrorMessage, status)
       }
 
       // Handle non-Axios errors
       console.error('ERROR SERVER API SERVICE', error)
-      throw new Error('An unexpected error occurred. Please try again.')
+      throw new HttpError(
+        'An unexpected error occurred. Please try again.',
+        500
+      )
     }
   }
 }

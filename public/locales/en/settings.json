@@ -1,0 +1,12 @@
+{
+  "title": "Settings",
+  "account": {
+    "title": "Account",
+    "email": "Email",
+    "username": "Username"
+  },
+  "language": {
+    "title": "Language"
+  },
+  "logout": "Log out"
+}

@@ -6,12 +6,22 @@ import { AmountCard } from '@/components/ui/AmountCard'
 import { GoalsSteps } from '@/components/ui/GoalsSteps'
 import { MotionDiv } from '@/components/ui/MotionDiv'
 import { entryAsset, expendituresAsset, walletAsset } from '@/config'
+import { getSalaryDetails } from '@/services/salary'
+import { getTransactions } from '@/services/transactions'
 import { Flex } from '@chakra-ui/react'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
-const dashboard = () => {
+interface DashboardProps {
+  incomeAmount: number
+  totalSpent: number
+}
+
+const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
+  const total = incomeAmount - totalSpent
+
   return (
     <ProsperoLayout
       title={'DashBoard'}
@@ -23,8 +33,8 @@ const dashboard = () => {
             bgColor="walletCard"
             title="Total"
             image={walletAsset}
-            totalAmount={100}
-            comparisonAmount={3}
+            totalAmount={total}
+            comparisonAmount={0}
             icon={TotalMoneyIcon}
             breakpointsImage={{
               base: '6.36em',
@@ -51,8 +61,8 @@ const dashboard = () => {
           <AmountCard
             bgColor="entryCard"
             title="Ingresos Mensuales"
-            totalAmount={100}
-            comparisonAmount={3}
+            totalAmount={incomeAmount}
+            comparisonAmount={0}
             icon={TotalMoneyIcon}
             image={entryAsset}
             breakpointsImage={{
@@ -79,8 +89,8 @@ const dashboard = () => {
           <AmountCard
             bgColor="expenditureCard"
             title="Gastos Mensuales"
-            totalAmount={100}
-            comparisonAmount={3}
+            totalAmount={totalSpent}
+            comparisonAmount={0}
             icon={FlameIcon}
             image={expendituresAsset}
             breakpointsImage={{
@@ -112,14 +122,61 @@ const dashboard = () => {
     </ProsperoLayout>
   )
 }
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  locale
+}) => {
+  const session = await getSession({ req })
+  let incomeAmount = 0
+  let totalSpent = 0
+
+  if (session?.accessToken) {
+    const authorization = `Bearer ${session.accessToken}`
+    const now = new Date()
+    const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+    const to = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59
+    ).toISOString()
+
+    try {
+      const salaryDetails = (await getSalaryDetails(null, {
+        authorization,
+        lang: locale
+      })) as { salary?: { amount: number }[] }
+      incomeAmount = salaryDetails?.salary?.[0]?.amount ?? 0
+    } catch (error) {
+      incomeAmount = 0
+    }
+
+    try {
+      const transactions = (await getTransactions(
+        { from, to },
+        { authorization, lang: locale }
+      )) as { amount: number }[]
+      totalSpent = (transactions ?? []).reduce(
+        (sum, transaction) => sum + transaction.amount,
+        0
+      )
+    } catch (error) {
+      totalSpent = 0
+    }
+  }
+
   return {
     props: {
       ...(await serverSideTranslations(locale as string, [
         'common',
         'sidebar',
         'mobileNav'
-      ]))
+      ])),
+      incomeAmount,
+      totalSpent
     }
   }
 }

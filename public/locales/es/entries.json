@@ -1,0 +1,23 @@
+{
+  "title": "Ingresos",
+  "form": {
+    "labelAmount": "Monto del ingreso",
+    "submit": "Registrar ingreso"
+  },
+  "list": {
+    "title": "Ingreso de este mes",
+    "empty": "Todavía no registraste un ingreso este mes.",
+    "amount": "Monto",
+    "distribution": "Distribución (fijos / variables / ahorro)"
+  },
+  "toast": {
+    "success": {
+      "title": "Ingreso registrado",
+      "description": "Tu ingreso se guardó con éxito"
+    },
+    "error": {
+      "title": "Error",
+      "description": "No pudimos registrar el ingreso"
+    }
+  }
+}

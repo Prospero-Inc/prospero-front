@@ -1,6 +1,12 @@
 import { PasswordInput } from '@/components/ui'
-import { CookiesEnum } from '@/enums'
+import { CookiesEnum, HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
+import {
+  isRequiresTwoFactorResponse,
+  LoginResponse,
+  PRE_AUTH_TOKEN_STORAGE_KEY
+} from '@/interfaces'
+import { localApiService } from '@/lib'
 import { cookiesPlugin } from '@/plugins'
 import { Stack, useToast } from '@chakra-ui/react'
 import {
@@ -66,10 +72,24 @@ export const LoginView = () => {
         colorScheme: 'primary'
       })
 
+      const loginResponse = await localApiService.request<LoginResponse>({
+        endPoint: '/proxy/login',
+        method: HttpMethod.POST,
+        data: { email: data.email, password: data.password },
+        headers: { 'x-lang': `${lang}` }
+      })
+
+      if (isRequiresTwoFactorResponse(loginResponse)) {
+        sessionStorage.setItem(
+          PRE_AUTH_TOKEN_STORAGE_KEY,
+          loginResponse.preAuthToken
+        )
+        return router.push('/auth/verify-2fa')
+      }
+
       const resp: SignInResponse | undefined = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        lang,
+        accessToken: loginResponse.accessToken,
+        user: JSON.stringify(loginResponse.user),
         redirect: false,
         callbackUrl: '/dashboard'
       })
@@ -84,7 +104,15 @@ export const LoginView = () => {
 
       if (resp?.url) return router.replace('/dashboard')
     } catch (error) {
-      console.log(error)
+      toast({
+        title: t('login.toast.error.title'),
+        description:
+          error instanceof Error
+            ? error.message
+            : t('login.toast.error.description'),
+        status: 'error',
+        isClosable: true
+      })
     } finally {
       setLoading(false)
       toastId && toast.close(toastId)

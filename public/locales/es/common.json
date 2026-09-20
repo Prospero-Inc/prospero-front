@@ -82,6 +82,18 @@
       "body": "Reserva el 20% restante para ahorrar o pagar deudas. Esto incluye aportaciones a fondos de emergencia, ahorros para metas a largo plazo o pagos adicionales de deudas."
     }
   },
+  "verifyTwoFactor": {
+    "heading": "Verifica tu autenticación de dos factores",
+    "text": "Ingresa el código de 6 dígitos de tu app de autenticación",
+    "required": "Este campo es obligatorio",
+    "submit": "Verificar",
+    "toast": {
+      "error": {
+        "title": "Error",
+        "description": "Ocurrió un error al verificar tu código 2FA"
+      }
+    }
+  },
   "forgotPassword": {
     "title": "¿Has olvidado tu contraseña?",
     "descriptionBlockOne": "Ingrese la dirección de correo electrónico que utilizó cuando se unió y le enviaremos instrucciones para restablecer su contraseña.",

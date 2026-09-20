@@ -6,7 +6,19 @@
     "lastName": "Apellido",
     "email": "Correo Electrónico",
     "buttonAction": {
-      "edit": "Editar"
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "toast": {
+      "success": {
+        "title": "Perfil actualizado",
+        "description": "Tu información se guardó con éxito"
+      },
+      "error": {
+        "title": "Error",
+        "description": "No pudimos actualizar tu perfil"
+      }
     }
   },
   "securitySection": {
