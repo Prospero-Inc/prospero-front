@@ -1,43 +1,44 @@
-# Deployment
+# Despliegue
 
-This repo ships with a working CI/CD pipeline
-(`.github/workflows/nextjs.deployment.yml`): every push to `main` lints,
-then rebuilds and restarts the app via Docker Compose, on a **self-hosted
-GitHub Actions runner** (a real server you control, not GitHub's own
-infra). `develop` is the integration branch and does **not** deploy on its
-own — merge `develop` → `main` when you actually want to ship.
+Este repo trae un pipeline de CI/CD funcionando
+(`.github/workflows/nextjs.deployment.yml`): cada push a `main` corre
+lint, y luego reconstruye y reinicia la app vía Docker Compose, sobre un
+**runner self-hosted de GitHub Actions** (un servidor real que tú
+controlas, no infraestructura de GitHub). `develop` es la rama de
+integración y **no** despliega por sí sola — mergea `develop` → `main`
+cuando de verdad quieras publicar.
 
-See `prospero-backend/DEPLOYMENT.md` for the full server setup (getting a
-free VM, installing Docker, creating the `prospero` external network,
-registering a runner). This app needs its **own** separate runner
-registration (repo Settings → Actions → Runners), but can live on the same
-physical server as the backend — it must, in fact, since it talks to the
-backend over that shared `prospero` Docker network by container/service
-name (`NEXT_PUBLIC_API_URL` typically points at `http://backend:3000/api`
-or whatever the backend's service is named on that network, not
-`localhost`).
+Ver `prospero-backend/DEPLOYMENT.md` para la configuración completa del
+servidor (lanzar la instancia EC2, instalar Docker, crear la red externa
+`prospero`, registrar un runner). Esta app necesita su **propio** registro
+de runner (Settings → Actions → Runners de este repo), pero puede vivir en
+el mismo servidor físico que el backend — de hecho debe, ya que habla con
+el backend por esa red de Docker compartida (`NEXT_PUBLIC_API_URL`
+normalmente apunta a `http://backend:3000/api` o como se llame el
+servicio del backend en esa red, no a `localhost`).
 
-## Required GitHub Actions secrets
+## Secretos requeridos en GitHub Actions
 
-Set these under this repo's Settings → Secrets and variables → Actions:
+Configúralos en Settings → Secrets and variables → Actions de este repo:
 
-| Secret | What it is |
+| Secreto | Qué es |
 |---|---|
-| `NEXT_PUBLIC_API_URL` | Base URL the browser/server use to reach `prospero-backend`, including the `/api` prefix. Gets baked into the client bundle at build time (it's a `NEXT_PUBLIC_*` var), so it must be set correctly before `docker compose up --build`. |
-| `NEXTAUTH_URL` | The browser-facing public URL of this app itself (e.g. `https://app.yourdomain.com`) |
-| `NEXTAUTH_SECRET` | Secret NextAuth uses to sign session JWTs/cookies — any long random string, e.g. `openssl rand -hex 32` |
-| `AUTH_SECRET` | Same value as `NEXTAUTH_SECRET` — some next-auth helpers read this name instead; both must be set to avoid silent auth failures |
+| `NEXT_PUBLIC_API_URL` | URL base que el navegador/servidor usan para llegar a `prospero-backend`, incluyendo el prefijo `/api`. Queda incrustada en el bundle del cliente en tiempo de build (es una variable `NEXT_PUBLIC_*`), así que debe estar bien puesta antes de `docker compose up --build`. |
+| `NEXTAUTH_URL` | URL pública de esta app tal como la ve el navegador (ej. `https://app.tudominio.com`) |
+| `NEXTAUTH_SECRET` | Secreto que NextAuth usa para firmar los JWT/cookies de sesión — cualquier string largo y aleatorio, ej. `openssl rand -hex 32` |
+| `AUTH_SECRET` | Mismo valor que `NEXTAUTH_SECRET` — algunos helpers de next-auth leen este nombre en su lugar; hay que poner los dos o falla la autenticación silenciosamente |
 
-If the port this app is reachable on externally differs from the port it
-listens on internally (like local dev's `4000:3000` mapping), you'll also
-need `NEXTAUTH_URL_INTERNAL` — see the comment in `.env.example` for why.
-Not required for a plain 1:1 port setup.
+Si el puerto por el que esta app es alcanzable desde afuera es distinto
+al puerto en el que escucha por dentro (como el mapeo `4000:3000` del dev
+local), también necesitas `NEXTAUTH_URL_INTERNAL` — ver el comentario en
+`.env.example`. No hace falta si el puerto es 1:1.
 
-## Deploying
+## Desplegar
 
 ```bash
 git push origin main
 ```
 
-(after merging `develop` into it). Watch the run under this repo's Actions
-tab — it stops the existing container, prunes the old image, and rebuilds.
+(después de mergear `develop` a `main`). Míralo en la pestaña Actions de
+este repo — para el contenedor existente, limpia la imagen vieja, y
+reconstruye.
