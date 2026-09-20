@@ -10,6 +10,7 @@
     "lint:fix": "pnpm lint --fix && pnpm format:fix",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --write \"src/**/*.{ts,tsx}\" ",
+    "generate-icons": "node scripts/generate-icons.js",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "next": "13.1.6",
     "next-auth": "^4.24.7",
     "next-i18next": "^15.3.0",
+    "next-pwa": "^5.6.0",
     "qrcode": "^1.5.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -59,7 +61,8 @@
     "eslint-plugin-react": "7.32.2",
     "husky": "8.0.3",
     "lint-staged": "13.1.0",
-    "prettier": "2.8.3"
+    "prettier": "2.8.3",
+    "sharp": "^0.33.5"
   },
   "engines": {
     "node": ">=18.x.x <=22.x.x",
