@@ -1,3 +1,5 @@
+export type PayFrequency = 'Biweekly' | 'Monthly'
+
 export interface Profile {
   id: number
   username: string
@@ -8,10 +10,18 @@ export interface Profile {
   lastName: string
   firstName: string
   createdAt: string
+  payFrequency: PayFrequency
+  needsPercent: number
+  wantsPercent: number
+  savingsPercent: number
 }
 
 export interface UpdateProfileData {
   firstName?: string
   lastName?: string
   username?: string
+  payFrequency?: PayFrequency
+  needsPercent?: number
+  wantsPercent?: number
+  savingsPercent?: number
 }

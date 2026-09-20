@@ -61,6 +61,13 @@ call happens:
   receives — that's how e.g. `update-transaction.ts`/`delete-transaction.ts` get an `id` (called
   as `/proxy/update-transaction?id=123`) without a dynamic route file. Add new backend
   integrations by adding a service function plus a matching proxy route, following this pattern.
+  **The client component calling the proxy must pass its own `Authorization` header explicitly**
+  (`useSession()` → `Bearer ${session?.accessToken}`) — the proxy route has no session of its
+  own, it only forwards whatever header the browser sent it. Forgetting this is a real bug we hit
+  twice (entries/expenditures silently 401'd with no visible error until `createHandler`'s error
+  handling was also fixed to stop swallowing the real status/message — see git history).
+  `apiService.ts`'s `HttpError` class carries the real upstream status end-to-end through this
+  chain; don't go back to throwing plain `Error`s there.
 - **`getServerSideProps`** (page-load data fetching) calls the same `src/services/*` functions
   **directly**, no proxy hop needed since it already runs on the server — see
   `requestProfile`/`getSalaryDetails`/`getTransactions` used this way in `profile/index.tsx`,

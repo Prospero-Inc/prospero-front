@@ -115,5 +115,15 @@
         "description": "We are sending an email with instructions to reset your password."
       }
     }
+  },
+  "dashboard": {
+    "daysElapsed": "{{count}} days elapsed",
+    "daysRemaining": "{{count}} estimated days remaining",
+    "budgetTitle": "Period budget"
+  },
+  "categoryBudget": {
+    "necesidad": "Needs",
+    "deseo": "Wants",
+    "ahorro": "Savings"
   }
 }

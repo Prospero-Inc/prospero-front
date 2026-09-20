@@ -1,23 +1,32 @@
 {
   "title": "Entries",
   "form": {
-    "labelAmount": "Income amount",
-    "submit": "Register entry"
+    "labelAmount": "Amount",
+    "labelDate": "Date",
+    "labelType": "Type",
+    "submit": "Register entry",
+    "submitEdit": "Update entry",
+    "cancel": "Cancel"
+  },
+  "types": {
+    "Payroll": "Payroll",
+    "Extra": "Extra (bonus, sale, gift)"
   },
   "list": {
-    "title": "This month's income",
-    "empty": "You haven't registered an income this month yet.",
-    "amount": "Amount",
-    "distribution": "Distribution (fixed / variable / savings)"
+    "title": "Income",
+    "empty": "You haven't registered any income yet.",
+    "actions": {
+      "edit": "Edit"
+    }
   },
   "toast": {
     "success": {
-      "title": "Entry registered",
-      "description": "Your income was saved successfully"
+      "title": "Entry saved",
+      "description": "The entry was saved successfully"
     },
     "error": {
       "title": "Error",
-      "description": "We could not register the entry"
+      "description": "We could not save the entry"
     }
   }
 }

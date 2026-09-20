@@ -5,6 +5,29 @@
     "email": "Correo electrónico",
     "username": "Nombre de usuario"
   },
+  "budget": {
+    "title": "Presupuesto",
+    "labelFrequency": "Frecuencia de pago",
+    "frequency": {
+      "Biweekly": "Quincenal",
+      "Monthly": "Mensual"
+    },
+    "labelNeeds": "Necesidad (%)",
+    "labelWants": "Deseo (%)",
+    "labelSavings": "Ahorro (%)",
+    "total": "Total: {{total}}% (debe sumar 100%)",
+    "submit": "Guardar presupuesto",
+    "toast": {
+      "success": {
+        "title": "Presupuesto guardado",
+        "description": "Tu configuración se guardó con éxito"
+      },
+      "error": {
+        "title": "Error",
+        "description": "No pudimos guardar tu configuración"
+      }
+    }
+  },
   "language": {
     "title": "Idioma"
   },

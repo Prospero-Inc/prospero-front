@@ -4,9 +4,9 @@ interface IBudgetResponse {
 }
 
 interface Distribution {
-  fixedExpenses: number
-  variableExpenses: number
-  savings: number
+  necesidad: number
+  deseo: number
+  ahorro: number
 }
 
 export type { IBudgetResponse, Distribution }

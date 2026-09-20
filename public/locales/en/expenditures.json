@@ -3,17 +3,22 @@
   "form": {
     "labelAmount": "Amount",
     "labelCategory": "Category",
-    "labelType": "Type",
     "labelDate": "Date",
     "labelDescription": "Note (optional)",
+    "labelPeriodOverride": "Count towards (optional)",
     "submit": "Save expense",
     "submitEdit": "Update expense",
     "cancel": "Cancel"
   },
-  "types": {
-    "FixedExpense": "Fixed expense",
-    "VariableExpense": "Variable expense",
-    "Savings": "Savings"
+  "categories": {
+    "Necesidad": "Needs",
+    "Deseo": "Wants",
+    "Ahorro": "Savings"
+  },
+  "periodOverride": {
+    "none": "Automatic (by date)",
+    "Previous": "Force to previous period",
+    "Current": "Force to current period"
   },
   "list": {
     "title": "Movements",

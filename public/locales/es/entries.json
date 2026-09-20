@@ -1,23 +1,32 @@
 {
   "title": "Ingresos",
   "form": {
-    "labelAmount": "Monto del ingreso",
-    "submit": "Registrar ingreso"
+    "labelAmount": "Monto",
+    "labelDate": "Fecha",
+    "labelType": "Tipo",
+    "submit": "Registrar ingreso",
+    "submitEdit": "Actualizar ingreso",
+    "cancel": "Cancelar"
+  },
+  "types": {
+    "Payroll": "Nómina",
+    "Extra": "Extra (bono, venta, regalo)"
   },
   "list": {
-    "title": "Ingreso de este mes",
-    "empty": "Todavía no registraste un ingreso este mes.",
-    "amount": "Monto",
-    "distribution": "Distribución (fijos / variables / ahorro)"
+    "title": "Ingresos",
+    "empty": "Todavía no registraste ningún ingreso.",
+    "actions": {
+      "edit": "Editar"
+    }
   },
   "toast": {
     "success": {
-      "title": "Ingreso registrado",
-      "description": "Tu ingreso se guardó con éxito"
+      "title": "Ingreso guardado",
+      "description": "El ingreso se guardó con éxito"
     },
     "error": {
       "title": "Error",
-      "description": "No pudimos registrar el ingreso"
+      "description": "No pudimos guardar el ingreso"
     }
   }
 }

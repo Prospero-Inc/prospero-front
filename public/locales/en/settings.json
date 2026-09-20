@@ -5,6 +5,29 @@
     "email": "Email",
     "username": "Username"
   },
+  "budget": {
+    "title": "Budget",
+    "labelFrequency": "Pay frequency",
+    "frequency": {
+      "Biweekly": "Biweekly",
+      "Monthly": "Monthly"
+    },
+    "labelNeeds": "Needs (%)",
+    "labelWants": "Wants (%)",
+    "labelSavings": "Savings (%)",
+    "total": "Total: {{total}}% (must add up to 100%)",
+    "submit": "Save budget",
+    "toast": {
+      "success": {
+        "title": "Budget saved",
+        "description": "Your settings were saved successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "We could not save your settings"
+      }
+    }
+  },
   "language": {
     "title": "Language"
   },

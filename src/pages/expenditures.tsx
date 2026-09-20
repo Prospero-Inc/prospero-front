@@ -41,9 +41,9 @@ interface ExpendituresProps {
 const emptyForm: TransactionData = {
   amount: 0,
   date: new Date().toISOString().slice(0, 10),
-  category: '',
-  type: 'VariableExpense',
-  description: ''
+  category: 'Necesidad',
+  description: '',
+  periodOverride: ''
 }
 
 export default function ExpendituresPage({ transactions }: ExpendituresProps) {
@@ -63,8 +63,8 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
       amount: transaction.amount,
       date: transaction.date.slice(0, 10),
       category: transaction.category,
-      type: transaction.type,
-      description: transaction.description ?? ''
+      description: transaction.description ?? '',
+      periodOverride: transaction.periodOverride ?? ''
     })
   }
 
@@ -76,7 +76,11 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
   const onSubmit = async (data: TransactionData) => {
     setIsLoading(true)
     try {
-      const payload = { ...data, amount: Number(data.amount) }
+      const payload = {
+        ...data,
+        amount: Number(data.amount),
+        periodOverride: data.periodOverride || undefined
+      }
       const headers = { Authorization: `Bearer ${session?.accessToken}` }
       if (editingId)
         await localApiService.request({
@@ -163,23 +167,11 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
             <Controller
               name="category"
               control={control}
-              render={({ field }) => <Input {...field} />}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>{t('form.labelType')}</FormLabel>
-            <Controller
-              name="type"
-              control={control}
               render={({ field }) => (
                 <Select {...field}>
-                  <option value="FixedExpense">
-                    {t('types.FixedExpense')}
-                  </option>
-                  <option value="VariableExpense">
-                    {t('types.VariableExpense')}
-                  </option>
-                  <option value="Savings">{t('types.Savings')}</option>
+                  <option value="Necesidad">{t('categories.Necesidad')}</option>
+                  <option value="Deseo">{t('categories.Deseo')}</option>
+                  <option value="Ahorro">{t('categories.Ahorro')}</option>
                 </Select>
               )}
             />
@@ -198,6 +190,22 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
               name="description"
               control={control}
               render={({ field }) => <Input {...field} />}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>{t('form.labelPeriodOverride')}</FormLabel>
+            <Controller
+              name="periodOverride"
+              control={control}
+              render={({ field }) => (
+                <Select {...field}>
+                  <option value="">{t('periodOverride.none')}</option>
+                  <option value="Previous">
+                    {t('periodOverride.Previous')}
+                  </option>
+                  <option value="Current">{t('periodOverride.Current')}</option>
+                </Select>
+              )}
             />
           </FormControl>
           <Stack direction="row">
@@ -224,7 +232,6 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
                 <Tr>
                   <Th>{t('form.labelDate')}</Th>
                   <Th>{t('form.labelCategory')}</Th>
-                  <Th>{t('form.labelType')}</Th>
                   <Th isNumeric>{t('form.labelAmount')}</Th>
                   <Th />
                 </Tr>
@@ -233,8 +240,7 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
                 {transactions.map(transaction => (
                   <Tr key={transaction.id}>
                     <Td>{transaction.date.slice(0, 10)}</Td>
-                    <Td>{transaction.category}</Td>
-                    <Td>{t(`types.${transaction.type}`)}</Td>
+                    <Td>{t(`categories.${transaction.category}`)}</Td>
                     <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
                     <Td>
                       <IconButton

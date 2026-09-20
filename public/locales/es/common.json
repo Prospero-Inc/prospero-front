@@ -115,5 +115,15 @@
         "description": "Estamos enviando un correo electrónico con instrucciones para restablecer su contraseña."
       }
     }
+  },
+  "dashboard": {
+    "daysElapsed": "{{count}} días transcurridos",
+    "daysRemaining": "{{count}} días estimados restantes",
+    "budgetTitle": "Presupuesto del período"
+  },
+  "categoryBudget": {
+    "necesidad": "Necesidad",
+    "deseo": "Deseo",
+    "ahorro": "Ahorro"
   }
 }

@@ -2,12 +2,15 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 import { Params } from '@/types'
 
+export type BudgetCategory = 'Necesidad' | 'Deseo' | 'Ahorro'
+export type PeriodOverride = 'Previous' | 'Current'
+
 export interface TransactionData {
   amount: number
   date: string
-  category: string
-  type: 'FixedExpense' | 'VariableExpense' | 'Savings'
+  category: BudgetCategory
   description?: string
+  periodOverride?: PeriodOverride | ''
 }
 
 interface TransactionFilters {

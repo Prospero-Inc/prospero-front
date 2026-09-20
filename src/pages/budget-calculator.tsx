@@ -45,7 +45,7 @@ const index = () => {
     try {
       setIsLoading(true)
       const {
-        distribution: { fixedExpenses, savings, variableExpenses }
+        distribution: { necesidad, deseo, ahorro }
       } = await localApiService.request<IBudgetResponse>({
         endPoint: '/proxy/budget-calculator',
         method: HttpMethod.GET,
@@ -56,9 +56,9 @@ const index = () => {
         query: { amount: +salary }
       })
       setAmounts({
-        fifty: fixedExpenses,
-        thirty: variableExpenses,
-        twenty: savings
+        fifty: necesidad,
+        thirty: deseo,
+        twenty: ahorro
       })
     } catch (error) {
       if (error instanceof Error)

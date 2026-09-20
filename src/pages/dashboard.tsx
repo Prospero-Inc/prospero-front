@@ -3,24 +3,26 @@ import { TotalMoneyIcon } from '@/components/icons/TotalMoneyIcon'
 import { ProsperoLayout } from '@/components/layouts'
 import { GenericSection } from '@/components/layouts/GenericSection'
 import { AmountCard } from '@/components/ui/AmountCard'
-import { GoalsSteps } from '@/components/ui/GoalsSteps'
+import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { MotionDiv } from '@/components/ui/MotionDiv'
 import { entryAsset, expendituresAsset, walletAsset } from '@/config'
-import { getSalaryDetails } from '@/services/salary'
-import { getTransactions } from '@/services/transactions'
-import { Flex } from '@chakra-ui/react'
+import { getCurrentPeriod, PeriodSummary } from '@/services/periods'
+import { Flex, Text } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 interface DashboardProps {
-  incomeAmount: number
-  totalSpent: number
+  period: PeriodSummary | null
 }
 
-const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
-  const total = incomeAmount - totalSpent
+const dashboard = ({ period }: DashboardProps) => {
+  const { t } = useTranslation('common')
+  const income = period?.income ?? 0
+  const totalSpent = period?.totalSpent ?? 0
+  const balance = period?.balance ?? 0
 
   return (
     <ProsperoLayout
@@ -33,7 +35,7 @@ const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
             bgColor="walletCard"
             title="Total"
             image={walletAsset}
-            totalAmount={total}
+            totalAmount={balance}
             comparisonAmount={0}
             icon={TotalMoneyIcon}
             breakpointsImage={{
@@ -60,8 +62,8 @@ const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
         <MotionDiv>
           <AmountCard
             bgColor="entryCard"
-            title="Ingresos Mensuales"
-            totalAmount={incomeAmount}
+            title="Ingreso del Período"
+            totalAmount={income}
             comparisonAmount={0}
             icon={TotalMoneyIcon}
             image={entryAsset}
@@ -88,7 +90,7 @@ const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
         <MotionDiv>
           <AmountCard
             bgColor="expenditureCard"
-            title="Gastos Mensuales"
+            title="Gastos del Período"
             totalAmount={totalSpent}
             comparisonAmount={0}
             icon={FlameIcon}
@@ -114,9 +116,35 @@ const dashboard = ({ incomeAmount, totalSpent }: DashboardProps) => {
           />{' '}
         </MotionDiv>
       </Flex>
-      <GenericSection title="">
+
+      {period && (
+        <Text color="GrayText" mb={4}>
+          {period.daysElapsed !== null &&
+            t('dashboard.daysElapsed', { count: period.daysElapsed })}
+          {period.estimatedDaysRemaining !== null &&
+            ` · ${t('dashboard.daysRemaining', {
+              count: period.estimatedDaysRemaining
+            })}`}
+        </Text>
+      )}
+
+      <GenericSection title={t('dashboard.budgetTitle')}>
         <MotionDiv>
-          <GoalsSteps />
+          <CategoryBudgetBars
+            necesidad={
+              period?.budget.necesidad ?? {
+                budgeted: 0,
+                spent: 0,
+                remaining: 0
+              }
+            }
+            deseo={
+              period?.budget.deseo ?? { budgeted: 0, spent: 0, remaining: 0 }
+            }
+            ahorro={
+              period?.budget.ahorro ?? { budgeted: 0, spent: 0, remaining: 0 }
+            }
+          />
         </MotionDiv>
       </GenericSection>
     </ProsperoLayout>
@@ -128,45 +156,17 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale
 }) => {
   const session = await getSession({ req })
-  let incomeAmount = 0
-  let totalSpent = 0
+  let period: PeriodSummary | null = null
 
-  if (session?.accessToken) {
-    const authorization = `Bearer ${session.accessToken}`
-    const now = new Date()
-    const from = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-    const to = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0,
-      23,
-      59,
-      59
-    ).toISOString()
-
+  if (session?.accessToken)
     try {
-      const salaryDetails = (await getSalaryDetails(null, {
-        authorization,
+      period = await getCurrentPeriod(null, {
+        authorization: `Bearer ${session.accessToken}`,
         lang: locale
-      })) as { salary?: { amount: number }[] }
-      incomeAmount = salaryDetails?.salary?.[0]?.amount ?? 0
+      })
     } catch (error) {
-      incomeAmount = 0
+      period = null
     }
-
-    try {
-      const transactions = (await getTransactions(
-        { from, to },
-        { authorization, lang: locale }
-      )) as { amount: number }[]
-      totalSpent = (transactions ?? []).reduce(
-        (sum, transaction) => sum + transaction.amount,
-        0
-      )
-    } catch (error) {
-      totalSpent = 0
-    }
-  }
 
   return {
     props: {
@@ -175,8 +175,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         'sidebar',
         'mobileNav'
       ])),
-      incomeAmount,
-      totalSpent
+      period
     }
   }
 }
