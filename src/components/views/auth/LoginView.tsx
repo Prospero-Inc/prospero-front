@@ -39,9 +39,7 @@ export const LoginView = () => {
       .string()
       .email(t('login.yupSchema.email.email'))
       .required(t('login.yupSchema.email.required')),
-    password: yup
-      .string()
-      .required(t('login.yupSchema.password.required'))
+    password: yup.string().required(t('login.yupSchema.password.required'))
   })
   const {
     control,
