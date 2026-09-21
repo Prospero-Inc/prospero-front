@@ -59,7 +59,7 @@
       "password": {
         "required": "Contraseña es requerida",
         "minLength": "Contraseña debe tener almenos 8 caracteres",
-        "matches": "Contraseña debe contener al menos una minuscula,una mayuscula,un digito,un caracter especial, y un punto"
+        "matches": "Contraseña debe contener al menos una minúscula, una mayúscula, un dígito y un carácter especial (ej. !@#$%^&*)"
       },
       "firstName": "Nombres es requerido",
       "lastName": "Apellidos es requerido",
