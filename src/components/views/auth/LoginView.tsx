@@ -1,5 +1,6 @@
 import { PasswordInput } from '@/components/ui'
-import { CookiesEnum, HttpMethod } from '@/enums'
+
+import m CookiesEnum, HttpMethod } from '@/enums'
 import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import {
   isRequiresTwoFactorResponse,
@@ -39,9 +40,8 @@ export const LoginView = () => {
       .string()
       .email(t('login.yupSchema.email.email'))
       .required(t('login.yupSchema.email.required')),
-    password: yup
-      .string()
-      .required(t('login.yupSchema.password.required'))
+    password: yup.string().required(t('login.yupSchema.password.required'))
+
   })
   const {
     control,
