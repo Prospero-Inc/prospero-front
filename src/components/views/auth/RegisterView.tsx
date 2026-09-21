@@ -35,7 +35,7 @@ const validationSchema = (t: TFunction) =>
       .required(t('register.yupSchema.password.required'))
       .min(8, t('register.yupSchema.password.minLength'))
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
         t('register.yupSchema.password.matches')
       ),
     name: yup.string().required(t('register.yupSchema.firstName')),

@@ -42,11 +42,6 @@ export const LoginView = () => {
     password: yup
       .string()
       .required(t('login.yupSchema.password.required'))
-      .min(8, t('login.yupSchema.password.minLength'))
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/,
-        t('login.yupSchema.password.matches')
-      )
   })
   const {
     control,

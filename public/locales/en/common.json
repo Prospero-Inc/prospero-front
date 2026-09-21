@@ -59,7 +59,7 @@
       "password": {
         "required": "Password is required",
         "minLength": "Password must be at least 8 characters long",
-        "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
+        "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (e.g. !@#$%^&*)"
       },
       "firstName": "FirstName is required",
       "lastName": "LastName is required",
