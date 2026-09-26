@@ -3,9 +3,12 @@ import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import { getSalaryList, IncomeType, SalaryData } from '@/services/salary'
 import {
+  Badge,
   Box,
   Button,
+  Checkbox,
   FormControl,
+  FormHelperText,
   FormLabel,
   Heading,
   IconButton,
@@ -42,7 +45,9 @@ interface EntriesProps {
 const emptyForm: SalaryData = {
   amount: 0,
   date: new Date().toISOString().slice(0, 10),
-  type: 'Payroll'
+  type: 'Payroll',
+  budgetCategory: '',
+  distributeAutomatically: false
 }
 
 export default function EntriesPage({ salary }: EntriesProps) {
@@ -52,16 +57,22 @@ export default function EntriesPage({ salary }: EntriesProps) {
   const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
-  const { control, handleSubmit, reset } = useForm<SalaryData>({
+  const { control, handleSubmit, reset, watch } = useForm<SalaryData>({
     defaultValues: emptyForm
   })
+
+  const type = watch('type')
+  const distributeAutomatically = watch('distributeAutomatically')
+  const isExtra = type === 'Extra'
 
   const startEdit = (entry: SalaryEntry) => {
     setEditingId(entry.id)
     reset({
       amount: entry.amount,
       date: entry.date.slice(0, 10),
-      type: entry.type
+      type: entry.type,
+      budgetCategory: entry.budgetCategory ?? '',
+      distributeAutomatically: entry.distributeAutomatically ?? false
     })
   }
 
@@ -73,7 +84,26 @@ export default function EntriesPage({ salary }: EntriesProps) {
   const onSubmit = async (data: SalaryData) => {
     setIsLoading(true)
     try {
-      const payload = { ...data, amount: Number(data.amount) }
+      const basePayload = {
+        amount: Number(data.amount),
+        date: data.date,
+        type: data.type
+      }
+      // budgetCategory/distributeAutomatically solo aplican (y solo se
+      // aceptan) cuando type === 'Extra'; el backend rechaza la request con
+      // 400 si vienen presentes en un Payroll, así que ni siquiera se
+      // incluyen las keys en ese caso.
+      const payload: SalaryData =
+        data.type === 'Extra'
+          ? {
+              ...basePayload,
+              distributeAutomatically: !!data.distributeAutomatically,
+              ...(data.budgetCategory && !data.distributeAutomatically
+                ? { budgetCategory: data.budgetCategory }
+                : {})
+            }
+          : basePayload
+
       const headers = { Authorization: `Bearer ${session?.accessToken}` }
       if (editingId)
         await localApiService.request({
@@ -151,6 +181,51 @@ export default function EntriesPage({ salary }: EntriesProps) {
               )}
             />
           </FormControl>
+
+          {isExtra && (
+            <>
+              <FormControl>
+                <FormLabel>{t('form.labelBudgetCategory')}</FormLabel>
+                <Controller
+                  name="budgetCategory"
+                  control={control}
+                  render={({ field }) => (
+                    <Select {...field} isDisabled={!!distributeAutomatically}>
+                      <option value="">
+                        {t('form.budgetCategoryPlaceholder')}
+                      </option>
+                      <option value="Necesidad">
+                        {t('categories.Necesidad')}
+                      </option>
+                      <option value="Deseo">{t('categories.Deseo')}</option>
+                      <option value="Ahorro">{t('categories.Ahorro')}</option>
+                    </Select>
+                  )}
+                />
+                <FormHelperText>
+                  {distributeAutomatically
+                    ? t('form.budgetCategoryDisabledHelper')
+                    : t('form.budgetCategoryHelper')}
+                </FormHelperText>
+              </FormControl>
+              <FormControl display="flex" alignItems="center">
+                <Controller
+                  name="distributeAutomatically"
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Checkbox
+                      {...field}
+                      isChecked={!!value}
+                      onChange={e => onChange(e.target.checked)}
+                    >
+                      {t('form.labelDistributeAutomatically')}
+                    </Checkbox>
+                  )}
+                />
+              </FormControl>
+            </>
+          )}
+
           <Stack direction="row">
             <Button colorScheme="primary" type="submit" isLoading={isLoading}>
               {editingId ? t('form.submitEdit') : t('form.submit')}
@@ -176,6 +251,7 @@ export default function EntriesPage({ salary }: EntriesProps) {
                   <Tr>
                     <Th>{t('form.labelDate')}</Th>
                     <Th>{t('form.labelType')}</Th>
+                    <Th>{t('list.columnCategory')}</Th>
                     <Th isNumeric>{t('form.labelAmount')}</Th>
                     <Th />
                   </Tr>
@@ -185,6 +261,17 @@ export default function EntriesPage({ salary }: EntriesProps) {
                     <Tr key={entry.id}>
                       <Td>{entry.date.slice(0, 10)}</Td>
                       <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                      <Td>
+                        {entry.type === 'Extra' && entry.budgetCategory ? (
+                          <Badge colorScheme="purple">
+                            {t(`categories.${entry.budgetCategory}`)}
+                          </Badge>
+                        ) : (
+                          <Text as="span" color="gray.500" fontSize="sm">
+                            {t('list.autoDistributed')}
+                          </Text>
+                        )}
+                      </Td>
                       <Td isNumeric>${entry.amount.toFixed(2)}</Td>
                       <Td>
                         <IconButton
