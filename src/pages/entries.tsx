@@ -13,6 +13,7 @@ import {
   Select,
   Stack,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
@@ -169,34 +170,36 @@ export default function EntriesPage({ salary }: EntriesProps) {
           {salary.length === 0 ? (
             <Text>{t('list.empty')}</Text>
           ) : (
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>{t('form.labelDate')}</Th>
-                  <Th>{t('form.labelType')}</Th>
-                  <Th isNumeric>{t('form.labelAmount')}</Th>
-                  <Th />
-                </Tr>
-              </Thead>
-              <Tbody>
-                {salary.map(entry => (
-                  <Tr key={entry.id}>
-                    <Td>{entry.date.slice(0, 10)}</Td>
-                    <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
-                    <Td isNumeric>${entry.amount.toFixed(2)}</Td>
-                    <Td>
-                      <IconButton
-                        aria-label={t('list.actions.edit')}
-                        icon={<MdEdit />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => startEdit(entry)}
-                      />
-                    </Td>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th>{t('form.labelDate')}</Th>
+                    <Th>{t('form.labelType')}</Th>
+                    <Th isNumeric>{t('form.labelAmount')}</Th>
+                    <Th />
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {salary.map(entry => (
+                    <Tr key={entry.id}>
+                      <Td>{entry.date.slice(0, 10)}</Td>
+                      <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                      <Td isNumeric>${entry.amount.toFixed(2)}</Td>
+                      <Td>
+                        <IconButton
+                          aria-label={t('list.actions.edit')}
+                          icon={<MdEdit />}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEdit(entry)}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           )}
         </Box>
       </Stack>

@@ -13,6 +13,7 @@ import {
   Select,
   Stack,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
@@ -227,42 +228,44 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
           {transactions.length === 0 ? (
             <Text>{t('list.empty')}</Text>
           ) : (
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>{t('form.labelDate')}</Th>
-                  <Th>{t('form.labelCategory')}</Th>
-                  <Th isNumeric>{t('form.labelAmount')}</Th>
-                  <Th />
-                </Tr>
-              </Thead>
-              <Tbody>
-                {transactions.map(transaction => (
-                  <Tr key={transaction.id}>
-                    <Td>{transaction.date.slice(0, 10)}</Td>
-                    <Td>{t(`categories.${transaction.category}`)}</Td>
-                    <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
-                    <Td>
-                      <IconButton
-                        aria-label={t('list.actions.edit')}
-                        icon={<MdEdit />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => startEdit(transaction)}
-                        mr={2}
-                      />
-                      <IconButton
-                        aria-label={t('list.actions.delete')}
-                        icon={<MdDelete />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onDelete(transaction.id)}
-                      />
-                    </Td>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th>{t('form.labelDate')}</Th>
+                    <Th>{t('form.labelCategory')}</Th>
+                    <Th isNumeric>{t('form.labelAmount')}</Th>
+                    <Th />
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {transactions.map(transaction => (
+                    <Tr key={transaction.id}>
+                      <Td>{transaction.date.slice(0, 10)}</Td>
+                      <Td>{t(`categories.${transaction.category}`)}</Td>
+                      <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
+                      <Td>
+                        <IconButton
+                          aria-label={t('list.actions.edit')}
+                          icon={<MdEdit />}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEdit(transaction)}
+                          mr={2}
+                        />
+                        <IconButton
+                          aria-label={t('list.actions.delete')}
+                          icon={<MdDelete />}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onDelete(transaction.id)}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           )}
         </Box>
       </Stack>

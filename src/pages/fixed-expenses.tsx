@@ -7,7 +7,11 @@ import {
   Badge,
   Box,
   Button,
+  Card,
+  CardBody,
   Checkbox,
+  Divider,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -16,6 +20,7 @@ import {
   Select,
   Stack,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
@@ -278,59 +283,139 @@ export default function FixedExpensesPage({
           {fixedExpenses.length === 0 ? (
             <Text>{t('list.empty')}</Text>
           ) : (
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>{t('form.labelDueDate')}</Th>
-                  <Th>{t('form.labelName')}</Th>
-                  <Th>{t('form.labelBudgetCategory')}</Th>
-                  <Th isNumeric>{t('form.labelAmount')}</Th>
-                  <Th />
-                  <Th />
-                </Tr>
-              </Thead>
-              <Tbody>
+            <>
+              {/* Desktop/tablet: table with horizontal scroll fallback */}
+              <TableContainer display={{ base: 'none', md: 'block' }}>
+                <Table variant="simple" size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th>{t('form.labelDueDate')}</Th>
+                      <Th>{t('form.labelName')}</Th>
+                      <Th>{t('form.labelBudgetCategory')}</Th>
+                      <Th isNumeric>{t('form.labelAmount')}</Th>
+                      <Th />
+                      <Th />
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {fixedExpenses.map(fixedExpense => (
+                      <Tr key={fixedExpense.id}>
+                        <Td>{fixedExpense.dueDate.slice(0, 10)}</Td>
+                        <Td>{fixedExpense.name}</Td>
+                        <Td>
+                          {t(`categories.${fixedExpense.budgetCategory}`)}
+                        </Td>
+                        <Td isNumeric>${fixedExpense.amount.toFixed(2)}</Td>
+                        <Td>
+                          {fixedExpense.paidThisCycle ? (
+                            <Badge colorScheme="green">{t('list.paid')}</Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              leftIcon={<MdCheckCircle />}
+                              isLoading={payingId === fixedExpense.id}
+                              onClick={() => onPay(fixedExpense.id)}
+                            >
+                              {t('list.actions.pay')}
+                            </Button>
+                          )}
+                        </Td>
+                        <Td>
+                          <IconButton
+                            aria-label={t('list.actions.edit')}
+                            icon={<MdEdit />}
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEdit(fixedExpense)}
+                            mr={2}
+                          />
+                          <IconButton
+                            aria-label={t('list.actions.delete')}
+                            icon={<MdDelete />}
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onDelete(fixedExpense.id)}
+                          />
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+
+              {/* Mobile: stacked cards, same data/handlers as the table above */}
+              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
                 {fixedExpenses.map(fixedExpense => (
-                  <Tr key={fixedExpense.id}>
-                    <Td>{fixedExpense.dueDate.slice(0, 10)}</Td>
-                    <Td>{fixedExpense.name}</Td>
-                    <Td>{t(`categories.${fixedExpense.budgetCategory}`)}</Td>
-                    <Td isNumeric>${fixedExpense.amount.toFixed(2)}</Td>
-                    <Td>
-                      {fixedExpense.paidThisCycle ? (
-                        <Badge colorScheme="green">{t('list.paid')}</Badge>
-                      ) : (
-                        <Button
-                          size="sm"
-                          leftIcon={<MdCheckCircle />}
-                          isLoading={payingId === fixedExpense.id}
-                          onClick={() => onPay(fixedExpense.id)}
-                        >
-                          {t('list.actions.pay')}
-                        </Button>
-                      )}
-                    </Td>
-                    <Td>
-                      <IconButton
-                        aria-label={t('list.actions.edit')}
-                        icon={<MdEdit />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => startEdit(fixedExpense)}
-                        mr={2}
-                      />
-                      <IconButton
-                        aria-label={t('list.actions.delete')}
-                        icon={<MdDelete />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onDelete(fixedExpense.id)}
-                      />
-                    </Td>
-                  </Tr>
+                  <Card key={fixedExpense.id} variant="outline">
+                    <CardBody>
+                      <Stack spacing={2}>
+                        <Text fontWeight="bold">{fixedExpense.name}</Text>
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelDueDate')}
+                          </Text>
+                          <Text fontSize="sm">
+                            {fixedExpense.dueDate.slice(0, 10)}
+                          </Text>
+                        </Flex>
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelBudgetCategory')}
+                          </Text>
+                          <Text fontSize="sm">
+                            {t(`categories.${fixedExpense.budgetCategory}`)}
+                          </Text>
+                        </Flex>
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelAmount')}
+                          </Text>
+                          <Text fontSize="sm" fontWeight="semibold">
+                            ${fixedExpense.amount.toFixed(2)}
+                          </Text>
+                        </Flex>
+
+                        <Divider />
+
+                        <Flex justify="space-between" align="center">
+                          {fixedExpense.paidThisCycle ? (
+                            <Badge colorScheme="green">{t('list.paid')}</Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              leftIcon={<MdCheckCircle />}
+                              isLoading={payingId === fixedExpense.id}
+                              onClick={() => onPay(fixedExpense.id)}
+                            >
+                              {t('list.actions.pay')}
+                            </Button>
+                          )}
+                          <Stack direction="row" spacing={1}>
+                            <IconButton
+                              aria-label={t('list.actions.edit')}
+                              icon={<MdEdit />}
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => startEdit(fixedExpense)}
+                            />
+                            <IconButton
+                              aria-label={t('list.actions.delete')}
+                              icon={<MdDelete />}
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => onDelete(fixedExpense.id)}
+                            />
+                          </Stack>
+                        </Flex>
+                      </Stack>
+                    </CardBody>
+                  </Card>
                 ))}
-              </Tbody>
-            </Table>
+              </Stack>
+            </>
           )}
         </Box>
       </Stack>
