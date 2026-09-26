@@ -81,4 +81,4 @@ jobs:
         run: docker compose up -d
 
       - name: Clean up old images
-        run: docker image prune -f
+        run: docker image prune -a -f
