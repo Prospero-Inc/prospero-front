@@ -4,6 +4,11 @@
     "labelAmount": "Amount",
     "labelDate": "Date",
     "labelType": "Type",
+    "labelBudgetCategory": "Assign to category",
+    "budgetCategoryPlaceholder": "No category (split automatically)",
+    "budgetCategoryHelper": "Optional. If you pick a category, this entry goes 100% to it instead of being split.",
+    "budgetCategoryDisabledHelper": "Not used because \"Split automatically\" is checked.",
+    "labelDistributeAutomatically": "Split automatically instead",
     "submit": "Register entry",
     "submitEdit": "Update entry",
     "cancel": "Cancel"
@@ -12,9 +17,16 @@
     "Payroll": "Payroll",
     "Extra": "Extra (bonus, sale, gift)"
   },
+  "categories": {
+    "Necesidad": "Needs",
+    "Deseo": "Wants",
+    "Ahorro": "Savings"
+  },
   "list": {
     "title": "Income",
     "empty": "You haven't registered any income yet.",
+    "columnCategory": "Category",
+    "autoDistributed": "Split automatically",
     "actions": {
       "edit": "Edit"
     }

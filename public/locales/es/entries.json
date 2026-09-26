@@ -4,6 +4,11 @@
     "labelAmount": "Monto",
     "labelDate": "Fecha",
     "labelType": "Tipo",
+    "labelBudgetCategory": "Asignar a categoría",
+    "budgetCategoryPlaceholder": "Sin categoría (reparto automático)",
+    "budgetCategoryHelper": "Opcional. Si elegís una categoría, este ingreso va 100% a ella en vez de repartirse.",
+    "budgetCategoryDisabledHelper": "No se usa porque está marcado \"Repartir automáticamente\".",
+    "labelDistributeAutomatically": "Repartir automáticamente en su lugar",
     "submit": "Registrar ingreso",
     "submitEdit": "Actualizar ingreso",
     "cancel": "Cancelar"
@@ -12,9 +17,16 @@
     "Payroll": "Nómina",
     "Extra": "Extra (bono, venta, regalo)"
   },
+  "categories": {
+    "Necesidad": "Necesidad",
+    "Deseo": "Deseo",
+    "Ahorro": "Ahorro"
+  },
   "list": {
     "title": "Ingresos",
     "empty": "Todavía no registraste ningún ingreso.",
+    "columnCategory": "Categoría",
+    "autoDistributed": "Reparto automático",
     "actions": {
       "edit": "Editar"
     }
