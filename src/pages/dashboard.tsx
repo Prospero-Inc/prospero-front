@@ -7,12 +7,13 @@ import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { MotionDiv } from '@/components/ui/MotionDiv'
 import { entryAsset, expendituresAsset, walletAsset } from '@/config'
 import { getCurrentPeriod, PeriodSummary } from '@/services/periods'
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Icon, Text } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
+import { MdCalendarToday } from 'react-icons/md'
 
 interface DashboardProps {
   period: PeriodSummary | null
@@ -23,6 +24,24 @@ const dashboard = ({ period }: DashboardProps) => {
   const income = period?.income ?? 0
   const totalSpent = period?.totalSpent ?? 0
   const balance = period?.balance ?? 0
+
+  const hasPeriodCaption =
+    !!period &&
+    (period.daysElapsed !== null || period.estimatedDaysRemaining !== null)
+
+  const periodCaption = hasPeriodCaption && (
+    <Flex align="center" gap={1.5} color="GrayText" fontSize="sm">
+      <Icon as={MdCalendarToday} boxSize={4} aria-hidden="true" />
+      <Text as="span" fontSize="sm">
+        {period?.daysElapsed !== null &&
+          t('dashboard.daysElapsed', { count: period?.daysElapsed })}
+        {period?.estimatedDaysRemaining !== null &&
+          ` · ${t('dashboard.daysRemaining', {
+            count: period?.estimatedDaysRemaining
+          })}`}
+      </Text>
+    </Flex>
+  )
 
   return (
     <ProsperoLayout
@@ -117,18 +136,10 @@ const dashboard = ({ period }: DashboardProps) => {
         </MotionDiv>
       </Flex>
 
-      {period && (
-        <Text color="GrayText" mb={4}>
-          {period.daysElapsed !== null &&
-            t('dashboard.daysElapsed', { count: period.daysElapsed })}
-          {period.estimatedDaysRemaining !== null &&
-            ` · ${t('dashboard.daysRemaining', {
-              count: period.estimatedDaysRemaining
-            })}`}
-        </Text>
-      )}
-
-      <GenericSection title={t('dashboard.budgetTitle')}>
+      <GenericSection
+        title={t('dashboard.budgetTitle')}
+        caption={periodCaption}
+      >
         <MotionDiv>
           <CategoryBudgetBars
             necesidad={
