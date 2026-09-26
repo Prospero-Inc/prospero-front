@@ -5,6 +5,10 @@ import { getTransactions, TransactionData } from '@/services/transactions'
 import {
   Box,
   Button,
+  Card,
+  CardBody,
+  Divider,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -228,44 +232,101 @@ export default function ExpendituresPage({ transactions }: ExpendituresProps) {
           {transactions.length === 0 ? (
             <Text>{t('list.empty')}</Text>
           ) : (
-            <TableContainer>
-              <Table variant="simple" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>{t('form.labelDate')}</Th>
-                    <Th>{t('form.labelCategory')}</Th>
-                    <Th isNumeric>{t('form.labelAmount')}</Th>
-                    <Th />
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {transactions.map(transaction => (
-                    <Tr key={transaction.id}>
-                      <Td>{transaction.date.slice(0, 10)}</Td>
-                      <Td>{t(`categories.${transaction.category}`)}</Td>
-                      <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
-                      <Td>
-                        <IconButton
-                          aria-label={t('list.actions.edit')}
-                          icon={<MdEdit />}
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => startEdit(transaction)}
-                          mr={2}
-                        />
-                        <IconButton
-                          aria-label={t('list.actions.delete')}
-                          icon={<MdDelete />}
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onDelete(transaction.id)}
-                        />
-                      </Td>
+            <>
+              {/* Desktop/tablet: table with horizontal scroll fallback */}
+              <TableContainer display={{ base: 'none', md: 'block' }}>
+                <Table variant="simple" size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th>{t('form.labelDate')}</Th>
+                      <Th>{t('form.labelCategory')}</Th>
+                      <Th isNumeric>{t('form.labelAmount')}</Th>
+                      <Th />
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+                  </Thead>
+                  <Tbody>
+                    {transactions.map(transaction => (
+                      <Tr key={transaction.id}>
+                        <Td>{transaction.date.slice(0, 10)}</Td>
+                        <Td>{t(`categories.${transaction.category}`)}</Td>
+                        <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
+                        <Td>
+                          <IconButton
+                            aria-label={t('list.actions.edit')}
+                            icon={<MdEdit />}
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={() => startEdit(transaction)}
+                            mr={2}
+                          />
+                          <IconButton
+                            aria-label={t('list.actions.delete')}
+                            icon={<MdDelete />}
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="red"
+                            onClick={() => onDelete(transaction.id)}
+                          />
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+
+              {/* Mobile: stacked cards, same data/handlers as the table above */}
+              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
+                {transactions.map(transaction => (
+                  <Card key={transaction.id} variant="outline">
+                    <CardBody>
+                      <Stack spacing={2}>
+                        <Flex justify="space-between">
+                          <Text fontWeight="bold">
+                            {transaction.date.slice(0, 10)}
+                          </Text>
+                          <Text fontSize="sm" fontWeight="semibold">
+                            ${transaction.amount.toFixed(2)}
+                          </Text>
+                        </Flex>
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelCategory')}
+                          </Text>
+                          <Text fontSize="sm">
+                            {t(`categories.${transaction.category}`)}
+                          </Text>
+                        </Flex>
+
+                        <Divider />
+
+                        <Flex justify="flex-end">
+                          <Stack direction="row" spacing={1}>
+                            <IconButton
+                              aria-label={t('list.actions.edit')}
+                              icon={<MdEdit />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="blue"
+                              onClick={() => startEdit(transaction)}
+                            />
+                            <IconButton
+                              aria-label={t('list.actions.delete')}
+                              icon={<MdDelete />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="red"
+                              onClick={() => onDelete(transaction.id)}
+                            />
+                          </Stack>
+                        </Flex>
+                      </Stack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </Stack>
+            </>
           )}
         </Box>
       </Stack>

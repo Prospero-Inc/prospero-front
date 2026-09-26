@@ -313,6 +313,7 @@ export default function FixedExpensesPage({
                             <Button
                               size="sm"
                               leftIcon={<MdCheckCircle />}
+                              colorScheme="green"
                               isLoading={payingId === fixedExpense.id}
                               onClick={() => onPay(fixedExpense.id)}
                             >
@@ -326,6 +327,7 @@ export default function FixedExpensesPage({
                             icon={<MdEdit />}
                             size="sm"
                             variant="ghost"
+                            colorScheme="blue"
                             onClick={() => startEdit(fixedExpense)}
                             mr={2}
                           />
@@ -334,6 +336,7 @@ export default function FixedExpensesPage({
                             icon={<MdDelete />}
                             size="sm"
                             variant="ghost"
+                            colorScheme="red"
                             onClick={() => onDelete(fixedExpense.id)}
                           />
                         </Td>
@@ -387,6 +390,7 @@ export default function FixedExpensesPage({
                             <Button
                               size="sm"
                               leftIcon={<MdCheckCircle />}
+                              colorScheme="green"
                               isLoading={payingId === fixedExpense.id}
                               onClick={() => onPay(fixedExpense.id)}
                             >
@@ -399,6 +403,7 @@ export default function FixedExpensesPage({
                               icon={<MdEdit />}
                               size="sm"
                               variant="ghost"
+                              colorScheme="blue"
                               onClick={() => startEdit(fixedExpense)}
                             />
                             <IconButton
@@ -406,6 +411,7 @@ export default function FixedExpensesPage({
                               icon={<MdDelete />}
                               size="sm"
                               variant="ghost"
+                              colorScheme="red"
                               onClick={() => onDelete(fixedExpense.id)}
                             />
                           </Stack>

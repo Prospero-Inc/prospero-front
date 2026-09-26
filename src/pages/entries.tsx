@@ -6,7 +6,11 @@ import {
   Badge,
   Box,
   Button,
+  Card,
+  CardBody,
   Checkbox,
+  Divider,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -245,48 +249,112 @@ export default function EntriesPage({ salary }: EntriesProps) {
           {salary.length === 0 ? (
             <Text>{t('list.empty')}</Text>
           ) : (
-            <TableContainer>
-              <Table variant="simple" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>{t('form.labelDate')}</Th>
-                    <Th>{t('form.labelType')}</Th>
-                    <Th>{t('list.columnCategory')}</Th>
-                    <Th isNumeric>{t('form.labelAmount')}</Th>
-                    <Th />
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {salary.map(entry => (
-                    <Tr key={entry.id}>
-                      <Td>{entry.date.slice(0, 10)}</Td>
-                      <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
-                      <Td>
-                        {entry.type === 'Extra' && entry.budgetCategory ? (
-                          <Badge colorScheme="purple">
-                            {t(`categories.${entry.budgetCategory}`)}
-                          </Badge>
-                        ) : (
-                          <Text as="span" color="gray.500" fontSize="sm">
-                            {t('list.autoDistributed')}
-                          </Text>
-                        )}
-                      </Td>
-                      <Td isNumeric>${entry.amount.toFixed(2)}</Td>
-                      <Td>
-                        <IconButton
-                          aria-label={t('list.actions.edit')}
-                          icon={<MdEdit />}
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => startEdit(entry)}
-                        />
-                      </Td>
+            <>
+              {/* Desktop/tablet: table with horizontal scroll fallback */}
+              <TableContainer display={{ base: 'none', md: 'block' }}>
+                <Table variant="simple" size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th>{t('form.labelDate')}</Th>
+                      <Th>{t('form.labelType')}</Th>
+                      <Th>{t('list.columnCategory')}</Th>
+                      <Th isNumeric>{t('form.labelAmount')}</Th>
+                      <Th />
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+                  </Thead>
+                  <Tbody>
+                    {salary.map(entry => (
+                      <Tr key={entry.id}>
+                        <Td>{entry.date.slice(0, 10)}</Td>
+                        <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                        <Td>
+                          {entry.type === 'Extra' && entry.budgetCategory ? (
+                            <Badge colorScheme="purple">
+                              {t(`categories.${entry.budgetCategory}`)}
+                            </Badge>
+                          ) : (
+                            <Text as="span" color="gray.500" fontSize="sm">
+                              {t('list.autoDistributed')}
+                            </Text>
+                          )}
+                        </Td>
+                        <Td isNumeric>${entry.amount.toFixed(2)}</Td>
+                        <Td>
+                          <IconButton
+                            aria-label={t('list.actions.edit')}
+                            icon={<MdEdit />}
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={() => startEdit(entry)}
+                          />
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+
+              {/* Mobile: stacked cards, same data/handlers as the table above */}
+              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
+                {salary.map(entry => (
+                  <Card key={entry.id} variant="outline">
+                    <CardBody>
+                      <Stack spacing={2}>
+                        <Flex justify="space-between" align="center">
+                          <Text fontWeight="bold">
+                            {entry.date.slice(0, 10)}
+                          </Text>
+                          <IconButton
+                            aria-label={t('list.actions.edit')}
+                            icon={<MdEdit />}
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={() => startEdit(entry)}
+                          />
+                        </Flex>
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelType')}
+                          </Text>
+                          <Text fontSize="sm">
+                            {t(`types.${entry.type as IncomeType}`)}
+                          </Text>
+                        </Flex>
+
+                        <Flex justify="space-between" align="center">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('list.columnCategory')}
+                          </Text>
+                          {entry.type === 'Extra' && entry.budgetCategory ? (
+                            <Badge colorScheme="purple">
+                              {t(`categories.${entry.budgetCategory}`)}
+                            </Badge>
+                          ) : (
+                            <Text as="span" color="gray.500" fontSize="sm">
+                              {t('list.autoDistributed')}
+                            </Text>
+                          )}
+                        </Flex>
+
+                        <Divider />
+
+                        <Flex justify="space-between">
+                          <Text fontSize="sm" color="gray.500">
+                            {t('form.labelAmount')}
+                          </Text>
+                          <Text fontSize="sm" fontWeight="semibold">
+                            ${entry.amount.toFixed(2)}
+                          </Text>
+                        </Flex>
+                      </Stack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </Stack>
+            </>
           )}
         </Box>
       </Stack>
