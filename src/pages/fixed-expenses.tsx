@@ -1,6 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
+import { getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import { FixedExpenseData, getFixedExpenses } from '@/services/fixedExpenses'
 import {
@@ -30,7 +30,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { getSession, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
@@ -433,7 +433,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   locale
 }) => {
-  const session = await getSession({ req })
+  const { session, redirect } = await getValidSession(req)
+  if (redirect) return redirect
+
   let fixedExpenses: FixedExpense[] = []
 
   if (session?.accessToken)

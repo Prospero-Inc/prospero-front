@@ -6,10 +6,10 @@ import { AmountCard } from '@/components/ui/AmountCard'
 import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { MotionDiv } from '@/components/ui/MotionDiv'
 import { entryAsset, expendituresAsset, walletAsset } from '@/config'
+import { getValidSession } from '@/lib'
 import { getCurrentPeriod, PeriodSummary } from '@/services/periods'
 import { Flex, Icon, Text } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
@@ -166,7 +166,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   locale
 }) => {
-  const session = await getSession({ req })
+  const { session, redirect } = await getValidSession(req)
+  if (redirect) return redirect
+
   let period: PeriodSummary | null = null
 
   if (session?.accessToken)
