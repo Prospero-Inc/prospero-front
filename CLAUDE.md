@@ -37,15 +37,60 @@ gates all non-API/non-static routes: redirects `/` → `/dashboard`, sends unaut
 for a hardcoded `allowedOrigins` list — update that list if a new client origin needs access.
 
 Login is two-step when the account has 2FA enabled: `LoginView` first calls
-`POST /proxy/login`; a plain success returns `{ accessToken, user }` and is handed straight to
-`signIn('credentials', { accessToken, user: JSON.stringify(user), ... })` (the
-`CredentialsProvider.authorize` in `authConfig.ts` short-circuits to that pair instead of calling
-the backend again when it sees them). A `{ requires2FA, preAuthToken }` response instead stashes
-`preAuthToken` in `sessionStorage` (`PRE_AUTH_TOKEN_STORAGE_KEY` in `src/interfaces/auth.interface.ts`)
-and routes to `/auth/verify-2fa` (`VerifyTwoFactorView`), which exchanges the OTP + preAuthToken
-via `POST /proxy/login-verify-2fa` for the real `{ accessToken, user }` before calling `signIn`
-the same way. Don't confuse this with `/profile/verify-2fa` — that page verifies a code when
-*enabling* 2FA from an already-authenticated session; it's unrelated to the login gate.
+`POST /proxy/login`; a plain success returns `{ accessToken, accessTokenExpiresIn, refreshToken,
+user }` and is handed straight to `signIn('credentials', { accessToken, refreshToken,
+accessTokenExpiresIn, user: JSON.stringify(user), ... })` (the `CredentialsProvider.authorize` in
+`authConfig.ts` short-circuits to that set of fields instead of calling the backend again when it
+sees them). A `{ requires2FA, preAuthToken }` response instead stashes `preAuthToken` in
+`sessionStorage` (`PRE_AUTH_TOKEN_STORAGE_KEY` in `src/interfaces/auth.interface.ts`) and routes to
+`/auth/verify-2fa` (`VerifyTwoFactorView`), which exchanges the OTP + preAuthToken via
+`POST /proxy/login-verify-2fa` for the real token set before calling `signIn` the same way. Don't
+confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
+already-authenticated session; it's unrelated to the login gate.
+
+#### Access + refresh token rotation
+
+The backend issues short-lived (15m) access tokens plus a long-lived (30d), rotating, revocable
+opaque `refreshToken` — see `docs/auth-refresh-tokens.md` for the full design (this is the
+approved, implemented design, not just a proposal). The NextAuth JWT (`token`, encrypted/httpOnly,
+never sent to the browser as-is) is the only place `refreshToken` and `accessTokenExpires` (an
+epoch-ms timestamp) live; the `session` object exposed to client code via `useSession()` only ever
+gets `session.accessToken` and `session.error` — **never** `session.refreshToken`. Don't
+"fix" this by copying it over by analogy with `accessToken`; it's the one security-load-bearing
+detail of this design.
+
+- `authConfig.ts`'s `jwt` callback is the refresh engine (NextAuth v4's documented refresh-token
+  rotation recipe): on a fresh `signIn` it seeds `token.accessToken`/`refreshToken`/
+  `accessTokenExpires` from the `user` object `authorize` returned; on every subsequent call it
+  either returns the token as-is (still before `accessTokenExpires`) or calls
+  `refreshAccessToken(token)`, which `POST`s `/proxy/refresh-token` with the current
+  `refreshToken`, rotates all three fields from the response, and — on failure (dead/revoked
+  refresh token) — sets `token.error = 'RefreshAccessTokenError'` instead of throwing, so NextAuth's
+  session handling doesn't crash; it just carries a session marked invalid.
+- `<SessionWatcher />` (`src/components/ui/SessionWatcher.tsx`, mounted in `_app.tsx` inside
+  `SessionProvider`) is a client-side effect watching `useSession()` that force-signs-out
+  (`signOut({ callbackUrl: '/auth/login' })`) as soon as `session.error === 'RefreshAccessTokenError'`.
+  `middleware.ts` additionally treats `token?.error` the same as "no token" (both for gating
+  protected pages *and* for not redirecting an errored session away from `/auth/login`, which
+  would otherwise infinite-loop against the SSR guard below), so a dead session can't get a page
+  render before the watcher fires.
+- `getServerSideProps` pages that need the session (`dashboard`, `entries`, `expenditures`,
+  `settings`, `profile/index`) call the shared `getValidSession(req)` helper (`src/lib/session.ts`)
+  instead of `next-auth/react`'s `getSession` directly — it wraps `getSession` and returns a
+  ready-to-return `{ redirect: { destination: '/auth/login', ... } }` when `session.error` is set,
+  so each page just does `const { session, redirect } = await getValidSession(req); if (redirect)
+  return redirect`. `fixed-expenses.tsx` and `profile/2fa.tsx` still call `getSession` directly and
+  haven't been migrated to this helper — same gap, lower priority since those pages weren't in
+  scope for the refresh-token rollout.
+- Explicit "cerrar sesión" actions (`settings.tsx`, `MobileNav.tsx`) just call NextAuth's
+  `signOut()` as before — server-side revocation happens automatically via `authConfig.ts`'s
+  `events.signOut`, which `POST`s `/proxy/logout` with the session's refresh token so it can't be
+  replayed after the user logs out.
+- The `jwt`/`logout` callbacks call this app's own `/api/proxy/refresh-token` and
+  `/api/proxy/logout` routes (not the backend directly) via an absolute self-URL built from
+  `NEXTAUTH_URL_INTERNAL`/`NEXTAUTH_URL` (same env vars `getSession({ req })` already relies on
+  for its own self-fetch, documented in `.env.example`) — required since this code runs
+  server-side with no browser `document` to resolve a relative URL against.
 
 ### API proxy pattern
 

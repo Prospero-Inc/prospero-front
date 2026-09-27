@@ -1,10 +1,10 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { PersonalInformation, Security } from '@/components/views/profile'
 import { Profile } from '@/interfaces'
+import { getValidSession } from '@/lib'
 import { requestProfile } from '@/services/request-profile'
 import { Container } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 type ProfileProps = {
@@ -31,7 +31,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   locale
 }) => {
-  const session = await getSession({ req })
+  const { session, redirect } = await getValidSession(req)
+  if (redirect) return redirect
+
   const token = session?.accessToken
 
   let profile: ProfileResponse | null = null

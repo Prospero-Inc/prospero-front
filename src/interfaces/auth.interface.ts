@@ -9,6 +9,8 @@ export interface LoginUser {
 
 export interface LoginSuccessResponse {
   accessToken: string
+  accessTokenExpiresIn: number
+  refreshToken: string
   user: LoginUser
 }
 

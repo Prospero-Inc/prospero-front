@@ -1,4 +1,5 @@
 import '@/styles/globals.css'
+import { SessionWatcher } from '@/components/ui'
 import { CookiesEnum } from '@/enums'
 import { cookiesPlugin } from '@/plugins'
 import { theme } from '@/themes'
@@ -35,7 +36,8 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         }
       }}
     >
-      <SessionProvider session={session}>
+      <SessionProvider session={session} refetchInterval={60}>
+        <SessionWatcher />
         <Component {...pageProps} />
       </SessionProvider>
     </ChakraProvider>
