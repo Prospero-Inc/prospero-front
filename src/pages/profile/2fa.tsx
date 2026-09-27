@@ -1,5 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { ChemicalStructure, CustomStat, QrComponent } from '@/components/ui'
+import { getValidSession } from '@/lib'
 import { activate2FA } from '@/services'
 import {
   Button,
@@ -11,7 +12,6 @@ import {
   Text
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import React, { FC } from 'react'
@@ -75,8 +75,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   locale
 }) => {
+  const { session, redirect } = await getValidSession(req)
+  if (redirect) return redirect
+
   try {
-    const session = await getSession({ req })
     const data = await activate2FA(
       {},
       {

@@ -37,10 +37,17 @@ export async function middleware(req: NextRequest) {
   if (pathname === '/')
     return NextResponse.redirect(new URL('/dashboard', req.url))
 
-  if (isAuthPage && token)
+  // A session whose refresh failed (dead/revoked refresh token) carries
+  // `token.error` even though the NextAuth JWT itself hasn't expired yet —
+  // treat it the same as "no token" everywhere below so it can't be used to
+  // reach a protected page, and doesn't get bounced away from the login page
+  // it needs to reach to re-authenticate.
+  const hasValidToken = !!token && !token.error
+
+  if (isAuthPage && hasValidToken)
     return NextResponse.redirect(new URL('/dashboard', req.url))
 
-  if (isProtectedPage && !token)
+  if (isProtectedPage && !hasValidToken)
     return NextResponse.redirect(new URL('/auth/login', req.url))
 
   return NextResponse.next()

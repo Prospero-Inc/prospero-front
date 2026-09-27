@@ -2,7 +2,7 @@ import { ProsperoLayout } from '@/components/layouts'
 import { SwitchLanguage } from '@/components/ui'
 import { HttpMethod } from '@/enums'
 import { PayFrequency } from '@/interfaces'
-import { localApiService } from '@/lib'
+import { getValidSession, localApiService } from '@/lib'
 import { requestProfile } from '@/services/request-profile'
 import {
   Box,
@@ -18,7 +18,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { getSession, signOut, useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useState } from 'react'
@@ -214,7 +214,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   locale
 }) => {
-  const session = await getSession({ req })
+  const { session, redirect } = await getValidSession(req)
+  if (redirect) return redirect
+
   let account: SettingsProps['account'] = null
   let budget: SettingsProps['budget'] = null
 
