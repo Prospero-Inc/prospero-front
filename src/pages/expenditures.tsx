@@ -1,6 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
-import { getValidSession, localApiService } from '@/lib'
+import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { getTransactions, TransactionData } from '@/services/transactions'
 import {
   Box,
@@ -45,7 +45,7 @@ interface ExpendituresProps {
 
 const emptyForm: TransactionData = {
   amount: 0,
-  date: new Date().toISOString().slice(0, 10),
+  date: getTodayLocalDate(),
   category: 'Necesidad',
   description: '',
   periodOverride: ''
