@@ -2,15 +2,6 @@ services:
   app:
     container_name: prospero-frontend
     image: ghcr.io/prospero-inc/prospero-front:latest
-    environment:
-      # getSession({req})/getServerSession self-fetch this app's own
-      # /api/auth/* and /api/proxy/* routes from the server side (session
-      # reads, silent token refresh, sign-out revocation) — this points
-      # that self-fetch at the container's own internal port instead of
-      # NEXTAUTH_URL (the public domain), which would otherwise round-trip
-      # out through the reverse proxy and back in on every call. See
-      # .env.example and docs/auth-refresh-tokens.md.
-      NEXTAUTH_URL_INTERNAL: http://localhost:3000
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
