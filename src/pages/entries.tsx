@@ -1,6 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
-import { getValidSession, localApiService } from '@/lib'
+import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { getSalaryList, IncomeType, SalaryData } from '@/services/salary'
 import {
   Badge,
@@ -48,7 +48,7 @@ interface EntriesProps {
 
 const emptyForm: SalaryData = {
   amount: 0,
-  date: new Date().toISOString().slice(0, 10),
+  date: getTodayLocalDate(),
   type: 'Payroll',
   budgetCategory: '',
   distributeAutomatically: false
