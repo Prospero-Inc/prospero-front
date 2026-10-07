@@ -1,8 +1,17 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { SwitchLanguage } from '@/components/ui'
+import {
+  FinancialInstitutions,
+  GmailConnection
+} from '@/components/views/settings'
 import { HttpMethod } from '@/enums'
 import { PayFrequency } from '@/interfaces'
 import { getValidSession, localApiService } from '@/lib'
+import {
+  FinancialInstitution,
+  getFinancialInstitutions
+} from '@/services/financialInstitutions'
+import { GmailConnectionStatus, getGmailConnection } from '@/services/gmail'
 import { requestProfile } from '@/services/request-profile'
 import {
   Box,
@@ -34,6 +43,8 @@ interface BudgetSettings {
 interface SettingsProps {
   account: { email: string; username: string } | null
   budget: BudgetSettings | null
+  institutions: FinancialInstitution[]
+  gmailConnection: GmailConnectionStatus
 }
 
 const defaultBudget: BudgetSettings = {
@@ -43,7 +54,20 @@ const defaultBudget: BudgetSettings = {
   savingsPercent: 20
 }
 
-export default function SettingsPage({ account, budget }: SettingsProps) {
+const defaultGmailConnection: GmailConnectionStatus = {
+  connected: false,
+  status: 'Disconnected',
+  lastSyncAt: null,
+  autoDetectEnabled: false,
+  notifyIncomeEnabled: false
+}
+
+export default function SettingsPage({
+  account,
+  budget,
+  institutions,
+  gmailConnection
+}: SettingsProps) {
   const { t } = useTranslation('settings')
   const { data: session } = useSession()
   const toast = useToast()
@@ -197,6 +221,14 @@ export default function SettingsPage({ account, budget }: SettingsProps) {
 
         <Divider />
 
+        <GmailConnection connection={gmailConnection} />
+
+        <Divider />
+
+        <FinancialInstitutions institutions={institutions} />
+
+        <Divider />
+
         <Button
           alignSelf="flex-start"
           colorScheme="red"
@@ -219,6 +251,28 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   let account: SettingsProps['account'] = null
   let budget: SettingsProps['budget'] = null
+  let institutions: SettingsProps['institutions'] = []
+  let gmailConnection: SettingsProps['gmailConnection'] = defaultGmailConnection
+
+  if (session?.accessToken)
+    try {
+      institutions = (await getFinancialInstitutions(
+        {},
+        { authorization: `Bearer ${session.accessToken}`, lang: locale }
+      )) as FinancialInstitution[]
+    } catch (error) {
+      institutions = []
+    }
+
+  if (session?.accessToken)
+    try {
+      gmailConnection = (await getGmailConnection(
+        {},
+        { authorization: `Bearer ${session.accessToken}`, lang: locale }
+      )) as GmailConnectionStatus
+    } catch (error) {
+      gmailConnection = defaultGmailConnection
+    }
 
   if (session?.accessToken)
     try {
@@ -251,7 +305,9 @@ export const getServerSideProps: GetServerSideProps = async ({
         'settings'
       ])),
       account,
-      budget
+      budget,
+      institutions,
+      gmailConnection
     }
   }
 }
