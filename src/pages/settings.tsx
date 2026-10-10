@@ -244,9 +244,10 @@ export default function SettingsPage({
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
+  res,
   locale
 }) => {
-  const { session, redirect } = await getValidSession(req)
+  const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
   let account: SettingsProps['account'] = null

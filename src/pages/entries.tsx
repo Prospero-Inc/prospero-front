@@ -364,9 +364,10 @@ export default function EntriesPage({ salary }: EntriesProps) {
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
+  res,
   locale
 }) => {
-  const { session, redirect } = await getValidSession(req)
+  const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
   let salary: SalaryEntry[] = []
