@@ -1,16 +1,23 @@
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
-import { FinancialInstitution } from '@/services/financialInstitutions'
 import {
+  FinancialInstitution,
+  SupportedParser
+} from '@/services/financialInstitutions'
+import {
+  Badge,
   Box,
   Button,
   Card,
   CardBody,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
   IconButton,
   Input,
+  Select,
   Stack,
   Switch,
   Text,
@@ -24,10 +31,17 @@ import { MdAdd, MdDelete } from 'react-icons/md'
 
 interface FinancialInstitutionsProps {
   institutions: FinancialInstitution[]
+  supportedParsers: SupportedParser[]
 }
 
+// Valor especial para "Otro banco" en los Select de parserKey: nunca se
+// envía al backend tal cual, se traduce a `undefined` (crear) o `null`
+// (editar, para volver explícitamente a "sin detección automática").
+const OTHER_BANK_VALUE = '__other__'
+
 export const FinancialInstitutions = ({
-  institutions
+  institutions,
+  supportedParsers
 }: FinancialInstitutionsProps) => {
   const { t } = useTranslation('settings', {
     keyPrefix: 'financialInstitutions'
@@ -37,6 +51,7 @@ export const FinancialInstitutions = ({
   const { data: session } = useSession()
   const authHeader = { Authorization: `Bearer ${session?.accessToken}` }
 
+  const [selectedBankKey, setSelectedBankKey] = useState('')
   const [newBankName, setNewBankName] = useState('')
   const [newSenderEmail, setNewSenderEmail] = useState<Record<number, string>>(
     {}
@@ -44,6 +59,9 @@ export const FinancialInstitutions = ({
   const [isCreating, setIsCreating] = useState(false)
   const [addingSenderFor, setAddingSenderFor] = useState<number | null>(null)
   const [togglingId, setTogglingId] = useState<number | null>(null)
+  const [updatingParserIdFor, setUpdatingParserIdFor] = useState<number | null>(
+    null
+  )
   const [deletingInstitutionId, setDeletingInstitutionId] = useState<
     number | null
   >(null)
@@ -61,16 +79,33 @@ export const FinancialInstitutions = ({
     })
   }
 
+  const onSelectBank = (value: string) => {
+    setSelectedBankKey(value)
+
+    if (value === '' || value === OTHER_BANK_VALUE) {
+      setNewBankName('')
+      return
+    }
+
+    const parser = supportedParsers.find(p => p.key === value)
+    setNewBankName(parser?.label ?? '')
+  }
+
   const onCreateBank = async (event: FormEvent) => {
     event.preventDefault()
     if (!newBankName.trim()) return
+
+    const parserKey =
+      selectedBankKey && selectedBankKey !== OTHER_BANK_VALUE
+        ? selectedBankKey
+        : undefined
 
     setIsCreating(true)
     try {
       await localApiService.request({
         endPoint: '/proxy/create-financial-institution',
         method: HttpMethod.POST,
-        data: { name: newBankName.trim() },
+        data: { name: newBankName.trim(), ...(parserKey ? { parserKey } : {}) },
         headers: authHeader
       })
       toast({
@@ -80,6 +115,7 @@ export const FinancialInstitutions = ({
         isClosable: true
       })
       setNewBankName('')
+      setSelectedBankKey('')
       router.replace(router.asPath)
     } catch (error) {
       showError(error)
@@ -102,6 +138,29 @@ export const FinancialInstitutions = ({
       showError(error)
     } finally {
       setTogglingId(null)
+    }
+  }
+
+  const onChangeInstitutionParserKey = async (
+    institution: FinancialInstitution,
+    value: string
+  ) => {
+    const parserKey = value === OTHER_BANK_VALUE ? null : value
+    if (parserKey === institution.parserKey) return
+
+    setUpdatingParserIdFor(institution.id)
+    try {
+      await localApiService.request({
+        endPoint: `/proxy/update-financial-institution?id=${institution.id}`,
+        method: HttpMethod.PATCH,
+        data: { parserKey },
+        headers: authHeader
+      })
+      router.replace(router.asPath)
+    } catch (error) {
+      showError(error)
+    } finally {
+      setUpdatingParserIdFor(null)
     }
   }
 
@@ -191,24 +250,49 @@ export const FinancialInstitutions = ({
         {t('title')}
       </Heading>
 
-      <Stack
-        as="form"
-        onSubmit={onCreateBank}
-        direction="row"
-        spacing={3}
-        mb={4}
-        maxW="lg"
-      >
-        <Input
-          value={newBankName}
-          onChange={e => setNewBankName(e.target.value)}
-          placeholder={t('form.labelName')}
-        />
+      <Stack as="form" onSubmit={onCreateBank} spacing={3} mb={4} maxW="lg">
+        <FormControl>
+          <FormLabel>{t('form.labelBank')}</FormLabel>
+          <Select
+            placeholder={t('form.bankPlaceholder')}
+            value={selectedBankKey}
+            onChange={e => onSelectBank(e.target.value)}
+          >
+            {supportedParsers.map(parser => (
+              <option key={parser.key} value={parser.key}>
+                {parser.label}
+              </option>
+            ))}
+            <option value={OTHER_BANK_VALUE}>
+              {t('form.bankOtherOption')}
+            </option>
+          </Select>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>
+            {selectedBankKey === OTHER_BANK_VALUE
+              ? t('form.labelNameOther')
+              : t('form.labelName')}
+          </FormLabel>
+          <Input
+            value={newBankName}
+            onChange={e => setNewBankName(e.target.value)}
+            placeholder={t('form.labelName')}
+          />
+        </FormControl>
+
+        {selectedBankKey === OTHER_BANK_VALUE && (
+          <Text fontSize="sm" color="gray.600">
+            {t('form.unsupportedBankNotice')}
+          </Text>
+        )}
+
         <Button
           type="submit"
           colorScheme="primary"
           isLoading={isCreating}
-          flexShrink={0}
+          alignSelf="flex-start"
         >
           {t('form.submit')}
         </Button>
@@ -222,8 +306,22 @@ export const FinancialInstitutions = ({
             <Card key={institution.id} variant="outline">
               <CardBody>
                 <Stack spacing={3}>
-                  <Flex justify="space-between" align="center">
-                    <Text fontWeight="bold">{institution.name}</Text>
+                  <Flex
+                    justify="space-between"
+                    align="center"
+                    wrap="wrap"
+                    gap={2}
+                  >
+                    <Flex align="center" gap={2} wrap="wrap">
+                      <Text fontWeight="bold">{institution.name}</Text>
+                      <Badge
+                        colorScheme={institution.parserKey ? 'green' : 'gray'}
+                      >
+                        {institution.parserKey
+                          ? t('badges.autoDetect')
+                          : t('badges.manualOnly')}
+                      </Badge>
+                    </Flex>
                     <Flex align="center" gap={3}>
                       <Switch
                         isChecked={institution.isActive}
@@ -241,6 +339,30 @@ export const FinancialInstitutions = ({
                       />
                     </Flex>
                   </Flex>
+
+                  <FormControl maxW="xs">
+                    <FormLabel fontSize="sm">{t('form.labelBank')}</FormLabel>
+                    <Select
+                      size="sm"
+                      value={institution.parserKey ?? OTHER_BANK_VALUE}
+                      isDisabled={updatingParserIdFor === institution.id}
+                      onChange={e =>
+                        onChangeInstitutionParserKey(
+                          institution,
+                          e.target.value
+                        )
+                      }
+                    >
+                      {supportedParsers.map(parser => (
+                        <option key={parser.key} value={parser.key}>
+                          {parser.label}
+                        </option>
+                      ))}
+                      <option value={OTHER_BANK_VALUE}>
+                        {t('form.bankOtherOption')}
+                      </option>
+                    </Select>
+                  </FormControl>
 
                   <Stack spacing={1} pl={2}>
                     {institution.senders.length === 0 ? (

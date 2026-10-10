@@ -4,6 +4,14 @@ import { Params } from '@/types'
 
 export type BudgetCategory = 'Necesidad' | 'Deseo' | 'Ahorro'
 export type PeriodOverride = 'Previous' | 'Current'
+export type MovementSource = 'Manual' | 'Gmail'
+export type TransactionReviewStatus = 'Detected' | 'PendingReview' | 'Confirmed'
+
+export interface PossibleGmailDuplicate {
+  id: number
+  senderEmail: string
+  processedAt: string
+}
 
 export interface TransactionData {
   amount: number
@@ -11,6 +19,18 @@ export interface TransactionData {
   category: BudgetCategory
   description?: string
   periodOverride?: PeriodOverride | ''
+}
+
+/** Shape de cada fila de `GET /transactions`: lo mismo que `TransactionData`
+ * más los campos de solo lectura que nunca se mandan en un create/update
+ * (`category` además puede venir `null` mientras la fila está
+ * `Detected`/`PendingReview` sin clasificar todavía). */
+export interface TransactionListItem extends Omit<TransactionData, 'category'> {
+  id: number
+  category: BudgetCategory | null
+  source: MovementSource
+  reviewStatus: TransactionReviewStatus
+  possibleGmailDuplicate: PossibleGmailDuplicate | null
 }
 
 interface TransactionFilters {

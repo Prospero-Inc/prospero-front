@@ -40,6 +40,11 @@
     "connect": "Conectar Gmail",
     "disconnect": "Desconectar Gmail",
     "confirmDisconnect": "¿Desconectar tu cuenta de Gmail? Dejaremos de detectar ingresos y gastos automáticamente.",
+    "syncNow": "Sincronizar ahora",
+    "lastSync": {
+      "value": "Última sincronización: {{date}}",
+      "never": "Todavía no se sincronizó (corre automático cada hora)"
+    },
     "toggles": {
       "autoDetect": "Detectar movimientos automáticamente",
       "notifyIncome": "Notificarme cuando se detecte un ingreso"
@@ -53,6 +58,12 @@
         "title": "Gmail desconectado",
         "description": "Tu cuenta de Gmail se desconectó con éxito"
       },
+      "synced": {
+        "title": "Sincronización completa",
+        "description": "Ya revisamos tus correos más recientes"
+      },
+      "syncRevoked": "La conexión con Gmail fue revocada, reconectá tu cuenta para volver a sincronizar",
+      "syncThrottled": "Ya sincronizaste varias veces en el último minuto, esperá un momento antes de intentar de nuevo",
       "error": {
         "title": "Error",
         "description": "No pudimos completar la acción"
@@ -72,7 +83,12 @@
     "title": "Bancos",
     "form": {
       "labelName": "Nombre del banco",
-      "submit": "Agregar banco"
+      "submit": "Agregar banco",
+      "labelBank": "Banco",
+      "bankPlaceholder": "Seleccioná tu banco",
+      "bankOtherOption": "Otro banco",
+      "labelNameOther": "Nombre del banco",
+      "unsupportedBankNotice": "Aún no soportamos la detección automática de este banco, pero podés seguir agregando remitentes para cuando lo soportemos."
     },
     "list": {
       "empty": "Todavía no configuraste ningún banco.",
@@ -114,6 +130,10 @@
         "title": "Error",
         "description": "No pudimos completar la acción"
       }
+    },
+    "badges": {
+      "autoDetect": "Detección automática activa",
+      "manualOnly": "Sin detección automática"
     }
   },
   "logout": "Cerrar sesión"

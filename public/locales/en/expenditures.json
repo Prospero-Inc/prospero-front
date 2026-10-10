@@ -26,7 +26,8 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete"
-    }
+    },
+    "confirmDelete": "Delete this expense?"
   },
   "toast": {
     "success": {
@@ -40,6 +41,34 @@
     "error": {
       "title": "Error",
       "description": "We could not save the movement"
+    }
+  },
+  "pendingReview": {
+    "title": "Pending review ({{count}})",
+    "description": "Gmail detected these expenses. Assign them a category or correct them to confirm.",
+    "badge": "Detected by Gmail",
+    "categoryPlaceholder": "Choose a category",
+    "confirmHelper": "Pick a category to confirm.",
+    "confirm": "Confirm"
+  },
+  "possibleDuplicate": {
+    "badge": "Gmail also detected this, we skipped it",
+    "tooltip": "An email from {{senderEmail}} with the same amount and date arrived on {{processedAt}}. We didn't create a new expense to avoid duplicating it.",
+    "notSameAction": "Not the same movement",
+    "confirmDialog": "Are you sure this is a different movement? We'll create a new expense with the data we detected in the email.",
+    "toast": {
+      "created": {
+        "title": "Expense created",
+        "description": "We created the expense with the data detected in the email"
+      },
+      "alreadyResolved": {
+        "title": "Already resolved",
+        "description": "This possible duplicate was already resolved before"
+      },
+      "missingSnapshot": {
+        "title": "Not available",
+        "description": "This email predates us saving its data, so the expense can't be created automatically"
+      }
     }
   }
 }

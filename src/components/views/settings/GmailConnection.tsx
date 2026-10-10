@@ -1,5 +1,6 @@
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
+import { HttpError } from '@/lib/apiService'
 import { GmailConnectionStatus } from '@/services/gmail'
 import {
   Badge,
@@ -44,6 +45,7 @@ export const GmailConnection = ({ connection }: GmailConnectionProps) => {
   const [isTogglingAutoDetect, setIsTogglingAutoDetect] = useState(false)
   const [isTogglingNotify, setIsTogglingNotify] = useState(false)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
 
   const hasHandledRedirect = useRef(false)
 
@@ -139,6 +141,42 @@ export const GmailConnection = ({ connection }: GmailConnectionProps) => {
     }
   }
 
+  const onSyncNow = async () => {
+    setIsSyncing(true)
+    try {
+      await localApiService.request({
+        endPoint: '/proxy/sync-gmail-now',
+        method: HttpMethod.POST,
+        headers: authHeader
+      })
+      toast({
+        title: t('toast.synced.title'),
+        description: t('toast.synced.description'),
+        status: 'success',
+        isClosable: true
+      })
+      router.replace(router.asPath)
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 409)
+        toast({
+          title: t('toast.error.title'),
+          description: t('toast.syncRevoked'),
+          status: 'warning',
+          isClosable: true
+        })
+      else if (error instanceof HttpError && error.status === 429)
+        toast({
+          title: t('toast.error.title'),
+          description: t('toast.syncThrottled'),
+          status: 'warning',
+          isClosable: true
+        })
+      else showError(error)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   const onDisconnect = async () => {
     if (!window.confirm(t('confirmDisconnect'))) return
 
@@ -183,8 +221,23 @@ export const GmailConnection = ({ connection }: GmailConnectionProps) => {
         </Stack>
       ) : (
         <Stack spacing={4}>
-          <Flex align="center" gap={3}>
+          <Flex align="center" gap={3} wrap="wrap">
             <Badge colorScheme="green">{t('status.connected')}</Badge>
+            <Text fontSize="sm" color="gray.500">
+              {connection.lastSyncAt
+                ? t('lastSync.value', {
+                    date: new Date(connection.lastSyncAt).toLocaleString()
+                  })
+                : t('lastSync.never')}
+            </Text>
+            <Button
+              size="sm"
+              variant="outline"
+              isLoading={isSyncing}
+              onClick={onSyncNow}
+            >
+              {t('syncNow')}
+            </Button>
           </Flex>
 
           <FormControl

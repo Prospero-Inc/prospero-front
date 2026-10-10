@@ -14,6 +14,10 @@ export interface FinancialInstitution {
   userId: number
   name: string
   isActive: boolean
+  /** Clave del parser de Gmail asociado a este banco (ver
+   * `supported-parsers`), o `null` si todavía no tiene detección automática
+   * ("Otro banco" en el formulario). */
+  parserKey: string | null
   senders: InstitutionSender[]
   createdAt: string
   updatedAt: string
@@ -22,6 +26,30 @@ export interface FinancialInstitution {
 export interface FinancialInstitutionData {
   name: string
   isActive?: boolean
+  /** `undefined` para no tocarlo, `string` para asignar un parser soportado,
+   * `null` para volver explícitamente a "Otro banco" (sin detección
+   * automática) en una institución que ya tenía uno asignado. */
+  parserKey?: string | null
+}
+
+export interface SupportedParser {
+  key: string
+  label: string
+}
+
+const getSupportedParsers = async (
+  _ignore: unknown,
+  params: Params | unknown
+): Promise<unknown> => {
+  const { lang, authorization } = params as Params
+  return await externalApiService.request({
+    method: HttpMethod.GET,
+    endPoint: '/financial-institutions/supported-parsers',
+    headers: {
+      'x-lang': `${lang}`,
+      Authorization: authorization
+    }
+  })
 }
 
 const getFinancialInstitutions = async (
@@ -121,6 +149,7 @@ const deleteInstitutionSender = async (
 }
 
 export {
+  getSupportedParsers,
   getFinancialInstitutions,
   createFinancialInstitution,
   updateFinancialInstitution,
