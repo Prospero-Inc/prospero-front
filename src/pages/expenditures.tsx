@@ -12,6 +12,7 @@ import {
   Badge,
   Box,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   Divider,
@@ -66,13 +67,20 @@ const emptyForm: TransactionData = {
 }
 
 /** Badge + tooltip informativo de "posible duplicado" detectado por Gmail,
- * compartido entre la tabla desktop y las cards mobile. */
+ * compartido entre la tabla desktop y las cards mobile. Ofrece las dos
+ * resoluciones posibles: confirmar que es el mismo movimiento (descarta el
+ * aviso, no crea nada) o aclarar que son movimientos distintos (crea un
+ * gasto nuevo con los datos del correo). */
 const PossibleDuplicateBadge = ({
   duplicate,
+  onDismiss,
+  isDismissing,
   onNotSame,
   isResolving
 }: {
   duplicate: NonNullable<Transaction['possibleGmailDuplicate']>
+  onDismiss: (_duplicateId: number) => void
+  isDismissing: boolean
   onNotSame: (_duplicateId: number) => void
   isResolving: boolean
 }) => {
@@ -90,21 +98,32 @@ const PossibleDuplicateBadge = ({
       <PopoverContent>
         <PopoverArrow />
         <PopoverBody fontSize="sm">
-          <Text mb={2}>
+          <Text mb={3}>
             {t('tooltip', {
               senderEmail: duplicate.senderEmail,
               processedAt: duplicate.processedAt.slice(0, 10)
             })}
           </Text>
-          <Button
-            size="xs"
-            variant="outline"
-            colorScheme="purple"
-            isLoading={isResolving}
-            onClick={() => onNotSame(duplicate.id)}
-          >
-            {t('notSameAction')}
-          </Button>
+          <ButtonGroup size="xs" spacing={2} isAttached={false}>
+            <Button
+              variant="solid"
+              colorScheme="purple"
+              isLoading={isDismissing}
+              isDisabled={isResolving}
+              onClick={() => onDismiss(duplicate.id)}
+            >
+              {t('dismissAction')}
+            </Button>
+            <Button
+              variant="outline"
+              colorScheme="purple"
+              isLoading={isResolving}
+              isDisabled={isDismissing}
+              onClick={() => onNotSame(duplicate.id)}
+            >
+              {t('notSameAction')}
+            </Button>
+          </ButtonGroup>
         </PopoverBody>
       </PopoverContent>
     </Popover>
@@ -126,6 +145,9 @@ export default function ExpendituresPage({
   >({})
   const [confirmingId, setConfirmingId] = useState<number | null>(null)
   const [resolvingDuplicateId, setResolvingDuplicateId] = useState<
+    number | null
+  >(null)
+  const [dismissingDuplicateId, setDismissingDuplicateId] = useState<
     number | null
   >(null)
   const { control, handleSubmit, reset } = useForm<TransactionData>({
@@ -264,6 +286,46 @@ export default function ExpendituresPage({
         })
     } finally {
       setResolvingDuplicateId(null)
+    }
+  }
+
+  const onDismissDuplicate = async (processedEmailId: number) => {
+    if (!window.confirm(t('possibleDuplicate.dismissConfirmDialog'))) return
+
+    setDismissingDuplicateId(processedEmailId)
+    try {
+      await localApiService.request({
+        endPoint: `/proxy/dismiss-processed-email?id=${processedEmailId}`,
+        method: HttpMethod.POST,
+        headers: { Authorization: `Bearer ${session?.accessToken}` }
+      })
+      toast({
+        title: t('possibleDuplicate.toast.dismissed.title'),
+        description: t('possibleDuplicate.toast.dismissed.description'),
+        status: 'success',
+        isClosable: true
+      })
+      router.replace(router.asPath)
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 409)
+        toast({
+          title: t('possibleDuplicate.toast.alreadyResolved.title'),
+          description: t('possibleDuplicate.toast.alreadyResolved.description'),
+          status: 'warning',
+          isClosable: true
+        })
+      else
+        toast({
+          title: t('toast.error.title'),
+          description:
+            error instanceof Error
+              ? error.message
+              : t('toast.error.description'),
+          status: 'error',
+          isClosable: true
+        })
+    } finally {
+      setDismissingDuplicateId(null)
     }
   }
 
@@ -513,6 +575,11 @@ export default function ExpendituresPage({
                             {transaction.possibleGmailDuplicate && (
                               <PossibleDuplicateBadge
                                 duplicate={transaction.possibleGmailDuplicate}
+                                onDismiss={onDismissDuplicate}
+                                isDismissing={
+                                  dismissingDuplicateId ===
+                                  transaction.possibleGmailDuplicate.id
+                                }
                                 onNotSame={onNotSameMovement}
                                 isResolving={
                                   resolvingDuplicateId ===
@@ -580,6 +647,11 @@ export default function ExpendituresPage({
                             {transaction.possibleGmailDuplicate && (
                               <PossibleDuplicateBadge
                                 duplicate={transaction.possibleGmailDuplicate}
+                                onDismiss={onDismissDuplicate}
+                                isDismissing={
+                                  dismissingDuplicateId ===
+                                  transaction.possibleGmailDuplicate.id
+                                }
                                 onNotSame={onNotSameMovement}
                                 isResolving={
                                   resolvingDuplicateId ===
