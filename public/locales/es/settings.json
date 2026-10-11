@@ -79,6 +79,24 @@
       }
     }
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "toggles": {
+      "gmailReview": "Avisarme por correo cuando un movimiento de Gmail necesite revisión",
+      "budgetAlert": "Avisarme por correo sobre alertas de presupuesto",
+      "budgetAlertNotice": "Próximamente: todavía no enviamos nada, solo guardamos tu preferencia para cuando esté disponible."
+    },
+    "toast": {
+      "success": {
+        "title": "Preferencias guardadas",
+        "description": "Tus preferencias de notificación se guardaron con éxito"
+      },
+      "error": {
+        "title": "Error",
+        "description": "No pudimos guardar tus preferencias de notificación"
+      }
+    }
+  },
   "financialInstitutions": {
     "title": "Bancos",
     "form": {
