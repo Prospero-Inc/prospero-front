@@ -2,10 +2,25 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 import { Params } from '@/types'
 
+import { BudgetCategory, TransactionReviewStatus } from './transactions'
+
 export interface PeriodCategoryBudget {
   budgeted: number
   spent: number
   remaining: number
+}
+
+/** Shape de cada entrada de `PeriodSummary.recentTransactions`. A diferencia
+ * de `TransactionListItem` (`GET /transactions`), estas filas vienen de
+ * `TransactionsService.findAllForUser` (la variante sin el cómputo de
+ * `possibleGmailDuplicate`), así que ese campo nunca está presente aquí. */
+export interface PeriodRecentTransaction {
+  id: number
+  amount: number
+  date: string
+  category: BudgetCategory | null
+  description: string | null
+  reviewStatus: TransactionReviewStatus
 }
 
 export interface PeriodSummary {
@@ -23,7 +38,7 @@ export interface PeriodSummary {
   daysElapsed: number | null
   estimatedNextPaymentDate: string | null
   estimatedDaysRemaining: number | null
-  recentTransactions: unknown[]
+  recentTransactions: PeriodRecentTransaction[]
 }
 
 const getCurrentPeriod = async (

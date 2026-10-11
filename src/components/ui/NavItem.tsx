@@ -1,4 +1,5 @@
 import { Badge, FlexProps, Link, Flex, Icon, Text } from '@chakra-ui/react'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactText } from 'react'
 import { IconType } from 'react-icons'
@@ -28,7 +29,8 @@ export const NavItem = ({
 
   return (
     <Link
-      onClick={() => router.push(path)}
+      as={NextLink}
+      href={path}
       style={{ textDecoration: 'none' }}
       _focus={{ boxShadow: 'none' }}
       textColor={isActive ? 'primary.500' : 'primaryGray'}

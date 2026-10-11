@@ -14,15 +14,13 @@ export default function SidebarWithHeader({
   return (
     <Box minH="100vh">
       <SidebarContent
-        onClose={() => onClose}
+        onClose={onClose}
         display={{ base: 'none', md: 'block' }}
       />
       <Drawer
-        autoFocus={false}
         isOpen={isOpen}
         placement="left"
         onClose={onClose}
-        returnFocusOnClose={false}
         onOverlayClick={onClose}
         size="full"
       >

@@ -13,6 +13,7 @@ import {
   MenuDivider,
   Text,
   Box,
+  Badge,
   Button,
   useColorMode
 } from '@chakra-ui/react'
@@ -42,6 +43,9 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   const handleSettingsClick = () => {
     router.push('/settings')
   }
+  const themeToggleLabel =
+    colorMode === 'light' ? t('toggleToDarkMode') : t('toggleToLightMode')
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -58,7 +62,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         display={{ base: 'flex', md: 'none' }}
         onClick={onOpen}
         variant="outline"
-        aria-label="open menu"
+        aria-label={t('openMenu')}
         icon={<FiMenu />}
       />
 
@@ -66,7 +70,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         <IconButton
           size="lg"
           variant="ghost"
-          aria-label="open menu"
+          aria-label={themeToggleLabel}
           icon={colorMode === 'light' ? <GoSun /> : <GoMoon />}
           onClick={handleChangeColorMode}
         />
@@ -99,7 +103,14 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
             >
               <MenuItem onClick={handleClick}>{t('profile')}</MenuItem>
               <MenuItem onClick={handleSettingsClick}>{t('settings')}</MenuItem>
-              <MenuItem>{t('billing')}</MenuItem>
+              <MenuItem isDisabled closeOnSelect={false}>
+                <Flex align="center" justify="space-between" flex="1">
+                  <Text>{t('billing')}</Text>
+                  <Badge ml="2" colorScheme="gray" fontSize="2xs">
+                    {t('billingComingSoon')}
+                  </Badge>
+                </Flex>
+              </MenuItem>
               <MenuDivider />
               <MenuItem
                 as={Button}
