@@ -31,5 +31,110 @@
   "language": {
     "title": "Idioma"
   },
+  "gmail": {
+    "title": "Gmail",
+    "status": {
+      "connected": "Conectado",
+      "disconnected": "No conectado"
+    },
+    "connect": "Conectar Gmail",
+    "disconnect": "Desconectar Gmail",
+    "confirmDisconnect": "¿Desconectar tu cuenta de Gmail? Dejaremos de detectar ingresos y gastos automáticamente.",
+    "syncNow": "Sincronizar ahora",
+    "lastSync": {
+      "value": "Última sincronización: {{date}}",
+      "never": "Todavía no se sincronizó (corre automático cada hora)"
+    },
+    "toggles": {
+      "autoDetect": "Detectar movimientos automáticamente",
+      "notifyIncome": "Notificarme cuando se detecte un ingreso"
+    },
+    "toast": {
+      "connected": {
+        "title": "Gmail conectado",
+        "description": "Tu cuenta de Gmail se conectó con éxito"
+      },
+      "disconnected": {
+        "title": "Gmail desconectado",
+        "description": "Tu cuenta de Gmail se desconectó con éxito"
+      },
+      "synced": {
+        "title": "Sincronización completa",
+        "description": "Ya revisamos tus correos más recientes"
+      },
+      "syncRevoked": "La conexión con Gmail fue revocada, reconectá tu cuenta para volver a sincronizar",
+      "syncThrottled": "Ya sincronizaste varias veces en el último minuto, esperá un momento antes de intentar de nuevo",
+      "error": {
+        "title": "Error",
+        "description": "No pudimos completar la acción"
+      },
+      "errors": {
+        "cancelled": "Cancelaste la conexión con Gmail",
+        "invalid_state": "La conexión expiró o no es válida, intentá de nuevo",
+        "exchange_failed": "No pudimos completar la conexión con Google, intentá de nuevo",
+        "no_refresh_token": "Google no nos dio los permisos necesarios, intentá de nuevo y aceptá todos los permisos solicitados",
+        "google_unavailable": "Google no está disponible en este momento, intentá más tarde",
+        "invalid_request": "La solicitud de conexión no es válida, intentá de nuevo",
+        "unknown_error": "Ocurrió un error inesperado al conectar Gmail, intentá de nuevo"
+      }
+    }
+  },
+  "financialInstitutions": {
+    "title": "Bancos",
+    "form": {
+      "labelName": "Nombre del banco",
+      "submit": "Agregar banco",
+      "labelBank": "Banco",
+      "bankPlaceholder": "Seleccioná tu banco",
+      "bankOtherOption": "Otro banco",
+      "labelNameOther": "Nombre del banco",
+      "unsupportedBankNotice": "Aún no soportamos la detección automática de este banco, pero podés seguir agregando remitentes para cuando lo soportemos."
+    },
+    "list": {
+      "empty": "Todavía no configuraste ningún banco.",
+      "confirmDelete": "¿Eliminar este banco y todos sus remitentes configurados?",
+      "actions": {
+        "delete": "Eliminar banco"
+      }
+    },
+    "senders": {
+      "labelEmail": "Correo del remitente",
+      "add": "Agregar remitente",
+      "empty": "Este banco todavía no tiene remitentes configurados.",
+      "actions": {
+        "delete": "Eliminar remitente"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Banco agregado",
+        "description": "El banco se agregó con éxito"
+      },
+      "deleted": {
+        "title": "Banco eliminado",
+        "description": "El banco se eliminó con éxito"
+      },
+      "senderAdded": {
+        "title": "Remitente agregado",
+        "description": "El remitente se agregó con éxito"
+      },
+      "senderDeleted": {
+        "title": "Remitente eliminado",
+        "description": "El remitente se eliminó con éxito"
+      },
+      "duplicateSender": {
+        "title": "Remitente duplicado",
+        "description": "Ese correo ya está configurado en otro de tus bancos"
+      },
+      "error": {
+        "title": "Error",
+        "description": "No pudimos completar la acción"
+      }
+    },
+    "badges": {
+      "autoDetect": "Detección automática activa",
+      "manualOnly": "Sin detección automática"
+    }
+  },
   "logout": "Cerrar sesión"
 }

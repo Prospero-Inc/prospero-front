@@ -1,7 +1,13 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
-import { getSalaryList, IncomeType, SalaryData } from '@/services/salary'
+import {
+  getSalaryList,
+  IncomeCategory,
+  IncomeType,
+  SalaryData,
+  SalaryListItem
+} from '@/services/salary'
 import {
   Badge,
   Box,
@@ -38,12 +44,20 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { MdEdit } from 'react-icons/md'
 
-interface SalaryEntry extends SalaryData {
-  id: number
-}
+type SalaryEntry = SalaryListItem
+
+const INCOME_CATEGORIES: IncomeCategory[] = [
+  'Payroll',
+  'Extra',
+  'Transfer',
+  'Reimbursement',
+  'Deposit',
+  'Other'
+]
 
 interface EntriesProps {
   salary: SalaryEntry[]
+  pendingSalary: SalaryEntry[]
 }
 
 const emptyForm: SalaryData = {
@@ -54,13 +68,17 @@ const emptyForm: SalaryData = {
   distributeAutomatically: false
 }
 
-export default function EntriesPage({ salary }: EntriesProps) {
+export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
   const { t } = useTranslation('entries')
   const router = useRouter()
   const toast = useToast()
   const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [pendingCategory, setPendingCategory] = useState<
+    Record<number, IncomeCategory | ''>
+  >({})
+  const [confirmingId, setConfirmingId] = useState<number | null>(null)
   const { control, handleSubmit, reset, watch } = useForm<SalaryData>({
     defaultValues: emptyForm
   })
@@ -142,6 +160,38 @@ export default function EntriesPage({ salary }: EntriesProps) {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const onConfirmPendingSalary = async (id: number) => {
+    const incomeCategory = pendingCategory[id]
+    if (!incomeCategory) return
+
+    setConfirmingId(id)
+    try {
+      await localApiService.request({
+        endPoint: `/proxy/update-salary?id=${id}`,
+        method: HttpMethod.PATCH,
+        data: { incomeCategory },
+        headers: { Authorization: `Bearer ${session?.accessToken}` }
+      })
+      toast({
+        title: t('toast.success.title'),
+        description: t('toast.success.description'),
+        status: 'success',
+        isClosable: true
+      })
+      router.replace(router.asPath)
+    } catch (error) {
+      toast({
+        title: t('toast.error.title'),
+        description:
+          error instanceof Error ? error.message : t('toast.error.description'),
+        status: 'error',
+        isClosable: true
+      })
+    } finally {
+      setConfirmingId(null)
     }
   }
 
@@ -241,6 +291,99 @@ export default function EntriesPage({ salary }: EntriesProps) {
             )}
           </Stack>
         </Stack>
+
+        {pendingSalary.length > 0 && (
+          <Box
+            bg="orange.50"
+            borderWidth="1px"
+            borderColor="orange.200"
+            borderRadius="md"
+            p={4}
+          >
+            <Heading size="sm" mb={1}>
+              {t('pendingReview.title', { count: pendingSalary.length })}
+            </Heading>
+            <Text fontSize="sm" color="gray.600" mb={4}>
+              {t('pendingReview.description')}
+            </Text>
+            <Stack spacing={3}>
+              {pendingSalary.map(entry => {
+                const selected = pendingCategory[entry.id] ?? ''
+                return (
+                  <Card key={entry.id} variant="outline" bg="white">
+                    <CardBody>
+                      <Stack spacing={3}>
+                        <Flex
+                          justify="space-between"
+                          align="center"
+                          wrap="wrap"
+                          gap={2}
+                        >
+                          <Stack spacing={0}>
+                            <Text fontWeight="bold">
+                              {entry.date.slice(0, 10)}
+                            </Text>
+                            <Text fontSize="sm">
+                              ${entry.amount.toFixed(2)}
+                            </Text>
+                          </Stack>
+                          <Badge colorScheme="orange">
+                            {t('pendingReview.badge')}
+                          </Badge>
+                        </Flex>
+
+                        <FormControl>
+                          <Select
+                            size="sm"
+                            placeholder={t('pendingReview.categoryPlaceholder')}
+                            value={selected}
+                            onChange={e =>
+                              setPendingCategory(prev => ({
+                                ...prev,
+                                [entry.id]: e.target.value as IncomeCategory
+                              }))
+                            }
+                          >
+                            {INCOME_CATEGORIES.map(category => (
+                              <option key={category} value={category}>
+                                {t(`incomeCategoryLabels.${category}`)}
+                              </option>
+                            ))}
+                          </Select>
+                          {!selected && (
+                            <FormHelperText>
+                              {t('pendingReview.confirmHelper')}
+                            </FormHelperText>
+                          )}
+                        </FormControl>
+
+                        <Stack direction="row">
+                          <Button
+                            size="sm"
+                            colorScheme="primary"
+                            isDisabled={!selected}
+                            aria-disabled={!selected}
+                            isLoading={confirmingId === entry.id}
+                            onClick={() => onConfirmPendingSalary(entry.id)}
+                          >
+                            {t('pendingReview.confirm')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEdit(entry)}
+                          >
+                            {t('list.actions.edit')}
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </CardBody>
+                  </Card>
+                )
+              })}
+            </Stack>
+          </Box>
+        )}
 
         <Box>
           <Heading size="md" mb={3}>
@@ -362,23 +505,38 @@ export default function EntriesPage({ salary }: EntriesProps) {
   )
 }
 
+const PENDING_STATUSES = ['Detected', 'PendingReview']
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
+  res,
   locale
 }) => {
-  const { session, redirect } = await getValidSession(req)
+  const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
   let salary: SalaryEntry[] = []
+  let pendingSalary: SalaryEntry[] = []
 
   if (session?.accessToken)
     try {
-      salary = (await getSalaryList(null, {
+      const allSalary = (await getSalaryList(null, {
         authorization: `Bearer ${session.accessToken}`,
         lang: locale
       })) as SalaryEntry[]
+
+      // Una sola llamada a /salary: separamos pendientes de revisión del
+      // resto en memoria en vez de pedirle al backend el mismo listado dos
+      // veces con filtros distintos.
+      pendingSalary = allSalary.filter(entry =>
+        PENDING_STATUSES.includes(entry.status)
+      )
+      salary = allSalary.filter(
+        entry => !PENDING_STATUSES.includes(entry.status)
+      )
     } catch (error) {
       salary = []
+      pendingSalary = []
     }
 
   return {
@@ -389,7 +547,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'mobileNav',
         'entries'
       ])),
-      salary
+      salary,
+      pendingSalary
     }
   }
 }

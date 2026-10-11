@@ -73,9 +73,10 @@ const TwoFA: FC<Props> = ({ data: { qr, secret } }) => {
 export default TwoFA
 export const getServerSideProps: GetServerSideProps = async ({
   req,
+  res,
   locale
 }) => {
-  const { session, redirect } = await getValidSession(req)
+  const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
   try {

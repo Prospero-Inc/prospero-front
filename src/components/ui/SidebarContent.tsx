@@ -1,3 +1,6 @@
+import { HttpMethod } from '@/enums'
+import { localApiService } from '@/lib'
+import { ReviewQueueSummary } from '@/services/reviewQueue'
 import {
   BoxProps,
   useBreakpointValue,
@@ -8,7 +11,10 @@ import {
   Text,
   useColorMode
 } from '@chakra-ui/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { IconType } from 'react-icons'
 import { BsStopCircle } from 'react-icons/bs'
 
@@ -20,15 +26,37 @@ import { GoalsIcon } from '../icons/GoalsIcon'
 import { SettingsIcon } from '../icons/SettingsIcon'
 import { Brand } from './Brand'
 import { NavItem } from './NavItem'
+
+const emptySummary: ReviewQueueSummary = {
+  pendingTransactions: 0,
+  pendingSalaries: 0
+}
+
 interface LinkItemProps {
   name: string
   icon: IconType
   route: string
+  /** Si está presente, este item muestra un badge con
+   * `summary[badgeKey]` y usa `badgeAriaKey` para el texto accesible. */
+  badgeKey?: keyof ReviewQueueSummary
+  badgeAriaKey?: string
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: 'dashboard', icon: BsStopCircle, route: '/dashboard' },
-  { name: 'entries', icon: EntryIcon, route: '/entries' },
-  { name: 'expenditures', icon: EgressIcon, route: '/expenditures' },
+  {
+    name: 'entries',
+    icon: EntryIcon,
+    route: '/entries',
+    badgeKey: 'pendingSalaries',
+    badgeAriaKey: 'pendingBadgeEntries'
+  },
+  {
+    name: 'expenditures',
+    icon: EgressIcon,
+    route: '/expenditures',
+    badgeKey: 'pendingTransactions',
+    badgeAriaKey: 'pendingBadgeExpenditures'
+  },
   { name: 'fixedExpenses', icon: FixedExpenseIcon, route: '/fixed-expenses' },
   { name: 'goals', icon: GoalsIcon, route: '/goals' },
   { name: 'budgetCalculator', icon: BagIcon, route: '/budget-calculator' },
@@ -41,6 +69,9 @@ interface SidebarProps extends BoxProps {
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const { colorMode } = useColorMode()
   const { t } = useTranslation('sidebar')
+  const router = useRouter()
+  const { data: session } = useSession()
+  const [summary, setSummary] = useState<ReviewQueueSummary>(emptySummary)
   const variant = useBreakpointValue(
     {
       base: 'center',
@@ -53,6 +84,35 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       fallback: 'md'
     }
   )
+
+  // Sincroniza el badge de pendientes con el backend: al montar y cada vez
+  // que termina una navegación client-side (ej. confirmar un pendiente en
+  // entries/expenditures hace router.replace, que dispara esto de nuevo).
+  useEffect(() => {
+    if (!session?.accessToken) return
+
+    let isMounted = true
+    const fetchSummary = async () => {
+      try {
+        const data = await localApiService.request<ReviewQueueSummary>({
+          endPoint: '/proxy/get-review-queue-summary',
+          method: HttpMethod.GET,
+          headers: { Authorization: `Bearer ${session.accessToken}` }
+        })
+        if (isMounted) setSummary(data)
+      } catch (error) {
+        // El badge es informativo; si falla, simplemente no se muestra.
+      }
+    }
+
+    fetchSummary()
+    router.events.on('routeChangeComplete', fetchSummary)
+    return () => {
+      isMounted = false
+      router.events.off('routeChangeComplete', fetchSummary)
+    }
+  }, [session?.accessToken, router.events])
+
   return (
     <Box
       // transition="2s ease"
@@ -70,11 +130,25 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map(link => (
-        <NavItem key={link.name} icon={link.icon} path={link.route}>
-          {t(`${link.name}`)}
-        </NavItem>
-      ))}
+      {LinkItems.map(link => {
+        const badgeCount = link.badgeKey ? summary[link.badgeKey] : undefined
+        const badgeAriaLabel =
+          link.badgeAriaKey && badgeCount
+            ? t(link.badgeAriaKey, { count: badgeCount })
+            : undefined
+
+        return (
+          <NavItem
+            key={link.name}
+            icon={link.icon}
+            path={link.route}
+            badgeCount={badgeCount}
+            badgeAriaLabel={badgeAriaLabel}
+          >
+            {t(`${link.name}`)}
+          </NavItem>
+        )
+      })}
     </Box>
   )
 }

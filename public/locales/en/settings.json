@@ -31,5 +31,110 @@
   "language": {
     "title": "Language"
   },
+  "gmail": {
+    "title": "Gmail",
+    "status": {
+      "connected": "Connected",
+      "disconnected": "Not connected"
+    },
+    "connect": "Connect Gmail",
+    "disconnect": "Disconnect Gmail",
+    "confirmDisconnect": "Disconnect your Gmail account? We'll stop automatically detecting income and expenses.",
+    "syncNow": "Sync now",
+    "lastSync": {
+      "value": "Last sync: {{date}}",
+      "never": "Not synced yet (runs automatically every hour)"
+    },
+    "toggles": {
+      "autoDetect": "Automatically detect transactions",
+      "notifyIncome": "Notify me when income is detected"
+    },
+    "toast": {
+      "connected": {
+        "title": "Gmail connected",
+        "description": "Your Gmail account was connected successfully"
+      },
+      "disconnected": {
+        "title": "Gmail disconnected",
+        "description": "Your Gmail account was disconnected successfully"
+      },
+      "synced": {
+        "title": "Sync complete",
+        "description": "We checked your most recent emails"
+      },
+      "syncRevoked": "The Gmail connection was revoked, reconnect your account to sync again",
+      "syncThrottled": "You've synced several times in the last minute, wait a moment before trying again",
+      "error": {
+        "title": "Error",
+        "description": "We could not complete the action"
+      },
+      "errors": {
+        "cancelled": "You cancelled the connection with Gmail",
+        "invalid_state": "The connection expired or is invalid, please try again",
+        "exchange_failed": "We couldn't complete the connection with Google, please try again",
+        "no_refresh_token": "Google didn't grant the required permissions, please try again and accept all requested permissions",
+        "google_unavailable": "Google is unavailable right now, please try again later",
+        "invalid_request": "The connection request is invalid, please try again",
+        "unknown_error": "An unexpected error occurred while connecting Gmail, please try again"
+      }
+    }
+  },
+  "financialInstitutions": {
+    "title": "Banks",
+    "form": {
+      "labelName": "Bank name",
+      "submit": "Add bank",
+      "labelBank": "Bank",
+      "bankPlaceholder": "Select your bank",
+      "bankOtherOption": "Other bank",
+      "labelNameOther": "Bank name",
+      "unsupportedBankNotice": "We don't support automatic detection for this bank yet, but you can keep adding senders for when we do."
+    },
+    "list": {
+      "empty": "You haven't configured any banks yet.",
+      "confirmDelete": "Delete this bank and all its configured senders?",
+      "actions": {
+        "delete": "Delete bank"
+      }
+    },
+    "senders": {
+      "labelEmail": "Sender email",
+      "add": "Add sender",
+      "empty": "This bank doesn't have any senders configured yet.",
+      "actions": {
+        "delete": "Delete sender"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Bank added",
+        "description": "The bank was added successfully"
+      },
+      "deleted": {
+        "title": "Bank deleted",
+        "description": "The bank was deleted successfully"
+      },
+      "senderAdded": {
+        "title": "Sender added",
+        "description": "The sender was added successfully"
+      },
+      "senderDeleted": {
+        "title": "Sender deleted",
+        "description": "The sender was deleted successfully"
+      },
+      "duplicateSender": {
+        "title": "Duplicate sender",
+        "description": "That email is already configured on another one of your banks"
+      },
+      "error": {
+        "title": "Error",
+        "description": "We could not complete the action"
+      }
+    },
+    "badges": {
+      "autoDetect": "Automatic detection active",
+      "manualOnly": "No automatic detection"
+    }
+  },
   "logout": "Log out"
 }
