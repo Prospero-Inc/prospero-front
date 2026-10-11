@@ -38,6 +38,7 @@ import {
   Th,
   Thead,
   Tr,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
@@ -153,6 +154,14 @@ export default function ExpendituresPage({
   const { control, handleSubmit, reset } = useForm<TransactionData>({
     defaultValues: emptyForm
   })
+
+  const pendingReviewBg = useColorModeValue('orange.50', 'orange.900')
+  const pendingReviewBorderColor = useColorModeValue('orange.200', 'orange.600')
+  const pendingReviewDescriptionColor = useColorModeValue(
+    'gray.600',
+    'orange.100'
+  )
+  const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
@@ -440,23 +449,27 @@ export default function ExpendituresPage({
 
         {pendingTransactions.length > 0 && (
           <Box
-            bg="orange.50"
+            bg={pendingReviewBg}
             borderWidth="1px"
-            borderColor="orange.200"
+            borderColor={pendingReviewBorderColor}
             borderRadius="md"
             p={4}
           >
             <Heading size="sm" mb={1}>
               {t('pendingReview.title', { count: pendingTransactions.length })}
             </Heading>
-            <Text fontSize="sm" color="gray.600" mb={4}>
+            <Text fontSize="sm" color={pendingReviewDescriptionColor} mb={4}>
               {t('pendingReview.description')}
             </Text>
             <Stack spacing={3}>
               {pendingTransactions.map(transaction => {
                 const selected = pendingCategory[transaction.id] ?? ''
                 return (
-                  <Card key={transaction.id} variant="outline" bg="white">
+                  <Card
+                    key={transaction.id}
+                    variant="outline"
+                    bg={pendingReviewCardBg}
+                  >
                     <CardBody>
                       <Stack spacing={3}>
                         <Flex
