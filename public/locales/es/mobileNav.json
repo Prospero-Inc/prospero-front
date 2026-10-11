@@ -2,5 +2,9 @@
   "profile": "Perfil",
   "settings": "Configuración",
   "billing": "Facturación",
-  "signOut": "Cerrar sesión"
+  "billingComingSoon": "Próximamente",
+  "signOut": "Cerrar sesión",
+  "openMenu": "Abrir menú",
+  "toggleToDarkMode": "Cambiar a modo oscuro",
+  "toggleToLightMode": "Cambiar a modo claro"
 }

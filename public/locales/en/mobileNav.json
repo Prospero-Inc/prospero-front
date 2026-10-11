@@ -2,5 +2,9 @@
   "profile": "Profile",
   "settings": "Settings",
   "billing": "Billing",
-  "signOut": "Sign out"
+  "billingComingSoon": "Coming soon",
+  "signOut": "Sign out",
+  "openMenu": "Open menu",
+  "toggleToDarkMode": "Switch to dark mode",
+  "toggleToLightMode": "Switch to light mode"
 }
