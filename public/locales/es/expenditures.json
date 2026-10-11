@@ -52,14 +52,20 @@
     "confirm": "Confirmar"
   },
   "possibleDuplicate": {
-    "badge": "Gmail también detectó esto, lo omitimos",
-    "tooltip": "Un correo de {{senderEmail}} con el mismo monto y fecha llegó el {{processedAt}}. No creamos un gasto nuevo para evitar duplicarlo.",
+    "badge": "Gmail detectó un posible duplicado",
+    "tooltip": "Un correo de {{senderEmail}} con el mismo monto y fecha llegó el {{processedAt}}. Todavía no creamos un gasto nuevo para no duplicarlo: confirmá si es el mismo movimiento o si en realidad son distintos.",
+    "dismissAction": "Es el mismo movimiento",
     "notSameAction": "No son el mismo",
     "confirmDialog": "¿Seguro que es un movimiento distinto? Vamos a crear un gasto nuevo con los datos que detectamos en el correo.",
+    "dismissConfirmDialog": "¿Confirmás que es el mismo movimiento que ya registraste? Vamos a descartar este aviso sin crear ningún gasto nuevo.",
     "toast": {
       "created": {
         "title": "Gasto creado",
         "description": "Creamos el gasto con los datos detectados en el correo"
+      },
+      "dismissed": {
+        "title": "Aviso descartado",
+        "description": "Marcamos el correo como resuelto, no se creó ningún gasto nuevo"
       },
       "alreadyResolved": {
         "title": "Ya resuelto",
