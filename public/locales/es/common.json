@@ -117,13 +117,49 @@
     }
   },
   "dashboard": {
+    "pageTitle": "Dashboard",
+    "pageDescription": "Página de inicio de Prospero",
     "daysElapsed": "{{count}} días transcurridos",
     "daysRemaining": "{{count}} días estimados restantes",
-    "budgetTitle": "Presupuesto del período"
+    "budgetTitle": "Presupuesto del período",
+    "summary": {
+      "title": "Resumen",
+      "income": {
+        "label": "Ingreso del período"
+      },
+      "spent": {
+        "label": "Gastos del período"
+      },
+      "balance": {
+        "label": "Saldo disponible",
+        "helpText": "Ingreso − gastos del período"
+      }
+    },
+    "recentActivity": {
+      "title": "Actividad reciente",
+      "viewAll": "Ver todas",
+      "empty": {
+        "heading": "Todavía no registraste gastos en este período",
+        "description": "Cuando agregues un gasto, va a aparecer acá.",
+        "cta": "Agregar primer gasto"
+      }
+    },
+    "budgetEmpty": {
+      "heading": "Aún no registraste un ingreso para este período",
+      "description": "Prospero calcula tu presupuesto a partir de tu último pago. Registrá uno para ver el desglose.",
+      "cta": "Registrar ingreso"
+    },
+    "error": {
+      "heading": "No pudimos cargar tu período actual",
+      "description": "Intentá recargar la página. Si el problema continúa, contactanos.",
+      "retry": "Reintentar"
+    }
   },
   "categoryBudget": {
     "necesidad": "Necesidad",
     "deseo": "Deseo",
-    "ahorro": "Ahorro"
+    "ahorro": "Ahorro",
+    "remaining": "{{amount}} disponible",
+    "overBudget": "{{amount}} sobre el límite"
   }
 }

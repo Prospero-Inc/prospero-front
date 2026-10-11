@@ -79,6 +79,24 @@
       }
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "toggles": {
+      "gmailReview": "Email me when a Gmail item needs review",
+      "budgetAlert": "Email me budget alerts",
+      "budgetAlertNotice": "Coming soon: this doesn't send anything yet, we're just saving your preference for when it launches."
+    },
+    "toast": {
+      "success": {
+        "title": "Preferences saved",
+        "description": "Your notification preferences were saved successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "We could not save your notification preferences"
+      }
+    }
+  },
   "financialInstitutions": {
     "title": "Banks",
     "form": {

@@ -12,6 +12,7 @@ import {
   Badge,
   Box,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   Divider,
@@ -37,6 +38,7 @@ import {
   Th,
   Thead,
   Tr,
+  useColorModeValue,
   useToast
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
@@ -66,13 +68,20 @@ const emptyForm: TransactionData = {
 }
 
 /** Badge + tooltip informativo de "posible duplicado" detectado por Gmail,
- * compartido entre la tabla desktop y las cards mobile. */
+ * compartido entre la tabla desktop y las cards mobile. Ofrece las dos
+ * resoluciones posibles: confirmar que es el mismo movimiento (descarta el
+ * aviso, no crea nada) o aclarar que son movimientos distintos (crea un
+ * gasto nuevo con los datos del correo). */
 const PossibleDuplicateBadge = ({
   duplicate,
+  onDismiss,
+  isDismissing,
   onNotSame,
   isResolving
 }: {
   duplicate: NonNullable<Transaction['possibleGmailDuplicate']>
+  onDismiss: (_duplicateId: number) => void
+  isDismissing: boolean
   onNotSame: (_duplicateId: number) => void
   isResolving: boolean
 }) => {
@@ -90,21 +99,32 @@ const PossibleDuplicateBadge = ({
       <PopoverContent>
         <PopoverArrow />
         <PopoverBody fontSize="sm">
-          <Text mb={2}>
+          <Text mb={3}>
             {t('tooltip', {
               senderEmail: duplicate.senderEmail,
               processedAt: duplicate.processedAt.slice(0, 10)
             })}
           </Text>
-          <Button
-            size="xs"
-            variant="outline"
-            colorScheme="purple"
-            isLoading={isResolving}
-            onClick={() => onNotSame(duplicate.id)}
-          >
-            {t('notSameAction')}
-          </Button>
+          <ButtonGroup size="xs" spacing={2} isAttached={false}>
+            <Button
+              variant="solid"
+              colorScheme="purple"
+              isLoading={isDismissing}
+              isDisabled={isResolving}
+              onClick={() => onDismiss(duplicate.id)}
+            >
+              {t('dismissAction')}
+            </Button>
+            <Button
+              variant="outline"
+              colorScheme="purple"
+              isLoading={isResolving}
+              isDisabled={isDismissing}
+              onClick={() => onNotSame(duplicate.id)}
+            >
+              {t('notSameAction')}
+            </Button>
+          </ButtonGroup>
         </PopoverBody>
       </PopoverContent>
     </Popover>
@@ -128,9 +148,20 @@ export default function ExpendituresPage({
   const [resolvingDuplicateId, setResolvingDuplicateId] = useState<
     number | null
   >(null)
+  const [dismissingDuplicateId, setDismissingDuplicateId] = useState<
+    number | null
+  >(null)
   const { control, handleSubmit, reset } = useForm<TransactionData>({
     defaultValues: emptyForm
   })
+
+  const pendingReviewBg = useColorModeValue('orange.50', 'orange.900')
+  const pendingReviewBorderColor = useColorModeValue('orange.200', 'orange.600')
+  const pendingReviewDescriptionColor = useColorModeValue(
+    'gray.600',
+    'orange.100'
+  )
+  const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
@@ -267,6 +298,46 @@ export default function ExpendituresPage({
     }
   }
 
+  const onDismissDuplicate = async (processedEmailId: number) => {
+    if (!window.confirm(t('possibleDuplicate.dismissConfirmDialog'))) return
+
+    setDismissingDuplicateId(processedEmailId)
+    try {
+      await localApiService.request({
+        endPoint: `/proxy/dismiss-processed-email?id=${processedEmailId}`,
+        method: HttpMethod.POST,
+        headers: { Authorization: `Bearer ${session?.accessToken}` }
+      })
+      toast({
+        title: t('possibleDuplicate.toast.dismissed.title'),
+        description: t('possibleDuplicate.toast.dismissed.description'),
+        status: 'success',
+        isClosable: true
+      })
+      router.replace(router.asPath)
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 409)
+        toast({
+          title: t('possibleDuplicate.toast.alreadyResolved.title'),
+          description: t('possibleDuplicate.toast.alreadyResolved.description'),
+          status: 'warning',
+          isClosable: true
+        })
+      else
+        toast({
+          title: t('toast.error.title'),
+          description:
+            error instanceof Error
+              ? error.message
+              : t('toast.error.description'),
+          status: 'error',
+          isClosable: true
+        })
+    } finally {
+      setDismissingDuplicateId(null)
+    }
+  }
+
   const onConfirmPendingTransaction = async (id: number) => {
     const category = pendingCategory[id]
     if (!category) return
@@ -378,23 +449,27 @@ export default function ExpendituresPage({
 
         {pendingTransactions.length > 0 && (
           <Box
-            bg="orange.50"
+            bg={pendingReviewBg}
             borderWidth="1px"
-            borderColor="orange.200"
+            borderColor={pendingReviewBorderColor}
             borderRadius="md"
             p={4}
           >
             <Heading size="sm" mb={1}>
               {t('pendingReview.title', { count: pendingTransactions.length })}
             </Heading>
-            <Text fontSize="sm" color="gray.600" mb={4}>
+            <Text fontSize="sm" color={pendingReviewDescriptionColor} mb={4}>
               {t('pendingReview.description')}
             </Text>
             <Stack spacing={3}>
               {pendingTransactions.map(transaction => {
                 const selected = pendingCategory[transaction.id] ?? ''
                 return (
-                  <Card key={transaction.id} variant="outline" bg="white">
+                  <Card
+                    key={transaction.id}
+                    variant="outline"
+                    bg={pendingReviewCardBg}
+                  >
                     <CardBody>
                       <Stack spacing={3}>
                         <Flex
@@ -513,6 +588,11 @@ export default function ExpendituresPage({
                             {transaction.possibleGmailDuplicate && (
                               <PossibleDuplicateBadge
                                 duplicate={transaction.possibleGmailDuplicate}
+                                onDismiss={onDismissDuplicate}
+                                isDismissing={
+                                  dismissingDuplicateId ===
+                                  transaction.possibleGmailDuplicate.id
+                                }
                                 onNotSame={onNotSameMovement}
                                 isResolving={
                                   resolvingDuplicateId ===
@@ -580,6 +660,11 @@ export default function ExpendituresPage({
                             {transaction.possibleGmailDuplicate && (
                               <PossibleDuplicateBadge
                                 duplicate={transaction.possibleGmailDuplicate}
+                                onDismiss={onDismissDuplicate}
+                                isDismissing={
+                                  dismissingDuplicateId ===
+                                  transaction.possibleGmailDuplicate.id
+                                }
                                 onNotSame={onNotSameMovement}
                                 isResolving={
                                   resolvingDuplicateId ===

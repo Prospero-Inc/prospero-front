@@ -2,7 +2,8 @@ import { ProsperoLayout } from '@/components/layouts'
 import { SwitchLanguage } from '@/components/ui'
 import {
   FinancialInstitutions,
-  GmailConnection
+  GmailConnection,
+  NotificationPreferences
 } from '@/components/views/settings'
 import { HttpMethod } from '@/enums'
 import { PayFrequency } from '@/interfaces'
@@ -14,6 +15,10 @@ import {
   SupportedParser
 } from '@/services/financialInstitutions'
 import { GmailConnectionStatus, getGmailConnection } from '@/services/gmail'
+import {
+  getNotificationPreferences,
+  NotificationPreferences as NotificationPreferencesData
+} from '@/services/notifications'
 import { requestProfile } from '@/services/request-profile'
 import {
   Box,
@@ -48,6 +53,7 @@ interface SettingsProps {
   institutions: FinancialInstitution[]
   supportedParsers: SupportedParser[]
   gmailConnection: GmailConnectionStatus
+  notificationPreferences: NotificationPreferencesData
 }
 
 const defaultBudget: BudgetSettings = {
@@ -65,12 +71,18 @@ const defaultGmailConnection: GmailConnectionStatus = {
   notifyIncomeEnabled: false
 }
 
+const defaultNotificationPreferences: NotificationPreferencesData = {
+  gmailReviewEmailEnabled: false,
+  budgetAlertEmailEnabled: false
+}
+
 export default function SettingsPage({
   account,
   budget,
   institutions,
   supportedParsers,
-  gmailConnection
+  gmailConnection,
+  notificationPreferences
 }: SettingsProps) {
   const { t } = useTranslation('settings')
   const { data: session } = useSession()
@@ -229,6 +241,10 @@ export default function SettingsPage({
 
         <Divider />
 
+        <NotificationPreferences preferences={notificationPreferences} />
+
+        <Divider />
+
         <FinancialInstitutions
           institutions={institutions}
           supportedParsers={supportedParsers}
@@ -262,6 +278,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   let institutions: SettingsProps['institutions'] = []
   let supportedParsers: SettingsProps['supportedParsers'] = []
   let gmailConnection: SettingsProps['gmailConnection'] = defaultGmailConnection
+  let notificationPreferences: SettingsProps['notificationPreferences'] =
+    defaultNotificationPreferences
 
   if (session?.accessToken)
     try {
@@ -291,6 +309,16 @@ export const getServerSideProps: GetServerSideProps = async ({
       )) as GmailConnectionStatus
     } catch (error) {
       gmailConnection = defaultGmailConnection
+    }
+
+  if (session?.accessToken)
+    try {
+      notificationPreferences = (await getNotificationPreferences(
+        {},
+        { authorization: `Bearer ${session.accessToken}`, lang: locale }
+      )) as NotificationPreferencesData
+    } catch (error) {
+      notificationPreferences = defaultNotificationPreferences
     }
 
   if (session?.accessToken)
@@ -327,7 +355,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       budget,
       institutions,
       supportedParsers,
-      gmailConnection
+      gmailConnection,
+      notificationPreferences
     }
   }
 }
