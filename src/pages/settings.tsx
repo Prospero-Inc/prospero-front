@@ -9,7 +9,9 @@ import { PayFrequency } from '@/interfaces'
 import { getValidSession, localApiService } from '@/lib'
 import {
   FinancialInstitution,
-  getFinancialInstitutions
+  getFinancialInstitutions,
+  getSupportedParsers,
+  SupportedParser
 } from '@/services/financialInstitutions'
 import { GmailConnectionStatus, getGmailConnection } from '@/services/gmail'
 import { requestProfile } from '@/services/request-profile'
@@ -44,6 +46,7 @@ interface SettingsProps {
   account: { email: string; username: string } | null
   budget: BudgetSettings | null
   institutions: FinancialInstitution[]
+  supportedParsers: SupportedParser[]
   gmailConnection: GmailConnectionStatus
 }
 
@@ -66,6 +69,7 @@ export default function SettingsPage({
   account,
   budget,
   institutions,
+  supportedParsers,
   gmailConnection
 }: SettingsProps) {
   const { t } = useTranslation('settings')
@@ -225,7 +229,10 @@ export default function SettingsPage({
 
         <Divider />
 
-        <FinancialInstitutions institutions={institutions} />
+        <FinancialInstitutions
+          institutions={institutions}
+          supportedParsers={supportedParsers}
+        />
 
         <Divider />
 
@@ -252,6 +259,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   let account: SettingsProps['account'] = null
   let budget: SettingsProps['budget'] = null
   let institutions: SettingsProps['institutions'] = []
+  let supportedParsers: SettingsProps['supportedParsers'] = []
   let gmailConnection: SettingsProps['gmailConnection'] = defaultGmailConnection
 
   if (session?.accessToken)
@@ -262,6 +270,16 @@ export const getServerSideProps: GetServerSideProps = async ({
       )) as FinancialInstitution[]
     } catch (error) {
       institutions = []
+    }
+
+  if (session?.accessToken)
+    try {
+      supportedParsers = (await getSupportedParsers(
+        {},
+        { authorization: `Bearer ${session.accessToken}`, lang: locale }
+      )) as SupportedParser[]
+    } catch (error) {
+      supportedParsers = []
     }
 
   if (session?.accessToken)
@@ -307,6 +325,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       account,
       budget,
       institutions,
+      supportedParsers,
       gmailConnection
     }
   }

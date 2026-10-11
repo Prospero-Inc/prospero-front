@@ -5,5 +5,7 @@
   "fixedExpenses": "Gastos fijos",
   "goals": "Metas",
   "budgetCalculator": "Calculadora de presupuesto",
-  "settings": "Configuración"
+  "settings": "Configuración",
+  "pendingBadgeEntries": "{{count}} ingresos pendientes de revisión",
+  "pendingBadgeExpenditures": "{{count}} gastos pendientes de revisión"
 }

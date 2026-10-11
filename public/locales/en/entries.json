@@ -40,5 +40,21 @@
       "title": "Error",
       "description": "We could not save the entry"
     }
+  },
+  "pendingReview": {
+    "title": "Pending review ({{count}})",
+    "description": "Gmail detected these income entries. Assign them a category or correct them to confirm.",
+    "badge": "Detected by Gmail",
+    "categoryPlaceholder": "Choose a category",
+    "confirmHelper": "Pick a category to confirm.",
+    "confirm": "Confirm"
+  },
+  "incomeCategoryLabels": {
+    "Payroll": "Payroll",
+    "Extra": "Extra",
+    "Transfer": "Transfer",
+    "Reimbursement": "Reimbursement",
+    "Deposit": "Deposit",
+    "Other": "Other"
   }
 }

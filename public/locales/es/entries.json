@@ -40,5 +40,21 @@
       "title": "Error",
       "description": "No pudimos guardar el ingreso"
     }
+  },
+  "pendingReview": {
+    "title": "Pendientes de revisión ({{count}})",
+    "description": "Gmail detectó estos ingresos. Asignales una categoría o corregilos para confirmarlos.",
+    "badge": "Detectado por Gmail",
+    "categoryPlaceholder": "Elegí una categoría",
+    "confirmHelper": "Elegí una categoría para poder confirmar.",
+    "confirm": "Confirmar"
+  },
+  "incomeCategoryLabels": {
+    "Payroll": "Nómina",
+    "Extra": "Extra",
+    "Transfer": "Transferencia",
+    "Reimbursement": "Reembolso",
+    "Deposit": "Depósito",
+    "Other": "Otro"
   }
 }

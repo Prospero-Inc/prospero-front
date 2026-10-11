@@ -1,9 +1,21 @@
 import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
-import { BudgetCategory } from '@/services/transactions'
+import {
+  BudgetCategory,
+  MovementSource,
+  PossibleGmailDuplicate
+} from '@/services/transactions'
 import { Params } from '@/types'
 
 export type IncomeType = 'Payroll' | 'Extra'
+export type IncomeReviewStatus = 'Detected' | 'PendingReview' | 'Classified'
+export type IncomeCategory =
+  | 'Payroll'
+  | 'Extra'
+  | 'Transfer'
+  | 'Reimbursement'
+  | 'Deposit'
+  | 'Other'
 
 export interface SalaryData {
   amount: number
@@ -23,6 +35,23 @@ export interface SalaryData {
    * type === 'Payroll', así que nunca debe enviarse en ese caso.
    */
   distributeAutomatically?: boolean
+  /**
+   * Categoría de ingreso (distinta de `type`/`budgetCategory`). Un ingreso
+   * detectado por Gmail nace sin ella ("Por clasificar"); asignarla vía
+   * `PATCH /salary/:id` es lo que el usuario hace al revisar un pendiente,
+   * y transiciona automáticamente `status` a `Classified` en el backend.
+   */
+  incomeCategory?: IncomeCategory | ''
+}
+
+/** Shape de cada fila de `GET /salary`: lo mismo que `SalaryData` más los
+ * campos de solo lectura que nunca se mandan en un create/update. */
+export interface SalaryListItem extends Omit<SalaryData, 'incomeCategory'> {
+  id: number
+  status: IncomeReviewStatus
+  incomeCategory: IncomeCategory | null
+  source: MovementSource
+  possibleGmailDuplicate: PossibleGmailDuplicate | null
 }
 
 const createSalary = async (data: SalaryData, params: Params | unknown) => {

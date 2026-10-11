@@ -82,9 +82,25 @@ const disconnectGmail = async (
   })
 }
 
+const syncGmailNow = async (
+  _ignore: unknown,
+  params: Params | unknown
+): Promise<unknown> => {
+  const { lang, authorization } = params as Params
+  return await externalApiService.request({
+    method: HttpMethod.POST,
+    endPoint: '/gmail-sync/sync-now',
+    headers: {
+      'x-lang': `${lang}`,
+      Authorization: authorization
+    }
+  })
+}
+
 export {
   getGmailConnection,
   getGmailConnectUrl,
   updateGmailPreferences,
-  disconnectGmail
+  disconnectGmail,
+  syncGmailNow
 }

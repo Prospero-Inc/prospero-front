@@ -26,7 +26,8 @@
     "actions": {
       "edit": "Editar",
       "delete": "Eliminar"
-    }
+    },
+    "confirmDelete": "¿Eliminar este gasto?"
   },
   "toast": {
     "success": {
@@ -40,6 +41,34 @@
     "error": {
       "title": "Error",
       "description": "No pudimos guardar el movimiento"
+    }
+  },
+  "pendingReview": {
+    "title": "Pendientes de revisión ({{count}})",
+    "description": "Gmail detectó estos gastos. Asignales una categoría o corregilos para confirmarlos.",
+    "badge": "Detectado por Gmail",
+    "categoryPlaceholder": "Elegí una categoría",
+    "confirmHelper": "Elegí una categoría para poder confirmar.",
+    "confirm": "Confirmar"
+  },
+  "possibleDuplicate": {
+    "badge": "Gmail también detectó esto, lo omitimos",
+    "tooltip": "Un correo de {{senderEmail}} con el mismo monto y fecha llegó el {{processedAt}}. No creamos un gasto nuevo para evitar duplicarlo.",
+    "notSameAction": "No son el mismo",
+    "confirmDialog": "¿Seguro que es un movimiento distinto? Vamos a crear un gasto nuevo con los datos que detectamos en el correo.",
+    "toast": {
+      "created": {
+        "title": "Gasto creado",
+        "description": "Creamos el gasto con los datos detectados en el correo"
+      },
+      "alreadyResolved": {
+        "title": "Ya resuelto",
+        "description": "Este posible duplicado ya había sido resuelto antes"
+      },
+      "missingSnapshot": {
+        "title": "No disponible",
+        "description": "Este correo es anterior a que guardáramos sus datos, no se puede crear el gasto automáticamente"
+      }
     }
   }
 }
