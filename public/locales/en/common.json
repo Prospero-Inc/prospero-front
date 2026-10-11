@@ -117,13 +117,49 @@
     }
   },
   "dashboard": {
+    "pageTitle": "Dashboard",
+    "pageDescription": "Prospero home page",
     "daysElapsed": "{{count}} days elapsed",
     "daysRemaining": "{{count}} estimated days remaining",
-    "budgetTitle": "Period budget"
+    "budgetTitle": "Period budget",
+    "summary": {
+      "title": "Summary",
+      "income": {
+        "label": "Period income"
+      },
+      "spent": {
+        "label": "Period expenses"
+      },
+      "balance": {
+        "label": "Available balance",
+        "helpText": "Income minus period expenses"
+      }
+    },
+    "recentActivity": {
+      "title": "Recent activity",
+      "viewAll": "View all",
+      "empty": {
+        "heading": "You haven't logged any expenses this period yet",
+        "description": "Once you add an expense, it'll show up here.",
+        "cta": "Add your first expense"
+      }
+    },
+    "budgetEmpty": {
+      "heading": "You haven't logged an income for this period yet",
+      "description": "Prospero calculates your budget from your last payment. Log one to see the breakdown.",
+      "cta": "Log income"
+    },
+    "error": {
+      "heading": "We couldn't load your current period",
+      "description": "Try reloading the page. If the problem continues, contact us.",
+      "retry": "Retry"
+    }
   },
   "categoryBudget": {
     "necesidad": "Needs",
     "deseo": "Wants",
-    "ahorro": "Savings"
+    "ahorro": "Savings",
+    "remaining": "{{amount}} remaining",
+    "overBudget": "{{amount}} over budget"
   }
 }
