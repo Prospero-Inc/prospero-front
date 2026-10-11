@@ -629,9 +629,10 @@ const PENDING_STATUSES = ['Detected', 'PendingReview']
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
+  res,
   locale
 }) => {
-  const { session, redirect } = await getValidSession(req)
+  const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
   let transactions: Transaction[] = []
