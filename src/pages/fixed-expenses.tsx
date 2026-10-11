@@ -1,6 +1,6 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
-import { getValidSession, localApiService } from '@/lib'
+import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import { FixedExpenseData, getFixedExpenses } from '@/services/fixedExpenses'
 import {
@@ -51,7 +51,7 @@ const emptyForm: FixedExpenseData = {
   amount: 0,
   name: '',
   budgetCategory: 'Necesidad',
-  dueDate: new Date().toISOString().slice(0, 10),
+  dueDate: getTodayLocalDate(),
   reminder: false,
   description: ''
 }
