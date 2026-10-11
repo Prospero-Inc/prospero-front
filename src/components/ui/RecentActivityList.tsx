@@ -100,9 +100,15 @@ export const RecentActivityList = ({
 
   // El locale de next-i18next también vale como tag de Intl (es/en); se evita
   // repetir el bug de hardcodear 'es' que rompía la UI en inglés.
+  // `timeZone: 'UTC'` es obligatorio: el contenedor Node corre en UTC pero el
+  // navegador del usuario no, así que sin fijarla el SSR y el CSR formatean
+  // un día distinto para fechas cercanas a medianoche UTC — mismo bug que
+  // `fix/date-picker-utc-offset` ya corrigió en otras pantallas, y lo que
+  // disparaba el error de hidratación de React.
   const dateFormatter = new Intl.DateTimeFormat(router.locale ?? 'es', {
     day: '2-digit',
-    month: 'short'
+    month: 'short',
+    timeZone: 'UTC'
   })
 
   return (
