@@ -161,5 +161,23 @@
     "ahorro": "Ahorro",
     "remaining": "{{amount}} disponible",
     "overBudget": "{{amount}} sobre el límite"
+  },
+  "movementFilters": {
+    "periodLabel": "Período",
+    "periodCurrent": "Actual · desde {{start}}",
+    "periodRange": "{{start}} – {{end}}",
+    "periodInitial": "Antes de tu primera nómina (hasta {{end}})",
+    "periodAll": "Todos los movimientos",
+    "searchLabel": "Buscar movimientos",
+    "searchPlaceholder": "Concepto o monto",
+    "sourceLabel": "Origen",
+    "source": {
+      "all": "Todos los orígenes",
+      "Manual": "Manual",
+      "Gmail": "Gmail"
+    },
+    "clear": "Limpiar filtros",
+    "noMatches": "Ningún movimiento coincide con los filtros.",
+    "showing": "Mostrando {{shown}} de {{total}}"
   }
 }

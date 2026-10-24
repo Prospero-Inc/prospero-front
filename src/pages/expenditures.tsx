@@ -1,13 +1,27 @@
 import { ProsperoLayout } from '@/components/layouts'
 import {
+  FilterResults,
+  MovementFiltersBar
+} from '@/components/ui/MovementFiltersBar'
+import {
   CategoryBadge,
   GmailSourceBadge,
   MovementSummary,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
+import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
+import {
+  hasActiveMovementFilters,
+  matchesMovementFilters
+} from '@/lib/movementFilters'
+import {
+  getPeriods,
+  getPeriodTransactions,
+  PeriodSummary
+} from '@/services/periods'
 import {
   BudgetCategory,
   getTransactions,
@@ -62,8 +76,11 @@ type Transaction = TransactionListItem
 const BUDGET_CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 
 interface ExpendituresProps {
+  /** Filas del período seleccionado, sin las pendientes de revisión. */
   transactions: Transaction[]
+  /** Pendientes de revisión de cualquier período. */
   pendingTransactions: Transaction[]
+  periods: PeriodSummary[]
 }
 
 const emptyForm: TransactionData = {
@@ -140,7 +157,8 @@ const PossibleDuplicateBadge = ({
 
 export default function ExpendituresPage({
   transactions,
-  pendingTransactions
+  pendingTransactions,
+  periods
 }: ExpendituresProps) {
   const { t } = useTranslation('expenditures')
   const router = useRouter()
@@ -170,6 +188,30 @@ export default function ExpendituresPage({
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
   const { formatAmount } = useMovementFormatters()
+  const {
+    filters,
+    period,
+    searchInput,
+    setSearchInput,
+    setFilters,
+    clearFilters,
+    setPeriod
+  } = useMovementFilters(BUDGET_CATEGORIES)
+
+  const selectedPeriod =
+    periods.find(summary => summary.key === period) ??
+    periods.find(summary => summary.isOpen)
+  const visibleTransactions = transactions.filter(transaction =>
+    matchesMovementFilters(
+      {
+        concept: transaction.description || transaction.fixedExpenseName || '',
+        amount: transaction.amount,
+        group: transaction.category,
+        source: transaction.source
+      },
+      filters
+    )
+  )
 
   // Concepto: lo que escribió el usuario (o lo que parseó Gmail); si no hay,
   // el nombre del gasto fijo que pagó; si tampoco, un placeholder atenuado.
@@ -631,9 +673,50 @@ export default function ExpendituresPage({
           <Heading size="md" mb={3}>
             {t('list.title')}
           </Heading>
-          {transactions.length === 0 ? (
-            <Text>{t('list.empty')}</Text>
-          ) : (
+          {periods.length > 0 && (
+            <Box mb={4}>
+              <MovementFiltersBar
+                periods={periods}
+                selectedPeriod={period}
+                onPeriodChange={setPeriod}
+                stats={
+                  selectedPeriod
+                    ? [
+                        {
+                          label: t('list.stats.spent'),
+                          value: formatAmount(selectedPeriod.totalSpent)
+                        },
+                        ...BUDGET_CATEGORIES.map(category => ({
+                          label: t(`categories.${category}`),
+                          value: formatAmount(
+                            selectedPeriod.budget[
+                              category.toLowerCase() as keyof PeriodSummary['budget']
+                            ].spent
+                          )
+                        }))
+                      ]
+                    : []
+                }
+                filters={filters}
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+                onFiltersChange={setFilters}
+                groupsLabel={t('form.labelCategory')}
+                groupOptions={BUDGET_CATEGORIES.map(category => ({
+                  value: category,
+                  label: t(`categories.${category}`)
+                }))}
+              />
+            </Box>
+          )}
+          <FilterResults
+            shown={visibleTransactions.length}
+            total={transactions.length}
+            isFiltering={hasActiveMovementFilters(filters)}
+            onClear={clearFilters}
+            emptyPeriodText={t('list.emptyPeriod')}
+          />
+          {visibleTransactions.length > 0 && (
             <>
               {/* Desktop/tablet: table with horizontal scroll fallback */}
               <TableContainer display={{ base: 'none', md: 'block' }}>
@@ -651,7 +734,7 @@ export default function ExpendituresPage({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {transactions.map(transaction => (
+                    {visibleTransactions.map(transaction => (
                       <Tr key={transaction.id}>
                         <Td maxW="sm" whiteSpace="normal">
                           {renderSummary(transaction, {
@@ -689,7 +772,7 @@ export default function ExpendituresPage({
 
               {/* Mobile: stacked cards, same data/handlers as the table above */}
               <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {transactions.map(transaction => (
+                {visibleTransactions.map(transaction => (
                   <Card key={transaction.id} variant="outline">
                     <CardBody>
                       <Stack spacing={2}>
@@ -747,34 +830,54 @@ const PENDING_STATUSES = ['Detected', 'PendingReview']
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
-  locale
+  locale,
+  defaultLocale,
+  query
 }) => {
   const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
+  const period = typeof query.period === 'string' ? query.period : undefined
   let transactions: Transaction[] = []
   let pendingTransactions: Transaction[] = []
+  let periods: PeriodSummary[] = []
 
-  if (session?.accessToken)
+  if (session?.accessToken) {
+    const params = {
+      authorization: `Bearer ${session.accessToken}`,
+      lang: locale
+    }
     try {
-      const allTransactions = (await getTransactions(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as Transaction[]
+      const [periodTransactions, pending, allPeriods] = await Promise.all([
+        getPeriodTransactions(period, params),
+        getTransactions(
+          { reviewStatus: PENDING_STATUSES.join(',') },
+          params
+        ) as Promise<Transaction[]>,
+        getPeriods(null, params)
+      ])
 
-      // Una sola llamada a /transactions: separamos pendientes de revisión
-      // del resto en memoria en vez de pedirle al backend el mismo listado
-      // dos veces con filtros distintos.
-      pendingTransactions = allTransactions.filter(transaction =>
-        PENDING_STATUSES.includes(transaction.reviewStatus)
-      )
-      transactions = allTransactions.filter(
+      // Los pendientes se muestran todos arriba, sin importar el período,
+      // así que se sacan de la lista del período para no duplicarlos.
+      transactions = periodTransactions.filter(
         transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
       )
+      pendingTransactions = pending
+      periods = allPeriods
     } catch (error) {
-      transactions = []
-      pendingTransactions = []
+      // Link a un período que ya no existe (p. ej. se borró su nómina):
+      // volver al período actual en vez de mostrar la vista vacía.
+      if (period && error instanceof HttpError && error.status === 404)
+        return {
+          redirect: {
+            destination: `${
+              locale && locale !== defaultLocale ? `/${locale}` : ''
+            }/expenditures`,
+            permanent: false
+          }
+        }
     }
+  }
 
   return {
     props: {
@@ -785,7 +888,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'expenditures'
       ])),
       transactions,
-      pendingTransactions
+      pendingTransactions,
+      periods
     }
   }
 }

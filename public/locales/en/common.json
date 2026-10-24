@@ -161,5 +161,23 @@
     "ahorro": "Savings",
     "remaining": "{{amount}} remaining",
     "overBudget": "{{amount}} over budget"
+  },
+  "movementFilters": {
+    "periodLabel": "Period",
+    "periodCurrent": "Current · since {{start}}",
+    "periodRange": "{{start}} – {{end}}",
+    "periodInitial": "Before your first payroll (until {{end}})",
+    "periodAll": "All movements",
+    "searchLabel": "Search movements",
+    "searchPlaceholder": "Description or amount",
+    "sourceLabel": "Source",
+    "source": {
+      "all": "All sources",
+      "Manual": "Manual",
+      "Gmail": "Gmail"
+    },
+    "clear": "Clear filters",
+    "noMatches": "No movements match the filters.",
+    "showing": "Showing {{shown}} of {{total}}"
   }
 }
