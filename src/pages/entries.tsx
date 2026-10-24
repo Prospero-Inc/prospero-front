@@ -4,6 +4,7 @@ import {
   FilterResults,
   MovementFiltersBar
 } from '@/components/ui/MovementFiltersBar'
+import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
 import {
   CategoryBadge,
   GmailSourceBadge,
@@ -48,6 +49,7 @@ import {
   Th,
   Tr,
   useColorModeValue,
+  useDisclosure,
   useToast,
   VisuallyHidden
 } from '@chakra-ui/react'
@@ -56,9 +58,9 @@ import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { MdEdit } from 'react-icons/md'
+import { MdAdd, MdEdit } from 'react-icons/md'
 
 type SalaryEntry = SalaryListItem
 
@@ -180,6 +182,17 @@ export default function EntriesPage({
   const distributeAutomatically = watch('distributeAutomatically')
   const isExtra = type === 'Extra'
 
+  const formDrawer = useDisclosure()
+  const amountInputRef = useRef<HTMLInputElement | null>(null)
+
+  const openCreate = () => {
+    setEditingId(null)
+    // Fecha de hoy calculada al abrir, no al cargar el módulo: la página
+    // puede quedar abierta de un día para otro.
+    reset({ ...emptyForm, date: getTodayLocalDate() })
+    formDrawer.onOpen()
+  }
+
   const startEdit = (entry: SalaryEntry) => {
     setEditingId(entry.id)
     reset({
@@ -190,11 +203,12 @@ export default function EntriesPage({
       distributeAutomatically: entry.distributeAutomatically ?? false,
       description: entry.description ?? ''
     })
+    formDrawer.onOpen()
   }
 
-  const cancelEdit = () => {
+  const closeForm = () => {
+    formDrawer.onClose()
     setEditingId(null)
-    reset(emptyForm)
   }
 
   const onSubmit = async (data: SalaryData) => {
@@ -243,7 +257,7 @@ export default function EntriesPage({
         status: 'success',
         isClosable: true
       })
-      cancelEdit()
+      closeForm()
       router.replace(router.asPath)
     } catch (error) {
       toast({
@@ -293,19 +307,46 @@ export default function EntriesPage({
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
-        <Stack
-          as="form"
+        <Flex justify="flex-end">
+          <Button
+            colorScheme="primary"
+            leftIcon={<MdAdd />}
+            onClick={openCreate}
+            minH="44px"
+            w={{ base: 'full', md: 'auto' }}
+          >
+            {t('form.openCreate')}
+          </Button>
+        </Flex>
+
+        <MovementFormDrawer
+          isOpen={formDrawer.isOpen}
+          onClose={closeForm}
+          title={editingId ? t('form.editTitle') : t('form.createTitle')}
+          formId="income-form"
           onSubmit={handleSubmit(onSubmit)}
-          spacing={4}
-          maxW="lg"
+          isSubmitting={isLoading}
+          submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
+          cancelLabel={t('form.cancel')}
+          initialFocusRef={amountInputRef}
         >
           <FormControl>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"
               control={control}
-              render={({ field }) => (
-                <Input {...field} type="number" step="0.01" min={0} />
+              render={({ field: { ref, ...field } }) => (
+                <Input
+                  {...field}
+                  ref={element => {
+                    ref(element)
+                    amountInputRef.current = element
+                  }}
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min={0}
+                />
               )}
             />
           </FormControl>
@@ -388,18 +429,7 @@ export default function EntriesPage({
               </FormControl>
             </>
           )}
-
-          <Stack direction="row">
-            <Button colorScheme="primary" type="submit" isLoading={isLoading}>
-              {editingId ? t('form.submitEdit') : t('form.submit')}
-            </Button>
-            {editingId && (
-              <Button variant="ghost" onClick={cancelEdit}>
-                {t('form.cancel')}
-              </Button>
-            )}
-          </Stack>
-        </Stack>
+        </MovementFormDrawer>
 
         {pendingSalary.length > 0 && (
           <Box
@@ -599,7 +629,8 @@ export default function EntriesPage({
                         <IconButton
                           aria-label={t('list.actions.edit')}
                           icon={<MdEdit />}
-                          size="sm"
+                          boxSize="44px"
+                          minW="44px"
                           variant="ghost"
                           colorScheme="blue"
                           onClick={() => startEdit(entry)}
