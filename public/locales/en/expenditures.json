@@ -9,7 +9,10 @@
     "submit": "Save expense",
     "submitEdit": "Update expense",
     "cancel": "Cancel",
-    "descriptionPlaceholder": "E.g. Groceries, Uber, pharmacy"
+    "descriptionPlaceholder": "E.g. Groceries, Uber, pharmacy",
+    "openCreate": "New expense",
+    "createTitle": "New expense",
+    "editTitle": "Edit expense"
   },
   "categories": {
     "Necesidad": "Needs",

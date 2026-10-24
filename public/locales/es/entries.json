@@ -13,7 +13,10 @@
     "submitEdit": "Actualizar ingreso",
     "cancel": "Cancelar",
     "labelDescription": "Concepto (opcional)",
-    "descriptionPlaceholder": "Ej. Quincena, venta de bicicleta"
+    "descriptionPlaceholder": "Ej. Quincena, venta de bicicleta",
+    "openCreate": "Nuevo ingreso",
+    "createTitle": "Nuevo ingreso",
+    "editTitle": "Editar ingreso"
   },
   "types": {
     "Payroll": "Nómina",

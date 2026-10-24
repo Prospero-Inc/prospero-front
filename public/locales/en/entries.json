@@ -13,7 +13,10 @@
     "submitEdit": "Update entry",
     "cancel": "Cancel",
     "labelDescription": "Description (optional)",
-    "descriptionPlaceholder": "E.g. Paycheck, sold bike"
+    "descriptionPlaceholder": "E.g. Paycheck, sold bike",
+    "openCreate": "New income",
+    "createTitle": "New income",
+    "editTitle": "Edit income"
   },
   "types": {
     "Payroll": "Payroll",
