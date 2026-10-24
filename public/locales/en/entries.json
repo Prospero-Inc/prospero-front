@@ -38,6 +38,10 @@
     "fallbackTitle": {
       "Payroll": "Payroll",
       "Extra": "Extra income"
+    },
+    "emptyPeriod": "You haven't registered income in this period.",
+    "stats": {
+      "income": "Received"
     }
   },
   "toast": {

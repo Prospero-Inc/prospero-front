@@ -33,7 +33,11 @@
     "columnActions": "Acciones",
     "noDescription": "Sin concepto",
     "fixedExpenseBadge": "Gasto fijo",
-    "gmailSource": "Gmail"
+    "gmailSource": "Gmail",
+    "emptyPeriod": "No registraste gastos en este período.",
+    "stats": {
+      "spent": "Gastado"
+    }
   },
   "toast": {
     "success": {

@@ -38,6 +38,10 @@
     "fallbackTitle": {
       "Payroll": "Nómina",
       "Extra": "Ingreso extra"
+    },
+    "emptyPeriod": "No registraste ingresos en este período.",
+    "stats": {
+      "income": "Ingresado"
     }
   },
   "toast": {

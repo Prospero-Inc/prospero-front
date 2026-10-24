@@ -88,13 +88,14 @@ const updateSalary = async (
 }
 
 const getSalaryList = async (
-  _ignore: unknown,
+  filters: { status?: string } | null,
   params: Params | unknown
 ): Promise<unknown> => {
   const { lang, authorization } = params as Params
   return await externalApiService.request({
     method: HttpMethod.GET,
     endPoint: '/salary',
+    query: filters ?? {},
     headers: {
       'x-lang': `${lang}`,
       Authorization: authorization

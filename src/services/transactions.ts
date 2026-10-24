@@ -40,6 +40,8 @@ export interface TransactionListItem extends Omit<TransactionData, 'category'> {
 interface TransactionFilters {
   from?: string
   to?: string
+  /** Separados por coma, p. ej. 'Detected,PendingReview'. */
+  reviewStatus?: string
 }
 
 const getTransactions = async (

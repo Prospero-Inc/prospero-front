@@ -1,12 +1,23 @@
 import { ProsperoLayout } from '@/components/layouts'
 import {
+  FilterResults,
+  MovementFiltersBar
+} from '@/components/ui/MovementFiltersBar'
+import {
   CategoryBadge,
   GmailSourceBadge,
   MovementSummary,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
+import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
+import { HttpError } from '@/lib/apiService'
+import {
+  hasActiveMovementFilters,
+  matchesMovementFilters
+} from '@/lib/movementFilters'
+import { getPeriodSalary, getPeriods, PeriodSummary } from '@/services/periods'
 import {
   getSalaryList,
   IncomeCategory,
@@ -63,9 +74,14 @@ const INCOME_CATEGORIES: IncomeCategory[] = [
   'Other'
 ]
 
+const INCOME_TYPES: IncomeType[] = ['Payroll', 'Extra']
+
 interface EntriesProps {
+  /** Ingresos del período seleccionado, sin los pendientes de revisión. */
   salary: SalaryEntry[]
+  /** Pendientes de revisión de cualquier período. */
   pendingSalary: SalaryEntry[]
+  periods: PeriodSummary[]
 }
 
 const emptyForm: SalaryData = {
@@ -77,7 +93,11 @@ const emptyForm: SalaryData = {
   description: ''
 }
 
-export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
+export default function EntriesPage({
+  salary,
+  pendingSalary,
+  periods
+}: EntriesProps) {
   const { t } = useTranslation('entries')
   const router = useRouter()
   const toast = useToast()
@@ -101,6 +121,30 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
   const { formatAmount } = useMovementFormatters()
+  const {
+    filters,
+    period,
+    searchInput,
+    setSearchInput,
+    setFilters,
+    clearFilters,
+    setPeriod
+  } = useMovementFilters(INCOME_TYPES)
+
+  const selectedPeriod =
+    periods.find(summary => summary.key === period) ??
+    periods.find(summary => summary.isOpen)
+  const visibleSalary = salary.filter(entry =>
+    matchesMovementFilters(
+      {
+        concept: entry.description ?? '',
+        amount: entry.amount,
+        group: entry.type ?? null,
+        source: entry.source
+      },
+      filters
+    )
+  )
 
   // Concepto: lo que escribió el usuario; si no hay, el tipo de ingreso
   // (atenuado) para que la fila nunca quede identificada solo por la fecha.
@@ -455,9 +499,42 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
           <Heading size="md" mb={3}>
             {t('list.title')}
           </Heading>
-          {salary.length === 0 ? (
-            <Text>{t('list.empty')}</Text>
-          ) : (
+          {periods.length > 0 && (
+            <Box mb={4}>
+              <MovementFiltersBar
+                periods={periods}
+                selectedPeriod={period}
+                onPeriodChange={setPeriod}
+                stats={
+                  selectedPeriod
+                    ? [
+                        {
+                          label: t('list.stats.income'),
+                          value: formatAmount(selectedPeriod.income)
+                        }
+                      ]
+                    : []
+                }
+                filters={filters}
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+                onFiltersChange={setFilters}
+                groupsLabel={t('form.labelType')}
+                groupOptions={INCOME_TYPES.map(type => ({
+                  value: type,
+                  label: t(`incomeCategoryLabels.${type}`)
+                }))}
+              />
+            </Box>
+          )}
+          <FilterResults
+            shown={visibleSalary.length}
+            total={salary.length}
+            isFiltering={hasActiveMovementFilters(filters)}
+            onClear={clearFilters}
+            emptyPeriodText={t('list.emptyPeriod')}
+          />
+          {visibleSalary.length > 0 && (
             <>
               {/* Desktop/tablet: table with horizontal scroll fallback */}
               <TableContainer display={{ base: 'none', md: 'block' }}>
@@ -476,7 +553,7 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {salary.map(entry => (
+                    {visibleSalary.map(entry => (
                       <Tr key={entry.id}>
                         <Td maxW="sm" whiteSpace="normal">
                           {renderSummary(entry)}
@@ -504,7 +581,7 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
 
               {/* Mobile: stacked cards, same data/handlers as the table above */}
               <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {salary.map(entry => (
+                {visibleSalary.map(entry => (
                   <Card key={entry.id} variant="outline">
                     <CardBody>
                       <Stack spacing={2}>
@@ -555,34 +632,54 @@ const PENDING_STATUSES = ['Detected', 'PendingReview']
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
-  locale
+  locale,
+  defaultLocale,
+  query
 }) => {
   const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
+  const period = typeof query.period === 'string' ? query.period : undefined
   let salary: SalaryEntry[] = []
   let pendingSalary: SalaryEntry[] = []
+  let periods: PeriodSummary[] = []
 
-  if (session?.accessToken)
+  if (session?.accessToken) {
+    const params = {
+      authorization: `Bearer ${session.accessToken}`,
+      lang: locale
+    }
     try {
-      const allSalary = (await getSalaryList(null, {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      })) as SalaryEntry[]
+      const [periodSalary, pending, allPeriods] = await Promise.all([
+        getPeriodSalary(period, params),
+        getSalaryList(
+          { status: PENDING_STATUSES.join(',') },
+          params
+        ) as Promise<SalaryEntry[]>,
+        getPeriods(null, params)
+      ])
 
-      // Una sola llamada a /salary: separamos pendientes de revisión del
-      // resto en memoria en vez de pedirle al backend el mismo listado dos
-      // veces con filtros distintos.
-      pendingSalary = allSalary.filter(entry =>
-        PENDING_STATUSES.includes(entry.status)
-      )
-      salary = allSalary.filter(
+      // Los pendientes se muestran todos arriba, sin importar el período,
+      // así que se sacan de la lista del período para no duplicarlos.
+      salary = periodSalary.filter(
         entry => !PENDING_STATUSES.includes(entry.status)
       )
+      pendingSalary = pending
+      periods = allPeriods
     } catch (error) {
-      salary = []
-      pendingSalary = []
+      // Link a un período que ya no existe (p. ej. se borró su nómina):
+      // volver al período actual en vez de mostrar la vista vacía.
+      if (period && error instanceof HttpError && error.status === 404)
+        return {
+          redirect: {
+            destination: `${
+              locale && locale !== defaultLocale ? `/${locale}` : ''
+            }/entries`,
+            permanent: false
+          }
+        }
     }
+  }
 
   return {
     props: {
@@ -593,7 +690,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'entries'
       ])),
       salary,
-      pendingSalary
+      pendingSalary,
+      periods
     }
   }
 }
