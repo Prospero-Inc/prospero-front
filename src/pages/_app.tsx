@@ -1,5 +1,6 @@
 import '@/styles/globals.css'
 import { SessionWatcher } from '@/components/ui'
+import { RouteProgress } from '@/components/ui/RouteProgress'
 import { theme } from '@/themes'
 import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
@@ -23,6 +24,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     >
       <SessionProvider session={session} refetchInterval={60}>
         <SessionWatcher />
+        <RouteProgress />
         <Component {...pageProps} />
       </SessionProvider>
     </ChakraProvider>
