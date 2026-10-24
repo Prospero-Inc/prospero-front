@@ -11,7 +11,12 @@
     "labelDistributeAutomatically": "Repartir automáticamente en su lugar",
     "submit": "Registrar ingreso",
     "submitEdit": "Actualizar ingreso",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "labelDescription": "Concepto (opcional)",
+    "descriptionPlaceholder": "Ej. Quincena, venta de bicicleta",
+    "openCreate": "Nuevo ingreso",
+    "createTitle": "Nuevo ingreso",
+    "editTitle": "Editar ingreso"
   },
   "types": {
     "Payroll": "Nómina",
@@ -29,6 +34,17 @@
     "autoDistributed": "Reparto automático",
     "actions": {
       "edit": "Editar"
+    },
+    "columnConcept": "Concepto",
+    "columnActions": "Acciones",
+    "gmailSource": "Gmail",
+    "fallbackTitle": {
+      "Payroll": "Nómina",
+      "Extra": "Ingreso extra"
+    },
+    "emptyPeriod": "No registraste ingresos en este período.",
+    "stats": {
+      "income": "Ingresado"
     }
   },
   "toast": {

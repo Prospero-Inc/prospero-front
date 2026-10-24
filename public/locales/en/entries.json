@@ -11,7 +11,12 @@
     "labelDistributeAutomatically": "Split automatically instead",
     "submit": "Register entry",
     "submitEdit": "Update entry",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "labelDescription": "Description (optional)",
+    "descriptionPlaceholder": "E.g. Paycheck, sold bike",
+    "openCreate": "New income",
+    "createTitle": "New income",
+    "editTitle": "Edit income"
   },
   "types": {
     "Payroll": "Payroll",
@@ -29,6 +34,17 @@
     "autoDistributed": "Split automatically",
     "actions": {
       "edit": "Edit"
+    },
+    "columnConcept": "Description",
+    "columnActions": "Actions",
+    "gmailSource": "Gmail",
+    "fallbackTitle": {
+      "Payroll": "Payroll",
+      "Extra": "Extra income"
+    },
+    "emptyPeriod": "You haven't registered income in this period.",
+    "stats": {
+      "income": "Received"
     }
   },
   "toast": {

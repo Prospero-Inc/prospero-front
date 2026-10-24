@@ -1,7 +1,29 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { MovementDayList } from '@/components/ui/MovementDayList'
+import {
+  FilterResults,
+  MovementFiltersBar
+} from '@/components/ui/MovementFiltersBar'
+import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
+import {
+  CategoryBadge,
+  GmailSourceBadge,
+  MovementSummary,
+  useMovementFormatters
+} from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
+import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
+import {
+  hasActiveMovementFilters,
+  matchesMovementFilters
+} from '@/lib/movementFilters'
+import {
+  getPeriods,
+  getPeriodTransactions,
+  PeriodSummary
+} from '@/services/periods'
 import {
   BudgetCategory,
   getTransactions,
@@ -30,33 +52,34 @@ import {
   PopoverTrigger,
   Select,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
   Td,
   Text,
   Th,
-  Thead,
   Tr,
   useColorModeValue,
-  useToast
+  useDisclosure,
+  useToast,
+  VisuallyHidden
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { MdDelete, MdEdit } from 'react-icons/md'
+import { MdAdd, MdDelete, MdEdit } from 'react-icons/md'
 
 type Transaction = TransactionListItem
 
 const BUDGET_CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 
 interface ExpendituresProps {
+  /** Filas del período seleccionado, sin las pendientes de revisión. */
   transactions: Transaction[]
+  /** Pendientes de revisión de cualquier período. */
   pendingTransactions: Transaction[]
+  periods: PeriodSummary[]
 }
 
 const emptyForm: TransactionData = {
@@ -133,7 +156,8 @@ const PossibleDuplicateBadge = ({
 
 export default function ExpendituresPage({
   transactions,
-  pendingTransactions
+  pendingTransactions,
+  periods
 }: ExpendituresProps) {
   const { t } = useTranslation('expenditures')
   const router = useRouter()
@@ -162,6 +186,105 @@ export default function ExpendituresPage({
     'orange.100'
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
+  const { formatAmount } = useMovementFormatters()
+  const {
+    filters,
+    period,
+    searchInput,
+    setSearchInput,
+    setFilters,
+    clearFilters,
+    setPeriod
+  } = useMovementFilters(BUDGET_CATEGORIES)
+
+  const selectedPeriod =
+    periods.find(summary => summary.key === period) ??
+    periods.find(summary => summary.isOpen)
+  const visibleTransactions = transactions.filter(transaction =>
+    matchesMovementFilters(
+      {
+        concept: transaction.description || transaction.fixedExpenseName || '',
+        amount: transaction.amount,
+        group: transaction.category,
+        source: transaction.source
+      },
+      filters
+    )
+  )
+
+  // Concepto: lo que escribió el usuario (o lo que parseó Gmail); si no hay,
+  // el nombre del gasto fijo que pagó; si tampoco, un placeholder atenuado.
+  const renderSummary = (
+    transaction: Transaction,
+    {
+      withDuplicateBadge,
+      showDate = true
+    }: { withDuplicateBadge: boolean; showDate?: boolean }
+  ) => (
+    <MovementSummary
+      title={
+        transaction.description?.trim() || transaction.fixedExpenseName || null
+      }
+      fallbackTitle={t('list.noDescription')}
+      date={transaction.date}
+      showDate={showDate}
+      badges={
+        (transaction.fixedExpenseName ||
+          transaction.source === 'Gmail' ||
+          (withDuplicateBadge && transaction.possibleGmailDuplicate)) && (
+          <>
+            {transaction.fixedExpenseName && (
+              <Badge colorScheme="teal" variant="subtle">
+                {t('list.fixedExpenseBadge')}
+              </Badge>
+            )}
+            {transaction.source === 'Gmail' && (
+              <GmailSourceBadge
+                label={transaction.institutionName ?? t('list.gmailSource')}
+              />
+            )}
+            {withDuplicateBadge && transaction.possibleGmailDuplicate && (
+              <PossibleDuplicateBadge
+                duplicate={transaction.possibleGmailDuplicate}
+                onDismiss={onDismissDuplicate}
+                isDismissing={
+                  dismissingDuplicateId ===
+                  transaction.possibleGmailDuplicate.id
+                }
+                onNotSame={onNotSameMovement}
+                isResolving={
+                  resolvingDuplicateId === transaction.possibleGmailDuplicate.id
+                }
+              />
+            )}
+          </>
+        )
+      }
+    />
+  )
+
+  const renderCategory = (transaction: Transaction) =>
+    transaction.category ? (
+      <CategoryBadge
+        category={transaction.category}
+        label={t(`categories.${transaction.category}`)}
+      />
+    ) : (
+      <Text as="span" color="gray.500" fontSize="sm">
+        —
+      </Text>
+    )
+
+  const formDrawer = useDisclosure()
+  const amountInputRef = useRef<HTMLInputElement | null>(null)
+
+  const openCreate = () => {
+    setEditingId(null)
+    // Fecha de hoy calculada al abrir, no al cargar el módulo: la página
+    // puede quedar abierta de un día para otro.
+    reset({ ...emptyForm, date: getTodayLocalDate() })
+    formDrawer.onOpen()
+  }
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
@@ -172,11 +295,12 @@ export default function ExpendituresPage({
       description: transaction.description ?? '',
       periodOverride: transaction.periodOverride ?? ''
     })
+    formDrawer.onOpen()
   }
 
-  const cancelEdit = () => {
+  const closeForm = () => {
+    formDrawer.onClose()
     setEditingId(null)
-    reset(emptyForm)
   }
 
   const onSubmit = async (data: TransactionData) => {
@@ -209,7 +333,7 @@ export default function ExpendituresPage({
         status: 'success',
         isClosable: true
       })
-      cancelEdit()
+      closeForm()
       router.replace(router.asPath)
     } catch (error) {
       toast({
@@ -373,19 +497,46 @@ export default function ExpendituresPage({
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
-        <Stack
-          as="form"
+        <Flex justify="flex-end">
+          <Button
+            colorScheme="primary"
+            leftIcon={<MdAdd />}
+            onClick={openCreate}
+            minH="44px"
+            w={{ base: 'full', md: 'auto' }}
+          >
+            {t('form.openCreate')}
+          </Button>
+        </Flex>
+
+        <MovementFormDrawer
+          isOpen={formDrawer.isOpen}
+          onClose={closeForm}
+          title={editingId ? t('form.editTitle') : t('form.createTitle')}
+          formId="expense-form"
           onSubmit={handleSubmit(onSubmit)}
-          spacing={4}
-          maxW="lg"
+          isSubmitting={isLoading}
+          submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
+          cancelLabel={t('form.cancel')}
+          initialFocusRef={amountInputRef}
         >
           <FormControl>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"
               control={control}
-              render={({ field }) => (
-                <Input {...field} type="number" step="0.01" min={0} />
+              render={({ field: { ref, ...field } }) => (
+                <Input
+                  {...field}
+                  ref={element => {
+                    ref(element)
+                    amountInputRef.current = element
+                  }}
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min={0}
+                />
               )}
             />
           </FormControl>
@@ -416,7 +567,12 @@ export default function ExpendituresPage({
             <Controller
               name="description"
               control={control}
-              render={({ field }) => <Input {...field} />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder={t('form.descriptionPlaceholder')}
+                />
+              )}
             />
           </FormControl>
           <FormControl>
@@ -435,17 +591,7 @@ export default function ExpendituresPage({
               )}
             />
           </FormControl>
-          <Stack direction="row">
-            <Button colorScheme="primary" type="submit" isLoading={isLoading}>
-              {editingId ? t('form.submitEdit') : t('form.submit')}
-            </Button>
-            {editingId && (
-              <Button variant="ghost" onClick={cancelEdit}>
-                {t('form.cancel')}
-              </Button>
-            )}
-          </Stack>
-        </Stack>
+        </MovementFormDrawer>
 
         {pendingTransactions.length > 0 && (
           <Box
@@ -478,14 +624,14 @@ export default function ExpendituresPage({
                           wrap="wrap"
                           gap={2}
                         >
-                          <Stack spacing={0}>
-                            <Text fontWeight="bold">
-                              {transaction.date.slice(0, 10)}
+                          <Flex flex="1" justify="space-between" gap={3}>
+                            {renderSummary(transaction, {
+                              withDuplicateBadge: false
+                            })}
+                            <Text fontWeight="semibold" whiteSpace="nowrap">
+                              {formatAmount(transaction.amount)}
                             </Text>
-                            <Text fontSize="sm">
-                              ${transaction.amount.toFixed(2)}
-                            </Text>
-                          </Stack>
+                          </Flex>
                           <Badge colorScheme="orange">
                             {t('pendingReview.badge')}
                           </Badge>
@@ -559,150 +705,144 @@ export default function ExpendituresPage({
           <Heading size="md" mb={3}>
             {t('list.title')}
           </Heading>
-          {transactions.length === 0 ? (
-            <Text>{t('list.empty')}</Text>
-          ) : (
-            <>
-              {/* Desktop/tablet: table with horizontal scroll fallback */}
-              <TableContainer display={{ base: 'none', md: 'block' }}>
-                <Table variant="simple" size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>{t('form.labelDate')}</Th>
-                      <Th>{t('form.labelCategory')}</Th>
-                      <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th />
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {transactions.map(transaction => (
-                      <Tr key={transaction.id}>
-                        <Td>{transaction.date.slice(0, 10)}</Td>
-                        <Td>
-                          <Flex align="center" gap={2} wrap="wrap">
-                            <Text as="span">
-                              {transaction.category
-                                ? t(`categories.${transaction.category}`)
-                                : ''}
-                            </Text>
-                            {transaction.possibleGmailDuplicate && (
-                              <PossibleDuplicateBadge
-                                duplicate={transaction.possibleGmailDuplicate}
-                                onDismiss={onDismissDuplicate}
-                                isDismissing={
-                                  dismissingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                                onNotSame={onNotSameMovement}
-                                isResolving={
-                                  resolvingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                              />
-                            )}
-                          </Flex>
-                        </Td>
-                        <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
-                        <Td>
+          {periods.length > 0 && (
+            <Box mb={4}>
+              <MovementFiltersBar
+                periods={periods}
+                selectedPeriod={period}
+                onPeriodChange={setPeriod}
+                stats={
+                  selectedPeriod
+                    ? [
+                        {
+                          label: t('list.stats.spent'),
+                          value: formatAmount(selectedPeriod.totalSpent)
+                        },
+                        ...BUDGET_CATEGORIES.map(category => ({
+                          label: t(`categories.${category}`),
+                          value: formatAmount(
+                            selectedPeriod.budget[
+                              category.toLowerCase() as keyof PeriodSummary['budget']
+                            ].spent
+                          )
+                        }))
+                      ]
+                    : []
+                }
+                filters={filters}
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+                onFiltersChange={setFilters}
+                groupsLabel={t('form.labelCategory')}
+                groupOptions={BUDGET_CATEGORIES.map(category => ({
+                  value: category,
+                  label: t(`categories.${category}`)
+                }))}
+              />
+            </Box>
+          )}
+          <FilterResults
+            shown={visibleTransactions.length}
+            total={transactions.length}
+            isFiltering={hasActiveMovementFilters(filters)}
+            onClear={clearFilters}
+            emptyPeriodText={t('list.emptyPeriod')}
+          />
+          {visibleTransactions.length > 0 && (
+            <MovementDayList
+              items={visibleTransactions}
+              getKey={transaction => transaction.id}
+              getDate={transaction => transaction.date}
+              getAmount={transaction => transaction.amount}
+              resetKey={JSON.stringify([period, filters])}
+              columnCount={4}
+              tableHead={
+                <Tr>
+                  <Th>{t('list.columnConcept')}</Th>
+                  <Th>{t('form.labelCategory')}</Th>
+                  <Th isNumeric>{t('form.labelAmount')}</Th>
+                  <Th>
+                    <VisuallyHidden>{t('list.columnActions')}</VisuallyHidden>
+                  </Th>
+                </Tr>
+              }
+              renderTableRow={transaction => (
+                <Tr key={transaction.id}>
+                  <Td maxW="sm" whiteSpace="normal">
+                    {renderSummary(transaction, {
+                      withDuplicateBadge: true,
+                      showDate: false
+                    })}
+                  </Td>
+                  <Td>{renderCategory(transaction)}</Td>
+                  <Td isNumeric fontWeight="semibold">
+                    {formatAmount(transaction.amount)}
+                  </Td>
+                  <Td>
+                    <IconButton
+                      aria-label={t('list.actions.edit')}
+                      icon={<MdEdit />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={() => startEdit(transaction)}
+                      mr={2}
+                    />
+                    <IconButton
+                      aria-label={t('list.actions.delete')}
+                      icon={<MdDelete />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => onDelete(transaction.id)}
+                    />
+                  </Td>
+                </Tr>
+              )}
+              renderCard={transaction => (
+                <Card key={transaction.id} variant="outline">
+                  <CardBody>
+                    <Stack spacing={2}>
+                      <Flex justify="space-between" align="flex-start" gap={3}>
+                        {renderSummary(transaction, {
+                          withDuplicateBadge: true,
+                          showDate: false
+                        })}
+                        <Text fontWeight="semibold" whiteSpace="nowrap">
+                          {formatAmount(transaction.amount)}
+                        </Text>
+                      </Flex>
+
+                      <Divider />
+
+                      <Flex justify="space-between" align="center">
+                        {renderCategory(transaction)}
+                        <Stack direction="row" spacing={1}>
                           <IconButton
                             aria-label={t('list.actions.edit')}
                             icon={<MdEdit />}
-                            size="sm"
+                            boxSize="44px"
+                            minW="44px"
                             variant="ghost"
                             colorScheme="blue"
                             onClick={() => startEdit(transaction)}
-                            mr={2}
                           />
                           <IconButton
                             aria-label={t('list.actions.delete')}
                             icon={<MdDelete />}
-                            size="sm"
+                            boxSize="44px"
+                            minW="44px"
                             variant="ghost"
                             colorScheme="red"
                             onClick={() => onDelete(transaction.id)}
                           />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-
-              {/* Mobile: stacked cards, same data/handlers as the table above */}
-              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {transactions.map(transaction => (
-                  <Card key={transaction.id} variant="outline">
-                    <CardBody>
-                      <Stack spacing={2}>
-                        <Flex justify="space-between">
-                          <Text fontWeight="bold">
-                            {transaction.date.slice(0, 10)}
-                          </Text>
-                          <Text fontSize="sm" fontWeight="semibold">
-                            ${transaction.amount.toFixed(2)}
-                          </Text>
-                        </Flex>
-
-                        <Flex
-                          justify="space-between"
-                          align="center"
-                          wrap="wrap"
-                        >
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelCategory')}
-                          </Text>
-                          <Flex align="center" gap={2}>
-                            <Text fontSize="sm">
-                              {transaction.category
-                                ? t(`categories.${transaction.category}`)
-                                : ''}
-                            </Text>
-                            {transaction.possibleGmailDuplicate && (
-                              <PossibleDuplicateBadge
-                                duplicate={transaction.possibleGmailDuplicate}
-                                onDismiss={onDismissDuplicate}
-                                isDismissing={
-                                  dismissingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                                onNotSame={onNotSameMovement}
-                                isResolving={
-                                  resolvingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                              />
-                            )}
-                          </Flex>
-                        </Flex>
-
-                        <Divider />
-
-                        <Flex justify="flex-end">
-                          <Stack direction="row" spacing={1}>
-                            <IconButton
-                              aria-label={t('list.actions.edit')}
-                              icon={<MdEdit />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="blue"
-                              onClick={() => startEdit(transaction)}
-                            />
-                            <IconButton
-                              aria-label={t('list.actions.delete')}
-                              icon={<MdDelete />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="red"
-                              onClick={() => onDelete(transaction.id)}
-                            />
-                          </Stack>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Stack>
-            </>
+                        </Stack>
+                      </Flex>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              )}
+            />
           )}
         </Box>
       </Stack>
@@ -715,34 +855,54 @@ const PENDING_STATUSES = ['Detected', 'PendingReview']
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
-  locale
+  locale,
+  defaultLocale,
+  query
 }) => {
   const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
+  const period = typeof query.period === 'string' ? query.period : undefined
   let transactions: Transaction[] = []
   let pendingTransactions: Transaction[] = []
+  let periods: PeriodSummary[] = []
 
-  if (session?.accessToken)
+  if (session?.accessToken) {
+    const params = {
+      authorization: `Bearer ${session.accessToken}`,
+      lang: locale
+    }
     try {
-      const allTransactions = (await getTransactions(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as Transaction[]
+      const [periodTransactions, pending, allPeriods] = await Promise.all([
+        getPeriodTransactions(period, params),
+        getTransactions(
+          { reviewStatus: PENDING_STATUSES.join(',') },
+          params
+        ) as Promise<Transaction[]>,
+        getPeriods(null, params)
+      ])
 
-      // Una sola llamada a /transactions: separamos pendientes de revisión
-      // del resto en memoria en vez de pedirle al backend el mismo listado
-      // dos veces con filtros distintos.
-      pendingTransactions = allTransactions.filter(transaction =>
-        PENDING_STATUSES.includes(transaction.reviewStatus)
-      )
-      transactions = allTransactions.filter(
+      // Los pendientes se muestran todos arriba, sin importar el período,
+      // así que se sacan de la lista del período para no duplicarlos.
+      transactions = periodTransactions.filter(
         transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
       )
+      pendingTransactions = pending
+      periods = allPeriods
     } catch (error) {
-      transactions = []
-      pendingTransactions = []
+      // Link a un período que ya no existe (p. ej. se borró su nómina):
+      // volver al período actual en vez de mostrar la vista vacía.
+      if (period && error instanceof HttpError && error.status === 404)
+        return {
+          redirect: {
+            destination: `${
+              locale && locale !== defaultLocale ? `/${locale}` : ''
+            }/expenditures`,
+            permanent: false
+          }
+        }
     }
+  }
 
   return {
     props: {
@@ -753,7 +913,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'expenditures'
       ])),
       transactions,
-      pendingTransactions
+      pendingTransactions,
+      periods
     }
   }
 }

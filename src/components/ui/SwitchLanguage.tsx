@@ -11,7 +11,9 @@ export const SwitchLanguage = () => {
 
   const handleChangeLanguage = async (lang: string) => {
     await i18n.changeLanguage(lang)
-    cookiesPlugin.setName(CookiesEnum.NEXT_LOCALE, lang)
+    // Un año: la preferencia sobrevive a cerrar el navegador. El middleware
+    // la usa para servir cada página directo en este idioma.
+    cookiesPlugin.setName(CookiesEnum.NEXT_LOCALE, lang, 365)
     router.push(router.asPath, router.asPath, { locale: lang })
   }
   return (

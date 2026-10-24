@@ -2,7 +2,12 @@ import { HttpMethod } from '@/enums'
 import { externalApiService } from '@/lib'
 import { Params } from '@/types'
 
-import { BudgetCategory, TransactionReviewStatus } from './transactions'
+import { SalaryListItem } from './salary'
+import {
+  BudgetCategory,
+  TransactionListItem,
+  TransactionReviewStatus
+} from './transactions'
 
 export interface PeriodCategoryBudget {
   budgeted: number
@@ -24,6 +29,9 @@ export interface PeriodRecentTransaction {
 }
 
 export interface PeriodSummary {
+  /** Fecha de inicio (YYYY-MM-DD) o 'initial' (período previo a la primera
+   * nómina). Es lo que esperan los `?period=` de abajo. */
+  key: string
   startDate: string | null
   endDate: string | null
   isOpen: boolean
@@ -56,4 +64,45 @@ const getCurrentPeriod = async (
   })
 }
 
-export { getCurrentPeriod }
+const authHeaders = (params: Params | unknown) => {
+  const { lang, authorization } = params as Params
+  return { 'x-lang': `${lang}`, Authorization: authorization }
+}
+
+/** Todos los períodos, del más reciente al más antiguo. */
+const getPeriods = async (
+  _ignore: unknown,
+  params: Params | unknown
+): Promise<PeriodSummary[]> =>
+  await externalApiService.request({
+    method: HttpMethod.GET,
+    endPoint: '/periods',
+    headers: authHeaders(params)
+  })
+
+/** Gastos que cuentan para el período (`periodOverride` incluido). Sin
+ * `period` → el período actual. */
+const getPeriodTransactions = async (
+  period: string | undefined,
+  params: Params | unknown
+): Promise<TransactionListItem[]> =>
+  await externalApiService.request({
+    method: HttpMethod.GET,
+    endPoint: '/periods/transactions',
+    query: period ? { period } : {},
+    headers: authHeaders(params)
+  })
+
+/** Ingresos del período. Sin `period` → el período actual. */
+const getPeriodSalary = async (
+  period: string | undefined,
+  params: Params | unknown
+): Promise<SalaryListItem[]> =>
+  await externalApiService.request({
+    method: HttpMethod.GET,
+    endPoint: '/periods/salary',
+    query: period ? { period } : {},
+    headers: authHeaders(params)
+  })
+
+export { getCurrentPeriod, getPeriods, getPeriodTransactions, getPeriodSalary }

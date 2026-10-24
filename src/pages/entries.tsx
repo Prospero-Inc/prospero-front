@@ -1,6 +1,25 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { MovementDayList } from '@/components/ui/MovementDayList'
+import {
+  FilterResults,
+  MovementFiltersBar
+} from '@/components/ui/MovementFiltersBar'
+import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
+import {
+  CategoryBadge,
+  GmailSourceBadge,
+  MovementSummary,
+  useMovementFormatters
+} from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
+import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
+import { HttpError } from '@/lib/apiService'
+import {
+  hasActiveMovementFilters,
+  matchesMovementFilters
+} from '@/lib/movementFilters'
+import { getPeriodSalary, getPeriods, PeriodSummary } from '@/services/periods'
 import {
   getSalaryList,
   IncomeCategory,
@@ -25,25 +44,23 @@ import {
   Input,
   Select,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
   Td,
   Text,
   Th,
-  Thead,
   Tr,
   useColorModeValue,
-  useToast
+  useDisclosure,
+  useToast,
+  VisuallyHidden
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { MdEdit } from 'react-icons/md'
+import { MdAdd, MdEdit } from 'react-icons/md'
 
 type SalaryEntry = SalaryListItem
 
@@ -56,9 +73,14 @@ const INCOME_CATEGORIES: IncomeCategory[] = [
   'Other'
 ]
 
+const INCOME_TYPES: IncomeType[] = ['Payroll', 'Extra']
+
 interface EntriesProps {
+  /** Ingresos del período seleccionado, sin los pendientes de revisión. */
   salary: SalaryEntry[]
+  /** Pendientes de revisión de cualquier período. */
   pendingSalary: SalaryEntry[]
+  periods: PeriodSummary[]
 }
 
 const emptyForm: SalaryData = {
@@ -66,10 +88,15 @@ const emptyForm: SalaryData = {
   date: getTodayLocalDate(),
   type: 'Payroll',
   budgetCategory: '',
-  distributeAutomatically: false
+  distributeAutomatically: false,
+  description: ''
 }
 
-export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
+export default function EntriesPage({
+  salary,
+  pendingSalary,
+  periods
+}: EntriesProps) {
   const { t } = useTranslation('entries')
   const router = useRouter()
   const toast = useToast()
@@ -92,9 +119,79 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
+  const { formatAmount } = useMovementFormatters()
+  const {
+    filters,
+    period,
+    searchInput,
+    setSearchInput,
+    setFilters,
+    clearFilters,
+    setPeriod
+  } = useMovementFilters(INCOME_TYPES)
+
+  const selectedPeriod =
+    periods.find(summary => summary.key === period) ??
+    periods.find(summary => summary.isOpen)
+  const visibleSalary = salary.filter(entry =>
+    matchesMovementFilters(
+      {
+        concept: entry.description ?? '',
+        amount: entry.amount,
+        group: entry.type ?? null,
+        source: entry.source
+      },
+      filters
+    )
+  )
+
+  // Concepto: lo que escribió el usuario; si no hay, el tipo de ingreso
+  // (atenuado) para que la fila nunca quede identificada solo por la fecha.
+  const renderSummary = (
+    entry: SalaryEntry,
+    { showDate = true }: { showDate?: boolean } = {}
+  ) => (
+    <MovementSummary
+      title={entry.description?.trim() || null}
+      fallbackTitle={t(`list.fallbackTitle.${entry.type ?? 'Payroll'}`)}
+      date={entry.date}
+      showDate={showDate}
+      badges={
+        entry.source === 'Gmail' && (
+          <GmailSourceBadge
+            label={entry.institutionName ?? t('list.gmailSource')}
+          />
+        )
+      }
+    />
+  )
+
+  const renderCategory = (entry: SalaryEntry) =>
+    entry.type === 'Extra' && entry.budgetCategory ? (
+      <CategoryBadge
+        category={entry.budgetCategory}
+        label={t(`categories.${entry.budgetCategory}`)}
+      />
+    ) : (
+      <Text as="span" color="gray.500" fontSize="sm">
+        {t('list.autoDistributed')}
+      </Text>
+    )
+
   const type = watch('type')
   const distributeAutomatically = watch('distributeAutomatically')
   const isExtra = type === 'Extra'
+
+  const formDrawer = useDisclosure()
+  const amountInputRef = useRef<HTMLInputElement | null>(null)
+
+  const openCreate = () => {
+    setEditingId(null)
+    // Fecha de hoy calculada al abrir, no al cargar el módulo: la página
+    // puede quedar abierta de un día para otro.
+    reset({ ...emptyForm, date: getTodayLocalDate() })
+    formDrawer.onOpen()
+  }
 
   const startEdit = (entry: SalaryEntry) => {
     setEditingId(entry.id)
@@ -103,13 +200,15 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
       date: entry.date.slice(0, 10),
       type: entry.type,
       budgetCategory: entry.budgetCategory ?? '',
-      distributeAutomatically: entry.distributeAutomatically ?? false
+      distributeAutomatically: entry.distributeAutomatically ?? false,
+      description: entry.description ?? ''
     })
+    formDrawer.onOpen()
   }
 
-  const cancelEdit = () => {
+  const closeForm = () => {
+    formDrawer.onClose()
     setEditingId(null)
-    reset(emptyForm)
   }
 
   const onSubmit = async (data: SalaryData) => {
@@ -118,7 +217,8 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
       const basePayload = {
         amount: Number(data.amount),
         date: data.date,
-        type: data.type
+        type: data.type,
+        description: data.description?.trim() ?? ''
       }
       // budgetCategory/distributeAutomatically solo aplican (y solo se
       // aceptan) cuando type === 'Extra'; el backend rechaza la request con
@@ -157,7 +257,7 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
         status: 'success',
         isClosable: true
       })
-      cancelEdit()
+      closeForm()
       router.replace(router.asPath)
     } catch (error) {
       toast({
@@ -207,19 +307,46 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
-        <Stack
-          as="form"
+        <Flex justify="flex-end">
+          <Button
+            colorScheme="primary"
+            leftIcon={<MdAdd />}
+            onClick={openCreate}
+            minH="44px"
+            w={{ base: 'full', md: 'auto' }}
+          >
+            {t('form.openCreate')}
+          </Button>
+        </Flex>
+
+        <MovementFormDrawer
+          isOpen={formDrawer.isOpen}
+          onClose={closeForm}
+          title={editingId ? t('form.editTitle') : t('form.createTitle')}
+          formId="income-form"
           onSubmit={handleSubmit(onSubmit)}
-          spacing={4}
-          maxW="lg"
+          isSubmitting={isLoading}
+          submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
+          cancelLabel={t('form.cancel')}
+          initialFocusRef={amountInputRef}
         >
           <FormControl>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"
               control={control}
-              render={({ field }) => (
-                <Input {...field} type="number" step="0.01" min={0} />
+              render={({ field: { ref, ...field } }) => (
+                <Input
+                  {...field}
+                  ref={element => {
+                    ref(element)
+                    amountInputRef.current = element
+                  }}
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min={0}
+                />
               )}
             />
           </FormControl>
@@ -229,6 +356,20 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
               name="date"
               control={control}
               render={({ field }) => <Input {...field} type="date" />}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>{t('form.labelDescription')}</FormLabel>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  maxLength={255}
+                  placeholder={t('form.descriptionPlaceholder')}
+                />
+              )}
             />
           </FormControl>
           <FormControl>
@@ -288,18 +429,7 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
               </FormControl>
             </>
           )}
-
-          <Stack direction="row">
-            <Button colorScheme="primary" type="submit" isLoading={isLoading}>
-              {editingId ? t('form.submitEdit') : t('form.submit')}
-            </Button>
-            {editingId && (
-              <Button variant="ghost" onClick={cancelEdit}>
-                {t('form.cancel')}
-              </Button>
-            )}
-          </Stack>
-        </Stack>
+        </MovementFormDrawer>
 
         {pendingSalary.length > 0 && (
           <Box
@@ -332,14 +462,12 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                           wrap="wrap"
                           gap={2}
                         >
-                          <Stack spacing={0}>
-                            <Text fontWeight="bold">
-                              {entry.date.slice(0, 10)}
+                          <Flex flex="1" justify="space-between" gap={3}>
+                            {renderSummary(entry)}
+                            <Text fontWeight="semibold" whiteSpace="nowrap">
+                              {formatAmount(entry.amount)}
                             </Text>
-                            <Text fontSize="sm">
-                              ${entry.amount.toFixed(2)}
-                            </Text>
-                          </Stack>
+                          </Flex>
                           <Badge colorScheme="orange">
                             {t('pendingReview.badge')}
                           </Badge>
@@ -402,115 +530,117 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
           <Heading size="md" mb={3}>
             {t('list.title')}
           </Heading>
-          {salary.length === 0 ? (
-            <Text>{t('list.empty')}</Text>
-          ) : (
-            <>
-              {/* Desktop/tablet: table with horizontal scroll fallback */}
-              <TableContainer display={{ base: 'none', md: 'block' }}>
-                <Table variant="simple" size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>{t('form.labelDate')}</Th>
-                      <Th>{t('form.labelType')}</Th>
-                      <Th>{t('list.columnCategory')}</Th>
-                      <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th />
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {salary.map(entry => (
-                      <Tr key={entry.id}>
-                        <Td>{entry.date.slice(0, 10)}</Td>
-                        <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
-                        <Td>
-                          {entry.type === 'Extra' && entry.budgetCategory ? (
-                            <Badge colorScheme="purple">
-                              {t(`categories.${entry.budgetCategory}`)}
-                            </Badge>
-                          ) : (
-                            <Text as="span" color="gray.500" fontSize="sm">
-                              {t('list.autoDistributed')}
-                            </Text>
-                          )}
-                        </Td>
-                        <Td isNumeric>${entry.amount.toFixed(2)}</Td>
-                        <Td>
-                          <IconButton
-                            aria-label={t('list.actions.edit')}
-                            icon={<MdEdit />}
-                            size="sm"
-                            variant="ghost"
-                            colorScheme="blue"
-                            onClick={() => startEdit(entry)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+          {periods.length > 0 && (
+            <Box mb={4}>
+              <MovementFiltersBar
+                periods={periods}
+                selectedPeriod={period}
+                onPeriodChange={setPeriod}
+                stats={
+                  selectedPeriod
+                    ? [
+                        {
+                          label: t('list.stats.income'),
+                          value: formatAmount(selectedPeriod.income)
+                        }
+                      ]
+                    : []
+                }
+                filters={filters}
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+                onFiltersChange={setFilters}
+                groupsLabel={t('form.labelType')}
+                groupOptions={INCOME_TYPES.map(type => ({
+                  value: type,
+                  label: t(`incomeCategoryLabels.${type}`)
+                }))}
+              />
+            </Box>
+          )}
+          <FilterResults
+            shown={visibleSalary.length}
+            total={salary.length}
+            isFiltering={hasActiveMovementFilters(filters)}
+            onClear={clearFilters}
+            emptyPeriodText={t('list.emptyPeriod')}
+          />
+          {visibleSalary.length > 0 && (
+            <MovementDayList
+              items={visibleSalary}
+              getKey={entry => entry.id}
+              getDate={entry => entry.date}
+              getAmount={entry => entry.amount}
+              resetKey={JSON.stringify([period, filters])}
+              columnCount={5}
+              tableHead={
+                <Tr>
+                  <Th>{t('list.columnConcept')}</Th>
+                  <Th>{t('form.labelType')}</Th>
+                  <Th>{t('list.columnCategory')}</Th>
+                  <Th isNumeric>{t('form.labelAmount')}</Th>
+                  <Th>
+                    <VisuallyHidden>{t('list.columnActions')}</VisuallyHidden>
+                  </Th>
+                </Tr>
+              }
+              renderTableRow={entry => (
+                <Tr key={entry.id}>
+                  <Td maxW="sm" whiteSpace="normal">
+                    {renderSummary(entry, { showDate: false })}
+                  </Td>
+                  <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                  <Td>{renderCategory(entry)}</Td>
+                  <Td isNumeric fontWeight="semibold">
+                    {formatAmount(entry.amount)}
+                  </Td>
+                  <Td>
+                    <IconButton
+                      aria-label={t('list.actions.edit')}
+                      icon={<MdEdit />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={() => startEdit(entry)}
+                    />
+                  </Td>
+                </Tr>
+              )}
+              renderCard={entry => (
+                <Card key={entry.id} variant="outline">
+                  <CardBody>
+                    <Stack spacing={2}>
+                      <Flex justify="space-between" align="flex-start" gap={3}>
+                        {renderSummary(entry, { showDate: false })}
+                        <Text fontWeight="semibold" whiteSpace="nowrap">
+                          {formatAmount(entry.amount)}
+                        </Text>
+                      </Flex>
 
-              {/* Mobile: stacked cards, same data/handlers as the table above */}
-              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {salary.map(entry => (
-                  <Card key={entry.id} variant="outline">
-                    <CardBody>
-                      <Stack spacing={2}>
-                        <Flex justify="space-between" align="center">
-                          <Text fontWeight="bold">
-                            {entry.date.slice(0, 10)}
-                          </Text>
-                          <IconButton
-                            aria-label={t('list.actions.edit')}
-                            icon={<MdEdit />}
-                            size="sm"
-                            variant="ghost"
-                            colorScheme="blue"
-                            onClick={() => startEdit(entry)}
-                          />
-                        </Flex>
+                      <Divider />
 
-                        <Flex justify="space-between">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelType')}
-                          </Text>
+                      <Flex justify="space-between" align="center" gap={2}>
+                        <Flex align="center" gap={2} wrap="wrap">
                           <Text fontSize="sm">
                             {t(`types.${entry.type as IncomeType}`)}
                           </Text>
+                          {renderCategory(entry)}
                         </Flex>
-
-                        <Flex justify="space-between" align="center">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('list.columnCategory')}
-                          </Text>
-                          {entry.type === 'Extra' && entry.budgetCategory ? (
-                            <Badge colorScheme="purple">
-                              {t(`categories.${entry.budgetCategory}`)}
-                            </Badge>
-                          ) : (
-                            <Text as="span" color="gray.500" fontSize="sm">
-                              {t('list.autoDistributed')}
-                            </Text>
-                          )}
-                        </Flex>
-
-                        <Divider />
-
-                        <Flex justify="space-between">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelAmount')}
-                          </Text>
-                          <Text fontSize="sm" fontWeight="semibold">
-                            ${entry.amount.toFixed(2)}
-                          </Text>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Stack>
-            </>
+                        <IconButton
+                          aria-label={t('list.actions.edit')}
+                          icon={<MdEdit />}
+                          boxSize="44px"
+                          minW="44px"
+                          variant="ghost"
+                          colorScheme="blue"
+                          onClick={() => startEdit(entry)}
+                        />
+                      </Flex>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              )}
+            />
           )}
         </Box>
       </Stack>
@@ -523,34 +653,54 @@ const PENDING_STATUSES = ['Detected', 'PendingReview']
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
-  locale
+  locale,
+  defaultLocale,
+  query
 }) => {
   const { session, redirect } = await getValidSession(req, res)
   if (redirect) return redirect
 
+  const period = typeof query.period === 'string' ? query.period : undefined
   let salary: SalaryEntry[] = []
   let pendingSalary: SalaryEntry[] = []
+  let periods: PeriodSummary[] = []
 
-  if (session?.accessToken)
+  if (session?.accessToken) {
+    const params = {
+      authorization: `Bearer ${session.accessToken}`,
+      lang: locale
+    }
     try {
-      const allSalary = (await getSalaryList(null, {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      })) as SalaryEntry[]
+      const [periodSalary, pending, allPeriods] = await Promise.all([
+        getPeriodSalary(period, params),
+        getSalaryList(
+          { status: PENDING_STATUSES.join(',') },
+          params
+        ) as Promise<SalaryEntry[]>,
+        getPeriods(null, params)
+      ])
 
-      // Una sola llamada a /salary: separamos pendientes de revisión del
-      // resto en memoria en vez de pedirle al backend el mismo listado dos
-      // veces con filtros distintos.
-      pendingSalary = allSalary.filter(entry =>
-        PENDING_STATUSES.includes(entry.status)
-      )
-      salary = allSalary.filter(
+      // Los pendientes se muestran todos arriba, sin importar el período,
+      // así que se sacan de la lista del período para no duplicarlos.
+      salary = periodSalary.filter(
         entry => !PENDING_STATUSES.includes(entry.status)
       )
+      pendingSalary = pending
+      periods = allPeriods
     } catch (error) {
-      salary = []
-      pendingSalary = []
+      // Link a un período que ya no existe (p. ej. se borró su nómina):
+      // volver al período actual en vez de mostrar la vista vacía.
+      if (period && error instanceof HttpError && error.status === 404)
+        return {
+          redirect: {
+            destination: `${
+              locale && locale !== defaultLocale ? `/${locale}` : ''
+            }/entries`,
+            permanent: false
+          }
+        }
     }
+  }
 
   return {
     props: {
@@ -561,7 +711,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         'entries'
       ])),
       salary,
-      pendingSalary
+      pendingSalary,
+      periods
     }
   }
 }
