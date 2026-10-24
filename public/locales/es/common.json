@@ -184,5 +184,6 @@
     "showing": "Mostrando {{shown}} de {{total}}",
     "loadMore": "Mostrar {{count}} más (quedan {{remaining}})",
     "dayTotalPartial": "{{total}} · {{count}} sin mostrar"
-  }
+  },
+  "routeLoading": "Cargando…"
 }

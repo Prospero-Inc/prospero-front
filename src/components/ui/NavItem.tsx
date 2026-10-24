@@ -1,3 +1,4 @@
+import { usePendingRoute } from '@/hooks/useRouteLoading'
 import { Badge, FlexProps, Link, Flex, Icon, Text } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,7 +25,10 @@ export const NavItem = ({
   ...rest
 }: NavItemProps) => {
   const router = useRouter()
-  const isActive = router.pathname === path
+  // Mientras se navega, resaltar a dónde vas (lo que muestra el skeleton),
+  // no la pantalla que estás dejando.
+  const pendingRoute = usePendingRoute()
+  const isActive = (pendingRoute ?? router.pathname) === path
   const hasBadge = typeof badgeCount === 'number' && badgeCount > 0
 
   return (

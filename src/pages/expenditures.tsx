@@ -11,8 +11,10 @@ import {
   MovementSummary,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
+import { MovementListSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { useMovementFilters } from '@/hooks/useMovementFilters'
+import { useIsReloadingPage } from '@/hooks/useRouteLoading'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
@@ -187,6 +189,7 @@ export default function ExpendituresPage({
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
   const { formatAmount } = useMovementFormatters()
+  const isReloading = useIsReloadingPage()
   const {
     filters,
     period,
@@ -733,6 +736,7 @@ export default function ExpendituresPage({
                 searchInput={searchInput}
                 onSearchInputChange={setSearchInput}
                 onFiltersChange={setFilters}
+                isReloading={isReloading}
                 groupsLabel={t('form.labelCategory')}
                 groupOptions={BUDGET_CATEGORIES.map(category => ({
                   value: category,
@@ -741,108 +745,122 @@ export default function ExpendituresPage({
               />
             </Box>
           )}
-          <FilterResults
-            shown={visibleTransactions.length}
-            total={transactions.length}
-            isFiltering={hasActiveMovementFilters(filters)}
-            onClear={clearFilters}
-            emptyPeriodText={t('list.emptyPeriod')}
-          />
-          {visibleTransactions.length > 0 && (
-            <MovementDayList
-              items={visibleTransactions}
-              getKey={transaction => transaction.id}
-              getDate={transaction => transaction.date}
-              getAmount={transaction => transaction.amount}
-              resetKey={JSON.stringify([period, filters])}
-              columnCount={4}
-              tableHead={
-                <Tr>
-                  <Th>{t('list.columnConcept')}</Th>
-                  <Th>{t('form.labelCategory')}</Th>
-                  <Th isNumeric>{t('form.labelAmount')}</Th>
-                  <Th>
-                    <VisuallyHidden>{t('list.columnActions')}</VisuallyHidden>
-                  </Th>
-                </Tr>
-              }
-              renderTableRow={transaction => (
-                <Tr key={transaction.id}>
-                  <Td maxW="sm" whiteSpace="normal">
-                    {renderSummary(transaction, {
-                      withDuplicateBadge: true,
-                      showDate: false
-                    })}
-                  </Td>
-                  <Td>{renderCategory(transaction)}</Td>
-                  <Td isNumeric fontWeight="semibold">
-                    {formatAmount(transaction.amount)}
-                  </Td>
-                  <Td>
-                    <IconButton
-                      aria-label={t('list.actions.edit')}
-                      icon={<MdEdit />}
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="blue"
-                      onClick={() => startEdit(transaction)}
-                      mr={2}
-                    />
-                    <IconButton
-                      aria-label={t('list.actions.delete')}
-                      icon={<MdDelete />}
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => onDelete(transaction.id)}
-                    />
-                  </Td>
-                </Tr>
-              )}
-              renderCard={transaction => (
-                <Card key={transaction.id} variant="outline">
-                  <CardBody>
-                    <Stack spacing={2}>
-                      <Flex justify="space-between" align="flex-start" gap={3}>
+          {/* Recargando esta misma pantalla (cambio de período, después de
+              guardar): la lista vieja se reemplaza por su skeleton. */}
+          {isReloading ? (
+            <MovementListSkeleton />
+          ) : (
+            <>
+              <FilterResults
+                shown={visibleTransactions.length}
+                total={transactions.length}
+                isFiltering={hasActiveMovementFilters(filters)}
+                onClear={clearFilters}
+                emptyPeriodText={t('list.emptyPeriod')}
+              />
+              {visibleTransactions.length > 0 && (
+                <MovementDayList
+                  items={visibleTransactions}
+                  getKey={transaction => transaction.id}
+                  getDate={transaction => transaction.date}
+                  getAmount={transaction => transaction.amount}
+                  resetKey={JSON.stringify([period, filters])}
+                  columnCount={4}
+                  tableHead={
+                    <Tr>
+                      <Th>{t('list.columnConcept')}</Th>
+                      <Th>{t('form.labelCategory')}</Th>
+                      <Th isNumeric>{t('form.labelAmount')}</Th>
+                      <Th>
+                        <VisuallyHidden>
+                          {t('list.columnActions')}
+                        </VisuallyHidden>
+                      </Th>
+                    </Tr>
+                  }
+                  renderTableRow={transaction => (
+                    <Tr key={transaction.id}>
+                      <Td maxW="sm" whiteSpace="normal">
                         {renderSummary(transaction, {
                           withDuplicateBadge: true,
                           showDate: false
                         })}
-                        <Text fontWeight="semibold" whiteSpace="nowrap">
-                          {formatAmount(transaction.amount)}
-                        </Text>
-                      </Flex>
+                      </Td>
+                      <Td>{renderCategory(transaction)}</Td>
+                      <Td isNumeric fontWeight="semibold">
+                        {formatAmount(transaction.amount)}
+                      </Td>
+                      <Td>
+                        <IconButton
+                          aria-label={t('list.actions.edit')}
+                          icon={<MdEdit />}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="blue"
+                          onClick={() => startEdit(transaction)}
+                          mr={2}
+                        />
+                        <IconButton
+                          aria-label={t('list.actions.delete')}
+                          icon={<MdDelete />}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="red"
+                          onClick={() => onDelete(transaction.id)}
+                        />
+                      </Td>
+                    </Tr>
+                  )}
+                  renderCard={transaction => (
+                    <Card key={transaction.id} variant="outline">
+                      <CardBody>
+                        <Stack spacing={2}>
+                          <Flex
+                            justify="space-between"
+                            align="flex-start"
+                            gap={3}
+                          >
+                            {renderSummary(transaction, {
+                              withDuplicateBadge: true,
+                              showDate: false
+                            })}
+                            <Text fontWeight="semibold" whiteSpace="nowrap">
+                              {formatAmount(transaction.amount)}
+                            </Text>
+                          </Flex>
 
-                      <Divider />
+                          <Divider />
 
-                      <Flex justify="space-between" align="center">
-                        {renderCategory(transaction)}
-                        <Stack direction="row" spacing={1}>
-                          <IconButton
-                            aria-label={t('list.actions.edit')}
-                            icon={<MdEdit />}
-                            boxSize="44px"
-                            minW="44px"
-                            variant="ghost"
-                            colorScheme="blue"
-                            onClick={() => startEdit(transaction)}
-                          />
-                          <IconButton
-                            aria-label={t('list.actions.delete')}
-                            icon={<MdDelete />}
-                            boxSize="44px"
-                            minW="44px"
-                            variant="ghost"
-                            colorScheme="red"
-                            onClick={() => onDelete(transaction.id)}
-                          />
+                          <Flex justify="space-between" align="center">
+                            {renderCategory(transaction)}
+                            <Stack direction="row" spacing={1}>
+                              <IconButton
+                                aria-label={t('list.actions.edit')}
+                                icon={<MdEdit />}
+                                boxSize="44px"
+                                minW="44px"
+                                variant="ghost"
+                                colorScheme="blue"
+                                onClick={() => startEdit(transaction)}
+                              />
+                              <IconButton
+                                aria-label={t('list.actions.delete')}
+                                icon={<MdDelete />}
+                                boxSize="44px"
+                                minW="44px"
+                                variant="ghost"
+                                colorScheme="red"
+                                onClick={() => onDelete(transaction.id)}
+                              />
+                            </Stack>
+                          </Flex>
                         </Stack>
-                      </Flex>
-                    </Stack>
-                  </CardBody>
-                </Card>
+                      </CardBody>
+                    </Card>
+                  )}
+                />
               )}
-            />
+            </>
           )}
         </Box>
       </Stack>
