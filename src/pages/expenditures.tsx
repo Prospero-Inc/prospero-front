@@ -1,4 +1,10 @@
 import { ProsperoLayout } from '@/components/layouts'
+import {
+  CategoryBadge,
+  GmailSourceBadge,
+  MovementSummary,
+  useMovementFormatters
+} from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
@@ -39,7 +45,8 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  useToast
+  useToast,
+  VisuallyHidden
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
@@ -162,6 +169,66 @@ export default function ExpendituresPage({
     'orange.100'
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
+  const { formatAmount } = useMovementFormatters()
+
+  // Concepto: lo que escribió el usuario (o lo que parseó Gmail); si no hay,
+  // el nombre del gasto fijo que pagó; si tampoco, un placeholder atenuado.
+  const renderSummary = (
+    transaction: Transaction,
+    { withDuplicateBadge }: { withDuplicateBadge: boolean }
+  ) => (
+    <MovementSummary
+      title={
+        transaction.description?.trim() || transaction.fixedExpenseName || null
+      }
+      fallbackTitle={t('list.noDescription')}
+      date={transaction.date}
+      badges={
+        (transaction.fixedExpenseName ||
+          transaction.source === 'Gmail' ||
+          (withDuplicateBadge && transaction.possibleGmailDuplicate)) && (
+          <>
+            {transaction.fixedExpenseName && (
+              <Badge colorScheme="teal" variant="subtle">
+                {t('list.fixedExpenseBadge')}
+              </Badge>
+            )}
+            {transaction.source === 'Gmail' && (
+              <GmailSourceBadge
+                label={transaction.institutionName ?? t('list.gmailSource')}
+              />
+            )}
+            {withDuplicateBadge && transaction.possibleGmailDuplicate && (
+              <PossibleDuplicateBadge
+                duplicate={transaction.possibleGmailDuplicate}
+                onDismiss={onDismissDuplicate}
+                isDismissing={
+                  dismissingDuplicateId ===
+                  transaction.possibleGmailDuplicate.id
+                }
+                onNotSame={onNotSameMovement}
+                isResolving={
+                  resolvingDuplicateId === transaction.possibleGmailDuplicate.id
+                }
+              />
+            )}
+          </>
+        )
+      }
+    />
+  )
+
+  const renderCategory = (transaction: Transaction) =>
+    transaction.category ? (
+      <CategoryBadge
+        category={transaction.category}
+        label={t(`categories.${transaction.category}`)}
+      />
+    ) : (
+      <Text as="span" color="gray.500" fontSize="sm">
+        —
+      </Text>
+    )
 
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
@@ -416,7 +483,12 @@ export default function ExpendituresPage({
             <Controller
               name="description"
               control={control}
-              render={({ field }) => <Input {...field} />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder={t('form.descriptionPlaceholder')}
+                />
+              )}
             />
           </FormControl>
           <FormControl>
@@ -478,14 +550,14 @@ export default function ExpendituresPage({
                           wrap="wrap"
                           gap={2}
                         >
-                          <Stack spacing={0}>
-                            <Text fontWeight="bold">
-                              {transaction.date.slice(0, 10)}
+                          <Flex flex="1" justify="space-between" gap={3}>
+                            {renderSummary(transaction, {
+                              withDuplicateBadge: false
+                            })}
+                            <Text fontWeight="semibold" whiteSpace="nowrap">
+                              {formatAmount(transaction.amount)}
                             </Text>
-                            <Text fontSize="sm">
-                              ${transaction.amount.toFixed(2)}
-                            </Text>
-                          </Stack>
+                          </Flex>
                           <Badge colorScheme="orange">
                             {t('pendingReview.badge')}
                           </Badge>
@@ -568,41 +640,28 @@ export default function ExpendituresPage({
                 <Table variant="simple" size="sm">
                   <Thead>
                     <Tr>
-                      <Th>{t('form.labelDate')}</Th>
+                      <Th>{t('list.columnConcept')}</Th>
                       <Th>{t('form.labelCategory')}</Th>
                       <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th />
+                      <Th>
+                        <VisuallyHidden>
+                          {t('list.columnActions')}
+                        </VisuallyHidden>
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {transactions.map(transaction => (
                       <Tr key={transaction.id}>
-                        <Td>{transaction.date.slice(0, 10)}</Td>
-                        <Td>
-                          <Flex align="center" gap={2} wrap="wrap">
-                            <Text as="span">
-                              {transaction.category
-                                ? t(`categories.${transaction.category}`)
-                                : ''}
-                            </Text>
-                            {transaction.possibleGmailDuplicate && (
-                              <PossibleDuplicateBadge
-                                duplicate={transaction.possibleGmailDuplicate}
-                                onDismiss={onDismissDuplicate}
-                                isDismissing={
-                                  dismissingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                                onNotSame={onNotSameMovement}
-                                isResolving={
-                                  resolvingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                              />
-                            )}
-                          </Flex>
+                        <Td maxW="sm" whiteSpace="normal">
+                          {renderSummary(transaction, {
+                            withDuplicateBadge: true
+                          })}
                         </Td>
-                        <Td isNumeric>${transaction.amount.toFixed(2)}</Td>
+                        <Td>{renderCategory(transaction)}</Td>
+                        <Td isNumeric fontWeight="semibold">
+                          {formatAmount(transaction.amount)}
+                        </Td>
                         <Td>
                           <IconButton
                             aria-label={t('list.actions.edit')}
@@ -634,50 +693,23 @@ export default function ExpendituresPage({
                   <Card key={transaction.id} variant="outline">
                     <CardBody>
                       <Stack spacing={2}>
-                        <Flex justify="space-between">
-                          <Text fontWeight="bold">
-                            {transaction.date.slice(0, 10)}
-                          </Text>
-                          <Text fontSize="sm" fontWeight="semibold">
-                            ${transaction.amount.toFixed(2)}
-                          </Text>
-                        </Flex>
-
                         <Flex
                           justify="space-between"
-                          align="center"
-                          wrap="wrap"
+                          align="flex-start"
+                          gap={3}
                         >
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelCategory')}
+                          {renderSummary(transaction, {
+                            withDuplicateBadge: true
+                          })}
+                          <Text fontWeight="semibold" whiteSpace="nowrap">
+                            {formatAmount(transaction.amount)}
                           </Text>
-                          <Flex align="center" gap={2}>
-                            <Text fontSize="sm">
-                              {transaction.category
-                                ? t(`categories.${transaction.category}`)
-                                : ''}
-                            </Text>
-                            {transaction.possibleGmailDuplicate && (
-                              <PossibleDuplicateBadge
-                                duplicate={transaction.possibleGmailDuplicate}
-                                onDismiss={onDismissDuplicate}
-                                isDismissing={
-                                  dismissingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                                onNotSame={onNotSameMovement}
-                                isResolving={
-                                  resolvingDuplicateId ===
-                                  transaction.possibleGmailDuplicate.id
-                                }
-                              />
-                            )}
-                          </Flex>
                         </Flex>
 
                         <Divider />
 
-                        <Flex justify="flex-end">
+                        <Flex justify="space-between" align="center">
+                          {renderCategory(transaction)}
                           <Stack direction="row" spacing={1}>
                             <IconButton
                               aria-label={t('list.actions.edit')}

@@ -4,11 +4,12 @@
     "labelAmount": "Monto",
     "labelCategory": "Categoría",
     "labelDate": "Fecha",
-    "labelDescription": "Nota (opcional)",
+    "labelDescription": "Concepto (opcional)",
     "labelPeriodOverride": "Contar en (opcional)",
     "submit": "Guardar gasto",
     "submitEdit": "Actualizar gasto",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "descriptionPlaceholder": "Ej. Supermercado, Uber, farmacia"
   },
   "categories": {
     "Necesidad": "Necesidad",
@@ -27,7 +28,12 @@
       "edit": "Editar",
       "delete": "Eliminar"
     },
-    "confirmDelete": "¿Eliminar este gasto?"
+    "confirmDelete": "¿Eliminar este gasto?",
+    "columnConcept": "Concepto",
+    "columnActions": "Acciones",
+    "noDescription": "Sin concepto",
+    "fixedExpenseBadge": "Gasto fijo",
+    "gmailSource": "Gmail"
   },
   "toast": {
     "success": {

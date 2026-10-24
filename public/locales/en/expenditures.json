@@ -4,11 +4,12 @@
     "labelAmount": "Amount",
     "labelCategory": "Category",
     "labelDate": "Date",
-    "labelDescription": "Note (optional)",
+    "labelDescription": "Description (optional)",
     "labelPeriodOverride": "Count towards (optional)",
     "submit": "Save expense",
     "submitEdit": "Update expense",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "descriptionPlaceholder": "E.g. Groceries, Uber, pharmacy"
   },
   "categories": {
     "Necesidad": "Needs",
@@ -27,7 +28,12 @@
       "edit": "Edit",
       "delete": "Delete"
     },
-    "confirmDelete": "Delete this expense?"
+    "confirmDelete": "Delete this expense?",
+    "columnConcept": "Description",
+    "columnActions": "Actions",
+    "noDescription": "No description",
+    "fixedExpenseBadge": "Fixed expense",
+    "gmailSource": "Gmail"
   },
   "toast": {
     "success": {
