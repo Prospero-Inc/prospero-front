@@ -4,12 +4,18 @@
     "labelAmount": "Amount",
     "labelName": "Name",
     "labelBudgetCategory": "Distribution",
-    "labelDueDate": "Billing day",
+    "labelDueDate": "Due day",
     "labelReminder": "Remind me",
     "labelDescription": "Note (optional)",
     "submit": "Save fixed expense",
     "submitEdit": "Update fixed expense",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "namePlaceholder": "E.g. Internet, rent, Spotify",
+    "dueDayOption": "Day {{day}}",
+    "dueDayHelper": "Charged that day every month. In shorter months, the last day counts.",
+    "openCreate": "New fixed expense",
+    "createTitle": "New fixed expense",
+    "editTitle": "Edit fixed expense"
   },
   "categories": {
     "Necesidad": "Needs",
@@ -24,7 +30,12 @@
       "edit": "Edit",
       "delete": "Delete",
       "pay": "Mark as paid"
-    }
+    },
+    "emptyHint": "Add what you pay every month (rent, internet, subscriptions) and mark it as paid in one click.",
+    "dueDay": "Day {{day}} of every month",
+    "columnStatus": "Status",
+    "columnActions": "Actions",
+    "confirmDelete": "Delete \"{{name}}\"? Payments you already registered are kept."
   },
   "toast": {
     "success": {
@@ -47,5 +58,17 @@
       "title": "Error",
       "description": "We could not save the fixed expense"
     }
+  },
+  "status": {
+    "paid": "Paid",
+    "overdue": "Was due on day {{day}}",
+    "today": "Due today",
+    "upcoming_one": "Due tomorrow",
+    "upcoming_other": "Due in {{count}} days"
+  },
+  "summary": {
+    "total": "Monthly total",
+    "paid": "Paid ({{paid}} of {{total}})",
+    "pending": "Left to pay"
   }
 }
