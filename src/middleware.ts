@@ -48,6 +48,22 @@ const clearSessionCookies = (req: NextRequest, res: NextResponse) => {
       res.cookies.set(cookie.name, '', { maxAge: 0, path: '/' })
 }
 
+// Same list as `next-i18next.config.js` — that file can't be imported here
+// (it `require`s Node's `path`, which the Edge runtime doesn't have).
+const SUPPORTED_LOCALES = ['en', 'es']
+const LOCALE_COOKIE = 'NEXT_LOCALE'
+
+/**
+ * The language the user picked in `SwitchLanguage`, if any. It wins over
+ * whatever locale the URL carries: server redirects (login, `/`, the
+ * period-not-found fallback) and links in emails are built without a locale
+ * prefix, which used to land on Spanish and then flip client-side.
+ */
+const getPreferredLocale = (req: NextRequest): string | undefined => {
+  const value = req.cookies.get(LOCALE_COOKIE)?.value
+  return value && SUPPORTED_LOCALES.includes(value) ? value : undefined
+}
+
 export async function middleware(req: NextRequest) {
   const origin = req.headers.get('origin') ?? ''
   const isAllowedOrigin = allowedOrigins.includes(origin)
@@ -63,6 +79,16 @@ export async function middleware(req: NextRequest) {
   }
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   const { pathname } = req.nextUrl
+  const preferredLocale = getPreferredLocale(req)
+
+  // Redirects keep the preferred locale so they don't need a second hop.
+  const redirectTo = (target: string) => {
+    const url = req.nextUrl.clone()
+    url.pathname = target
+    url.search = ''
+    url.locale = preferredLocale ?? req.nextUrl.locale
+    return NextResponse.redirect(url)
+  }
 
   const isAuthPage =
     pathname.startsWith('/auth/login') ||
@@ -71,8 +97,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/auth/verify-2fa')
 
   const isProtectedPage = !isAuthPage
-  if (pathname === '/')
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+  if (pathname === '/') return redirectTo('/dashboard')
 
   // A session whose refresh failed (dead/revoked refresh token) carries
   // `token.error` even though the NextAuth JWT itself hasn't expired yet —
@@ -81,11 +106,26 @@ export async function middleware(req: NextRequest) {
   // it needs to reach to re-authenticate.
   const hasValidToken = !!token && !token.error
 
+  // Full page loads only: client-side navigations fetch `/_next/data/...`
+  // (flagged with `x-nextjs-data`), and `SwitchLanguage` sets the cookie
+  // right before navigating, so those already carry the chosen locale.
+  const isDataRequest = req.headers.has('x-nextjs-data')
+  const needsLocaleRedirect =
+    !isDataRequest &&
+    !!preferredLocale &&
+    preferredLocale !== req.nextUrl.locale
+
   const response =
     isAuthPage && hasValidToken
-      ? NextResponse.redirect(new URL('/dashboard', req.url))
+      ? redirectTo('/dashboard')
       : isProtectedPage && !hasValidToken
-      ? NextResponse.redirect(new URL('/auth/login', req.url))
+      ? redirectTo('/auth/login')
+      : needsLocaleRedirect
+      ? (() => {
+          const url = req.nextUrl.clone()
+          url.locale = preferredLocale
+          return NextResponse.redirect(url)
+        })()
       : NextResponse.next()
 
   // See `clearSessionCookies` above — do this unconditionally whenever the

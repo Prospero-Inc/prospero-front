@@ -4,9 +4,13 @@ class CookiesPlugin {
   constructor() {
     this.cookie = Cookies
   }
-  setName(name: string, value: string): void {
+  /** `expires` en días; sin él la cookie es de sesión y se pierde al cerrar
+   * el navegador. */
+  setName(name: string, value: string, expires?: number): void {
     this.cookie.set(name, value, {
-      path: '/'
+      path: '/',
+      sameSite: 'lax',
+      ...(expires !== undefined && { expires })
     })
   }
 

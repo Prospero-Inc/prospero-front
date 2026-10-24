@@ -1,31 +1,16 @@
 import '@/styles/globals.css'
 import { SessionWatcher } from '@/components/ui'
-import { CookiesEnum } from '@/enums'
-import { cookiesPlugin } from '@/plugins'
 import { theme } from '@/themes'
 import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation } from 'next-i18next'
-import { useTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-  const { i18n } = useTranslation('common')
-  const router = useRouter()
-  const changelanguage = async () => {
-    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
-
-    if (!lang) cookiesPlugin.setName(CookiesEnum.NEXT_LOCALE, 'en')
-
-    await i18n.changeLanguage(lang ?? 'en')
-    router.push(router.asPath, router.asPath, { locale: lang ?? 'en' })
-  }
-  useEffect(() => {
-    changelanguage()
-  }, [])
-
+  // El idioma lo resuelve el middleware a partir de la cookie NEXT_LOCALE
+  // (ver `middleware.ts`) antes de renderizar: acá antes se cambiaba del
+  // lado del cliente después del primer render, lo que hacía "saltar" de
+  // idioma y forzaba inglés a quien entraba por primera vez.
   return (
     <ChakraProvider
       theme={theme}
