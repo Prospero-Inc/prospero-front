@@ -42,6 +42,8 @@ export interface SalaryData {
    * y transiciona automáticamente `status` a `Classified` en el backend.
    */
   incomeCategory?: IncomeCategory | ''
+  /** Concepto libre para identificar el ingreso en el listado. */
+  description?: string
 }
 
 /** Shape de cada fila de `GET /salary`: lo mismo que `SalaryData` más los
@@ -51,6 +53,8 @@ export interface SalaryListItem extends Omit<SalaryData, 'incomeCategory'> {
   status: IncomeReviewStatus
   incomeCategory: IncomeCategory | null
   source: MovementSource
+  /** Banco del que se detectó (Gmail), si se conoce. */
+  institutionName: string | null
   possibleGmailDuplicate: PossibleGmailDuplicate | null
 }
 

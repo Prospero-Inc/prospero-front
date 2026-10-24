@@ -30,6 +30,10 @@ export interface TransactionListItem extends Omit<TransactionData, 'category'> {
   category: BudgetCategory | null
   source: MovementSource
   reviewStatus: TransactionReviewStatus
+  /** Gasto fijo que paga esta fila, si la generó "marcar como pagado". */
+  fixedExpenseName: string | null
+  /** Banco del que se detectó (Gmail), si se conoce. */
+  institutionName: string | null
   possibleGmailDuplicate: PossibleGmailDuplicate | null
 }
 

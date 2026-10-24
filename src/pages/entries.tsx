@@ -1,4 +1,10 @@
 import { ProsperoLayout } from '@/components/layouts'
+import {
+  CategoryBadge,
+  GmailSourceBadge,
+  MovementSummary,
+  useMovementFormatters
+} from '@/components/ui/MovementSummary'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
 import {
@@ -34,7 +40,8 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  useToast
+  useToast,
+  VisuallyHidden
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
@@ -66,7 +73,8 @@ const emptyForm: SalaryData = {
   date: getTodayLocalDate(),
   type: 'Payroll',
   budgetCategory: '',
-  distributeAutomatically: false
+  distributeAutomatically: false,
+  description: ''
 }
 
 export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
@@ -92,6 +100,37 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
+  const { formatAmount } = useMovementFormatters()
+
+  // Concepto: lo que escribió el usuario; si no hay, el tipo de ingreso
+  // (atenuado) para que la fila nunca quede identificada solo por la fecha.
+  const renderSummary = (entry: SalaryEntry) => (
+    <MovementSummary
+      title={entry.description?.trim() || null}
+      fallbackTitle={t(`list.fallbackTitle.${entry.type ?? 'Payroll'}`)}
+      date={entry.date}
+      badges={
+        entry.source === 'Gmail' && (
+          <GmailSourceBadge
+            label={entry.institutionName ?? t('list.gmailSource')}
+          />
+        )
+      }
+    />
+  )
+
+  const renderCategory = (entry: SalaryEntry) =>
+    entry.type === 'Extra' && entry.budgetCategory ? (
+      <CategoryBadge
+        category={entry.budgetCategory}
+        label={t(`categories.${entry.budgetCategory}`)}
+      />
+    ) : (
+      <Text as="span" color="gray.500" fontSize="sm">
+        {t('list.autoDistributed')}
+      </Text>
+    )
+
   const type = watch('type')
   const distributeAutomatically = watch('distributeAutomatically')
   const isExtra = type === 'Extra'
@@ -103,7 +142,8 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
       date: entry.date.slice(0, 10),
       type: entry.type,
       budgetCategory: entry.budgetCategory ?? '',
-      distributeAutomatically: entry.distributeAutomatically ?? false
+      distributeAutomatically: entry.distributeAutomatically ?? false,
+      description: entry.description ?? ''
     })
   }
 
@@ -118,7 +158,8 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
       const basePayload = {
         amount: Number(data.amount),
         date: data.date,
-        type: data.type
+        type: data.type,
+        description: data.description?.trim() ?? ''
       }
       // budgetCategory/distributeAutomatically solo aplican (y solo se
       // aceptan) cuando type === 'Extra'; el backend rechaza la request con
@@ -232,6 +273,20 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
             />
           </FormControl>
           <FormControl>
+            <FormLabel>{t('form.labelDescription')}</FormLabel>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  maxLength={255}
+                  placeholder={t('form.descriptionPlaceholder')}
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl>
             <FormLabel>{t('form.labelType')}</FormLabel>
             <Controller
               name="type"
@@ -332,14 +387,12 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                           wrap="wrap"
                           gap={2}
                         >
-                          <Stack spacing={0}>
-                            <Text fontWeight="bold">
-                              {entry.date.slice(0, 10)}
+                          <Flex flex="1" justify="space-between" gap={3}>
+                            {renderSummary(entry)}
+                            <Text fontWeight="semibold" whiteSpace="nowrap">
+                              {formatAmount(entry.amount)}
                             </Text>
-                            <Text fontSize="sm">
-                              ${entry.amount.toFixed(2)}
-                            </Text>
-                          </Stack>
+                          </Flex>
                           <Badge colorScheme="orange">
                             {t('pendingReview.badge')}
                           </Badge>
@@ -411,30 +464,28 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                 <Table variant="simple" size="sm">
                   <Thead>
                     <Tr>
-                      <Th>{t('form.labelDate')}</Th>
+                      <Th>{t('list.columnConcept')}</Th>
                       <Th>{t('form.labelType')}</Th>
                       <Th>{t('list.columnCategory')}</Th>
                       <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th />
+                      <Th>
+                        <VisuallyHidden>
+                          {t('list.columnActions')}
+                        </VisuallyHidden>
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {salary.map(entry => (
                       <Tr key={entry.id}>
-                        <Td>{entry.date.slice(0, 10)}</Td>
-                        <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
-                        <Td>
-                          {entry.type === 'Extra' && entry.budgetCategory ? (
-                            <Badge colorScheme="purple">
-                              {t(`categories.${entry.budgetCategory}`)}
-                            </Badge>
-                          ) : (
-                            <Text as="span" color="gray.500" fontSize="sm">
-                              {t('list.autoDistributed')}
-                            </Text>
-                          )}
+                        <Td maxW="sm" whiteSpace="normal">
+                          {renderSummary(entry)}
                         </Td>
-                        <Td isNumeric>${entry.amount.toFixed(2)}</Td>
+                        <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                        <Td>{renderCategory(entry)}</Td>
+                        <Td isNumeric fontWeight="semibold">
+                          {formatAmount(entry.amount)}
+                        </Td>
                         <Td>
                           <IconButton
                             aria-label={t('list.actions.edit')}
@@ -457,10 +508,26 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                   <Card key={entry.id} variant="outline">
                     <CardBody>
                       <Stack spacing={2}>
-                        <Flex justify="space-between" align="center">
-                          <Text fontWeight="bold">
-                            {entry.date.slice(0, 10)}
+                        <Flex
+                          justify="space-between"
+                          align="flex-start"
+                          gap={3}
+                        >
+                          {renderSummary(entry)}
+                          <Text fontWeight="semibold" whiteSpace="nowrap">
+                            {formatAmount(entry.amount)}
                           </Text>
+                        </Flex>
+
+                        <Divider />
+
+                        <Flex justify="space-between" align="center" gap={2}>
+                          <Flex align="center" gap={2} wrap="wrap">
+                            <Text fontSize="sm">
+                              {t(`types.${entry.type as IncomeType}`)}
+                            </Text>
+                            {renderCategory(entry)}
+                          </Flex>
                           <IconButton
                             aria-label={t('list.actions.edit')}
                             icon={<MdEdit />}
@@ -469,41 +536,6 @@ export default function EntriesPage({ salary, pendingSalary }: EntriesProps) {
                             colorScheme="blue"
                             onClick={() => startEdit(entry)}
                           />
-                        </Flex>
-
-                        <Flex justify="space-between">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelType')}
-                          </Text>
-                          <Text fontSize="sm">
-                            {t(`types.${entry.type as IncomeType}`)}
-                          </Text>
-                        </Flex>
-
-                        <Flex justify="space-between" align="center">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('list.columnCategory')}
-                          </Text>
-                          {entry.type === 'Extra' && entry.budgetCategory ? (
-                            <Badge colorScheme="purple">
-                              {t(`categories.${entry.budgetCategory}`)}
-                            </Badge>
-                          ) : (
-                            <Text as="span" color="gray.500" fontSize="sm">
-                              {t('list.autoDistributed')}
-                            </Text>
-                          )}
-                        </Flex>
-
-                        <Divider />
-
-                        <Flex justify="space-between">
-                          <Text fontSize="sm" color="gray.500">
-                            {t('form.labelAmount')}
-                          </Text>
-                          <Text fontSize="sm" fontWeight="semibold">
-                            ${entry.amount.toFixed(2)}
-                          </Text>
                         </Flex>
                       </Stack>
                     </CardBody>
