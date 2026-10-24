@@ -179,5 +179,10 @@
     "clear": "Clear filters",
     "noMatches": "No movements match the filters.",
     "showing": "Showing {{shown}} of {{total}}"
+  },
+  "movementList": {
+    "showing": "Showing {{shown}} of {{total}}",
+    "loadMore": "Show {{count}} more ({{remaining}} left)",
+    "dayTotalPartial": "{{total}} · {{count}} not shown"
   }
 }

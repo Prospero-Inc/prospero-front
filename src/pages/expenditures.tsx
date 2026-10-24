@@ -1,4 +1,5 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { MovementDayList } from '@/components/ui/MovementDayList'
 import {
   FilterResults,
   MovementFiltersBar
@@ -50,13 +51,9 @@ import {
   PopoverTrigger,
   Select,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
   Td,
   Text,
   Th,
-  Thead,
   Tr,
   useColorModeValue,
   useToast,
@@ -217,7 +214,10 @@ export default function ExpendituresPage({
   // el nombre del gasto fijo que pagó; si tampoco, un placeholder atenuado.
   const renderSummary = (
     transaction: Transaction,
-    { withDuplicateBadge }: { withDuplicateBadge: boolean }
+    {
+      withDuplicateBadge,
+      showDate = true
+    }: { withDuplicateBadge: boolean; showDate?: boolean }
   ) => (
     <MovementSummary
       title={
@@ -225,6 +225,7 @@ export default function ExpendituresPage({
       }
       fallbackTitle={t('list.noDescription')}
       date={transaction.date}
+      showDate={showDate}
       badges={
         (transaction.fixedExpenseName ||
           transaction.source === 'Gmail' ||
@@ -717,35 +718,75 @@ export default function ExpendituresPage({
             emptyPeriodText={t('list.emptyPeriod')}
           />
           {visibleTransactions.length > 0 && (
-            <>
-              {/* Desktop/tablet: table with horizontal scroll fallback */}
-              <TableContainer display={{ base: 'none', md: 'block' }}>
-                <Table variant="simple" size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>{t('list.columnConcept')}</Th>
-                      <Th>{t('form.labelCategory')}</Th>
-                      <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th>
-                        <VisuallyHidden>
-                          {t('list.columnActions')}
-                        </VisuallyHidden>
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {visibleTransactions.map(transaction => (
-                      <Tr key={transaction.id}>
-                        <Td maxW="sm" whiteSpace="normal">
-                          {renderSummary(transaction, {
-                            withDuplicateBadge: true
-                          })}
-                        </Td>
-                        <Td>{renderCategory(transaction)}</Td>
-                        <Td isNumeric fontWeight="semibold">
+            <MovementDayList
+              items={visibleTransactions}
+              getKey={transaction => transaction.id}
+              getDate={transaction => transaction.date}
+              getAmount={transaction => transaction.amount}
+              resetKey={JSON.stringify([period, filters])}
+              columnCount={4}
+              tableHead={
+                <Tr>
+                  <Th>{t('list.columnConcept')}</Th>
+                  <Th>{t('form.labelCategory')}</Th>
+                  <Th isNumeric>{t('form.labelAmount')}</Th>
+                  <Th>
+                    <VisuallyHidden>{t('list.columnActions')}</VisuallyHidden>
+                  </Th>
+                </Tr>
+              }
+              renderTableRow={transaction => (
+                <Tr key={transaction.id}>
+                  <Td maxW="sm" whiteSpace="normal">
+                    {renderSummary(transaction, {
+                      withDuplicateBadge: true,
+                      showDate: false
+                    })}
+                  </Td>
+                  <Td>{renderCategory(transaction)}</Td>
+                  <Td isNumeric fontWeight="semibold">
+                    {formatAmount(transaction.amount)}
+                  </Td>
+                  <Td>
+                    <IconButton
+                      aria-label={t('list.actions.edit')}
+                      icon={<MdEdit />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={() => startEdit(transaction)}
+                      mr={2}
+                    />
+                    <IconButton
+                      aria-label={t('list.actions.delete')}
+                      icon={<MdDelete />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => onDelete(transaction.id)}
+                    />
+                  </Td>
+                </Tr>
+              )}
+              renderCard={transaction => (
+                <Card key={transaction.id} variant="outline">
+                  <CardBody>
+                    <Stack spacing={2}>
+                      <Flex justify="space-between" align="flex-start" gap={3}>
+                        {renderSummary(transaction, {
+                          withDuplicateBadge: true,
+                          showDate: false
+                        })}
+                        <Text fontWeight="semibold" whiteSpace="nowrap">
                           {formatAmount(transaction.amount)}
-                        </Td>
-                        <Td>
+                        </Text>
+                      </Flex>
+
+                      <Divider />
+
+                      <Flex justify="space-between" align="center">
+                        {renderCategory(transaction)}
+                        <Stack direction="row" spacing={1}>
                           <IconButton
                             aria-label={t('list.actions.edit')}
                             icon={<MdEdit />}
@@ -753,7 +794,6 @@ export default function ExpendituresPage({
                             variant="ghost"
                             colorScheme="blue"
                             onClick={() => startEdit(transaction)}
-                            mr={2}
                           />
                           <IconButton
                             aria-label={t('list.actions.delete')}
@@ -763,61 +803,13 @@ export default function ExpendituresPage({
                             colorScheme="red"
                             onClick={() => onDelete(transaction.id)}
                           />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-
-              {/* Mobile: stacked cards, same data/handlers as the table above */}
-              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {visibleTransactions.map(transaction => (
-                  <Card key={transaction.id} variant="outline">
-                    <CardBody>
-                      <Stack spacing={2}>
-                        <Flex
-                          justify="space-between"
-                          align="flex-start"
-                          gap={3}
-                        >
-                          {renderSummary(transaction, {
-                            withDuplicateBadge: true
-                          })}
-                          <Text fontWeight="semibold" whiteSpace="nowrap">
-                            {formatAmount(transaction.amount)}
-                          </Text>
-                        </Flex>
-
-                        <Divider />
-
-                        <Flex justify="space-between" align="center">
-                          {renderCategory(transaction)}
-                          <Stack direction="row" spacing={1}>
-                            <IconButton
-                              aria-label={t('list.actions.edit')}
-                              icon={<MdEdit />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="blue"
-                              onClick={() => startEdit(transaction)}
-                            />
-                            <IconButton
-                              aria-label={t('list.actions.delete')}
-                              icon={<MdDelete />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="red"
-                              onClick={() => onDelete(transaction.id)}
-                            />
-                          </Stack>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Stack>
-            </>
+                        </Stack>
+                      </Flex>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              )}
+            />
           )}
         </Box>
       </Stack>
