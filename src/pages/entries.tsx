@@ -1,4 +1,5 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { MovementDayList } from '@/components/ui/MovementDayList'
 import {
   FilterResults,
   MovementFiltersBar
@@ -42,13 +43,9 @@ import {
   Input,
   Select,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
   Td,
   Text,
   Th,
-  Thead,
   Tr,
   useColorModeValue,
   useToast,
@@ -148,11 +145,15 @@ export default function EntriesPage({
 
   // Concepto: lo que escribió el usuario; si no hay, el tipo de ingreso
   // (atenuado) para que la fila nunca quede identificada solo por la fecha.
-  const renderSummary = (entry: SalaryEntry) => (
+  const renderSummary = (
+    entry: SalaryEntry,
+    { showDate = true }: { showDate?: boolean } = {}
+  ) => (
     <MovementSummary
       title={entry.description?.trim() || null}
       fallbackTitle={t(`list.fallbackTitle.${entry.type ?? 'Payroll'}`)}
       date={entry.date}
+      showDate={showDate}
       badges={
         entry.source === 'Gmail' && (
           <GmailSourceBadge
@@ -535,91 +536,80 @@ export default function EntriesPage({
             emptyPeriodText={t('list.emptyPeriod')}
           />
           {visibleSalary.length > 0 && (
-            <>
-              {/* Desktop/tablet: table with horizontal scroll fallback */}
-              <TableContainer display={{ base: 'none', md: 'block' }}>
-                <Table variant="simple" size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>{t('list.columnConcept')}</Th>
-                      <Th>{t('form.labelType')}</Th>
-                      <Th>{t('list.columnCategory')}</Th>
-                      <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th>
-                        <VisuallyHidden>
-                          {t('list.columnActions')}
-                        </VisuallyHidden>
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {visibleSalary.map(entry => (
-                      <Tr key={entry.id}>
-                        <Td maxW="sm" whiteSpace="normal">
-                          {renderSummary(entry)}
-                        </Td>
-                        <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
-                        <Td>{renderCategory(entry)}</Td>
-                        <Td isNumeric fontWeight="semibold">
+            <MovementDayList
+              items={visibleSalary}
+              getKey={entry => entry.id}
+              getDate={entry => entry.date}
+              getAmount={entry => entry.amount}
+              resetKey={JSON.stringify([period, filters])}
+              columnCount={5}
+              tableHead={
+                <Tr>
+                  <Th>{t('list.columnConcept')}</Th>
+                  <Th>{t('form.labelType')}</Th>
+                  <Th>{t('list.columnCategory')}</Th>
+                  <Th isNumeric>{t('form.labelAmount')}</Th>
+                  <Th>
+                    <VisuallyHidden>{t('list.columnActions')}</VisuallyHidden>
+                  </Th>
+                </Tr>
+              }
+              renderTableRow={entry => (
+                <Tr key={entry.id}>
+                  <Td maxW="sm" whiteSpace="normal">
+                    {renderSummary(entry, { showDate: false })}
+                  </Td>
+                  <Td>{t(`types.${entry.type as IncomeType}`)}</Td>
+                  <Td>{renderCategory(entry)}</Td>
+                  <Td isNumeric fontWeight="semibold">
+                    {formatAmount(entry.amount)}
+                  </Td>
+                  <Td>
+                    <IconButton
+                      aria-label={t('list.actions.edit')}
+                      icon={<MdEdit />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={() => startEdit(entry)}
+                    />
+                  </Td>
+                </Tr>
+              )}
+              renderCard={entry => (
+                <Card key={entry.id} variant="outline">
+                  <CardBody>
+                    <Stack spacing={2}>
+                      <Flex justify="space-between" align="flex-start" gap={3}>
+                        {renderSummary(entry, { showDate: false })}
+                        <Text fontWeight="semibold" whiteSpace="nowrap">
                           {formatAmount(entry.amount)}
-                        </Td>
-                        <Td>
-                          <IconButton
-                            aria-label={t('list.actions.edit')}
-                            icon={<MdEdit />}
-                            size="sm"
-                            variant="ghost"
-                            colorScheme="blue"
-                            onClick={() => startEdit(entry)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                        </Text>
+                      </Flex>
 
-              {/* Mobile: stacked cards, same data/handlers as the table above */}
-              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {visibleSalary.map(entry => (
-                  <Card key={entry.id} variant="outline">
-                    <CardBody>
-                      <Stack spacing={2}>
-                        <Flex
-                          justify="space-between"
-                          align="flex-start"
-                          gap={3}
-                        >
-                          {renderSummary(entry)}
-                          <Text fontWeight="semibold" whiteSpace="nowrap">
-                            {formatAmount(entry.amount)}
+                      <Divider />
+
+                      <Flex justify="space-between" align="center" gap={2}>
+                        <Flex align="center" gap={2} wrap="wrap">
+                          <Text fontSize="sm">
+                            {t(`types.${entry.type as IncomeType}`)}
                           </Text>
+                          {renderCategory(entry)}
                         </Flex>
-
-                        <Divider />
-
-                        <Flex justify="space-between" align="center" gap={2}>
-                          <Flex align="center" gap={2} wrap="wrap">
-                            <Text fontSize="sm">
-                              {t(`types.${entry.type as IncomeType}`)}
-                            </Text>
-                            {renderCategory(entry)}
-                          </Flex>
-                          <IconButton
-                            aria-label={t('list.actions.edit')}
-                            icon={<MdEdit />}
-                            size="sm"
-                            variant="ghost"
-                            colorScheme="blue"
-                            onClick={() => startEdit(entry)}
-                          />
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Stack>
-            </>
+                        <IconButton
+                          aria-label={t('list.actions.edit')}
+                          icon={<MdEdit />}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="blue"
+                          onClick={() => startEdit(entry)}
+                        />
+                      </Flex>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              )}
+            />
           )}
         </Box>
       </Stack>

@@ -85,6 +85,9 @@ interface MovementSummaryProps {
   /** Se muestra atenuado cuando no hay `title`. */
   fallbackTitle: string
   date: string
+  /** `false` dentro de un listado agrupado por día, donde el encabezado del
+   * grupo ya dice la fecha. */
+  showDate?: boolean
   badges?: ReactNode
 }
 
@@ -95,6 +98,7 @@ export const MovementSummary = ({
   title,
   fallbackTitle,
   date,
+  showDate = true,
   badges
 }: MovementSummaryProps) => {
   const mutedColor = useColorModeValue('gray.600', 'gray.400')
@@ -111,9 +115,11 @@ export const MovementSummary = ({
       >
         {title ?? fallbackTitle}
       </Text>
-      <Text fontSize="sm" color={mutedColor}>
-        <time dateTime={date.slice(0, 10)}>{formatDate(date)}</time>
-      </Text>
+      {showDate && (
+        <Text fontSize="sm" color={mutedColor}>
+          <time dateTime={date.slice(0, 10)}>{formatDate(date)}</time>
+        </Text>
+      )}
       {badges && (
         <Flex gap={1} mt={1} wrap="wrap">
           {badges}
