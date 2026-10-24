@@ -30,14 +30,20 @@ export const useMovementFilters = (allowedGroups: readonly string[]) => {
   // para no reescribir el historial en cada tecla.
   const [searchInput, setSearchInput] = useState(filters.search)
 
-  const buildQuery = (next: MovementFilters, nextPeriod = period) => ({
+  // `nextPeriod` es obligatorio a propósito: con un valor por defecto,
+  // pasar `undefined` (= volver al período actual) caía en el default y
+  // dejaba la URL en el período anterior.
+  const buildQuery = (
+    next: MovementFilters,
+    nextPeriod: string | undefined
+  ) => ({
     ...(nextPeriod && { period: nextPeriod }),
     ...toMovementFiltersQuery(next)
   })
 
   const setFilters = (next: MovementFilters) =>
     router.replace(
-      { pathname: router.pathname, query: buildQuery(next) },
+      { pathname: router.pathname, query: buildQuery(next, period) },
       undefined,
       { shallow: true, scroll: false }
     )
