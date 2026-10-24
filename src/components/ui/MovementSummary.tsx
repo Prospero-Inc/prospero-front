@@ -27,10 +27,12 @@ export const useMovementFormatters = () => {
       year: 'numeric',
       timeZone: 'UTC'
     })
-    const currencyFormatter = new Intl.NumberFormat(locale ?? 'es', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })
+    // 'es' a secas formatea 1234,50; la app usa dólares con la convención de
+    // El Salvador (1,234.50), igual que los montos del dashboard.
+    const currencyFormatter = new Intl.NumberFormat(
+      !locale || locale === 'es' ? 'es-SV' : locale,
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    )
 
     return {
       formatDate: (date: string) => dateFormatter.format(new Date(date)),
