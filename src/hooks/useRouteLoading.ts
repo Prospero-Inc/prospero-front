@@ -68,6 +68,24 @@ export const useRouteLoading = (): RouteLoadingState => {
   return state
 }
 
+/** Estado de navegación compartido desde `_app` (un solo listener de
+ * eventos para toda la app). */
+export const RouteLoadingContext = createContext<RouteLoadingState>({
+  isLoading: false,
+  targetPathname: null
+})
+
+/**
+ * `true` mientras se recarga la pantalla actual (cambio de período, después
+ * de guardar o marcar como pagado). Las páginas lo usan para mostrar el
+ * skeleton de su lista en lugar de dejar la vieja quieta.
+ */
+export const useIsReloadingPage = (): boolean => {
+  const router = useRouter()
+  const { isLoading, targetPathname } = useContext(RouteLoadingContext)
+  return isLoading && targetPathname === router.pathname
+}
+
 /** Página de destino mientras se navega (o `null`), para que el menú
  * resalte a dónde vas y no la pantalla que estás dejando. */
 export const PendingRouteContext = createContext<string | null>(null)

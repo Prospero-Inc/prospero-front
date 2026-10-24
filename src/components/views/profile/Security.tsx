@@ -1,6 +1,7 @@
 'use client'
 import { InfoLayout, InfoSection } from '@/components/layouts'
 import { CustomStat } from '@/components/ui'
+import { ProfileSecuritySkeleton } from '@/components/ui/PageSkeletons'
 import { Profile } from '@/interfaces'
 import { localApiService } from '@/lib'
 import { useToast } from '@chakra-ui/react'
@@ -54,7 +55,9 @@ export const Security = ({ enable2FA }: Partial<Profile>) => {
   }
 
   // Asegurarse de que el contenido solo se renderice en el cliente
-  if (!mounted) return null // O mostrar un fallback como un spinner
+  // Hasta montar se muestra la forma de la sección en vez de nada: antes
+  // la página aparecía vacía y el contenido "saltaba" al hidratar.
+  if (!mounted) return <ProfileSecuritySkeleton />
 
   return (
     <CustomStat>

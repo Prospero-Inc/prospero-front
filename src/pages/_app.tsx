@@ -3,7 +3,11 @@ import { ProsperoLayout } from '@/components/layouts'
 import { SessionWatcher } from '@/components/ui'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
-import { PendingRouteContext, useRouteLoading } from '@/hooks/useRouteLoading'
+import {
+  PendingRouteContext,
+  RouteLoadingContext,
+  useRouteLoading
+} from '@/hooks/useRouteLoading'
 import { theme } from '@/themes'
 import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
@@ -14,7 +18,8 @@ import { useRouter } from 'next/router'
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter()
   const { t } = useTranslation('common')
-  const { isLoading, targetPathname } = useRouteLoading()
+  const routeLoading = useRouteLoading()
+  const { isLoading, targetPathname } = routeLoading
   // Al ir a otra pantalla, se muestra enseguida su skeleton (dentro del
   // layout real, con el menú) en vez de dejar la pantalla vieja quieta
   // mientras llegan los datos. Recargar la misma pantalla (cambiar de
@@ -41,17 +46,19 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
       <SessionProvider session={session} refetchInterval={60}>
         <SessionWatcher />
         <RouteProgress isLoading={isLoading} />
-        <PendingRouteContext.Provider
-          value={PageSkeleton ? targetPathname : null}
-        >
-          {PageSkeleton ? (
-            <ProsperoLayout title={t('routeLoading')} pageDescription="">
-              <PageSkeleton />
-            </ProsperoLayout>
-          ) : (
-            <Component {...pageProps} />
-          )}
-        </PendingRouteContext.Provider>
+        <RouteLoadingContext.Provider value={routeLoading}>
+          <PendingRouteContext.Provider
+            value={PageSkeleton ? targetPathname : null}
+          >
+            {PageSkeleton ? (
+              <ProsperoLayout title={t('routeLoading')} pageDescription="">
+                <PageSkeleton />
+              </ProsperoLayout>
+            ) : (
+              <Component {...pageProps} />
+            )}
+          </PendingRouteContext.Provider>
+        </RouteLoadingContext.Provider>
       </SessionProvider>
     </ChakraProvider>
   )

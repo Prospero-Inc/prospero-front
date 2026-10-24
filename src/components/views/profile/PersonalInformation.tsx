@@ -1,5 +1,6 @@
 'use client'
 import { InfoLayout, InfoSection } from '@/components/layouts'
+import { ProfileInfoSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import {
@@ -80,7 +81,9 @@ export const PersonalInformation = ({
     }
   }
 
-  if (!isMounted) return null
+  // Hasta montar se muestra la forma de la sección en vez de nada: antes
+  // la página aparecía vacía y el contenido "saltaba" al hidratar.
+  if (!isMounted) return <ProfileInfoSkeleton />
 
   if (isEditing)
     return (
