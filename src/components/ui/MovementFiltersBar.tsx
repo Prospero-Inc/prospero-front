@@ -12,6 +12,7 @@ import {
   InputLeftElement,
   Select,
   SimpleGrid,
+  Skeleton,
   Stat,
   StatLabel,
   StatNumber,
@@ -22,6 +23,7 @@ import {
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { MdSearch } from 'react-icons/md'
 
 export interface MovementGroupOption {
@@ -46,6 +48,9 @@ interface MovementFiltersBarProps {
   onFiltersChange: (_filters: MovementFilters) => void
   groupsLabel: string
   groupOptions: MovementGroupOption[]
+  /** Recargando el período: los totales todavía son del período anterior,
+   * así que se muestran como skeleton. */
+  isReloading?: boolean
 }
 
 /** Etiqueta legible de un período: "10 oct – 23 oct", "Actual · desde 10
@@ -85,7 +90,8 @@ export const MovementFiltersBar = ({
   onSearchInputChange,
   onFiltersChange,
   groupsLabel,
-  groupOptions
+  groupOptions,
+  isReloading = false
 }: MovementFiltersBarProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'movementFilters' })
   const periodLabel = usePeriodLabel()
@@ -93,6 +99,11 @@ export const MovementFiltersBar = ({
   const mutedColor = useColorModeValue('gray.600', 'gray.300')
   const fieldBg = useColorModeValue('white', 'gray.800')
   const currentKey = periods.find(period => period.isOpen)?.key
+  // El período elegido se muestra al instante, aunque la URL (y con ella
+  // `selectedPeriod`) recién cambie cuando llegan los datos: si no, el
+  // selector volvía a la opción anterior durante la carga.
+  const [pendingPeriod, setPendingPeriod] = useState<string | null>(null)
+  useEffect(() => setPendingPeriod(null), [selectedPeriod])
 
   const toggleGroup = (value: string) =>
     onFiltersChange({
@@ -113,12 +124,13 @@ export const MovementFiltersBar = ({
         <FormControl maxW={{ md: 'xs' }}>
           <FormLabel fontSize="sm">{t('periodLabel')}</FormLabel>
           <Select
-            value={selectedPeriod ?? currentKey ?? ''}
-            onChange={e =>
+            value={pendingPeriod ?? selectedPeriod ?? currentKey ?? ''}
+            onChange={e => {
+              setPendingPeriod(e.target.value)
               onPeriodChange(
                 e.target.value === currentKey ? undefined : e.target.value
               )
-            }
+            }}
           >
             {periods.map(period => (
               <option key={period.key} value={period.key}>
@@ -136,7 +148,13 @@ export const MovementFiltersBar = ({
           {stats.map(stat => (
             <Stat key={stat.label}>
               <StatLabel color={mutedColor}>{stat.label}</StatLabel>
-              <StatNumber fontSize="xl">{stat.value}</StatNumber>
+              <StatNumber fontSize="xl">
+                {isReloading ? (
+                  <Skeleton h="24px" w="80px" mt={1} />
+                ) : (
+                  stat.value
+                )}
+              </StatNumber>
             </Stat>
           ))}
         </SimpleGrid>

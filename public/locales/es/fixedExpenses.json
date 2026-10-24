@@ -9,7 +9,13 @@
     "labelDescription": "Nota (opcional)",
     "submit": "Guardar gasto fijo",
     "submitEdit": "Actualizar gasto fijo",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "namePlaceholder": "Ej. Internet, alquiler, Spotify",
+    "dueDayOption": "Día {{day}}",
+    "dueDayHelper": "Se cobra ese día cada mes. Si el mes es más corto, cuenta el último día.",
+    "openCreate": "Nuevo gasto fijo",
+    "createTitle": "Nuevo gasto fijo",
+    "editTitle": "Editar gasto fijo"
   },
   "categories": {
     "Necesidad": "Necesidad",
@@ -24,7 +30,12 @@
       "edit": "Editar",
       "delete": "Eliminar",
       "pay": "Marcar como pagado"
-    }
+    },
+    "emptyHint": "Agregá lo que pagás todos los meses (alquiler, internet, suscripciones) y marcalo como pagado con un clic.",
+    "dueDay": "Día {{day}} de cada mes",
+    "columnStatus": "Estado",
+    "columnActions": "Acciones",
+    "confirmDelete": "¿Eliminar \"{{name}}\"? Los pagos que ya registraste se mantienen."
   },
   "toast": {
     "success": {
@@ -47,5 +58,17 @@
       "title": "Error",
       "description": "No pudimos guardar el gasto fijo"
     }
+  },
+  "status": {
+    "paid": "Pagado",
+    "overdue": "Venció el día {{day}}",
+    "today": "Vence hoy",
+    "upcoming_one": "Vence mañana",
+    "upcoming_other": "Vence en {{count}} días"
+  },
+  "summary": {
+    "total": "Total mensual",
+    "paid": "Pagado ({{paid}} de {{total}})",
+    "pending": "Falta pagar"
   }
 }
