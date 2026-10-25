@@ -105,4 +105,32 @@ const getPeriodSalary = async (
     headers: authHeaders(params)
   })
 
-export { getCurrentPeriod, getPeriods, getPeriodTransactions, getPeriodSalary }
+/** `GET /periods/month`: totales del mes calendario actual (spec §6 "Del
+ * mes"), independientes de los períodos de pago. */
+export interface MonthSummary {
+  year: number
+  /** 1–12. */
+  month: number
+  income: number
+  payrollCount: number
+  totalSpent: number
+  balance: number
+}
+
+const getMonthSummary = async (
+  _ignore: unknown,
+  params: Params | unknown
+): Promise<MonthSummary> =>
+  await externalApiService.request({
+    method: HttpMethod.GET,
+    endPoint: '/periods/month',
+    headers: authHeaders(params)
+  })
+
+export {
+  getCurrentPeriod,
+  getMonthSummary,
+  getPeriods,
+  getPeriodTransactions,
+  getPeriodSalary
+}
