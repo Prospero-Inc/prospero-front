@@ -36,7 +36,13 @@ export const NavItem = ({
       as={NextLink}
       href={path}
       style={{ textDecoration: 'none' }}
+      aria-current={isActive ? 'page' : undefined}
+      // Foco visible solo con teclado (WCAG 2.4.7), dibujado sobre la
+      // "píldora" del item y no sobre todo el ancho del sidebar. Antes el
+      // foco estaba desactivado para todos los casos.
       _focus={{ boxShadow: 'none' }}
+      _focusVisible={{ outline: 'none', boxShadow: 'none' }}
+      sx={{ '&:focus-visible > div': { boxShadow: 'outline' } }}
       textColor={isActive ? 'primary.500' : 'primaryGray'}
       fontWeight={isActive ? 'bold' : 'normal'}
     >

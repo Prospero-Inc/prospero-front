@@ -4,7 +4,16 @@ import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { DashboardSummaryCard } from '@/components/ui/DashboardSummaryCard'
 import { RecentActivityList } from '@/components/ui/RecentActivityList'
 import { getValidSession } from '@/lib'
-import { getCurrentPeriod, PeriodSummary } from '@/services/periods'
+import {
+  getCurrentPeriod,
+  getMonthSummary,
+  MonthSummary,
+  PeriodSummary
+} from '@/services/periods'
+import {
+  getReviewQueueSummary,
+  ReviewQueueSummary
+} from '@/services/reviewQueue'
 import {
   Alert,
   AlertDescription,
@@ -12,6 +21,7 @@ import {
   AlertTitle,
   Box,
   Button,
+  ButtonGroup,
   Flex,
   Icon,
   Link,
@@ -29,11 +39,72 @@ import {
   MdAccountBalanceWallet,
   MdArrowDownward,
   MdArrowUpward,
-  MdCalendarToday
+  MdCalendarToday,
+  MdMarkEmailUnread
 } from 'react-icons/md'
 
 interface DashboardProps {
   period: PeriodSummary | null
+  /** `null` si falló: la sección del mes simplemente no se muestra. */
+  month: MonthSummary | null
+  reviewQueue: ReviewQueueSummary | null
+}
+
+/** Movimientos que Gmail detectó y esperan confirmación (spec §6): arriba
+ * de todo. Ya suman en los totales (el backend no los excluye), pero sin
+ * categoría no entran en las barras por categoría hasta confirmarlos. */
+const PendingReviewAlert = ({ summary }: { summary: ReviewQueueSummary }) => {
+  const { t } = useTranslation('common')
+  const total = summary.pendingTransactions + summary.pendingSalaries
+  if (total === 0) return null
+
+  return (
+    <Alert
+      status="warning"
+      borderRadius="md"
+      mb={8}
+      flexDirection={{ base: 'column', sm: 'row' }}
+      alignItems={{ base: 'flex-start', sm: 'center' }}
+      gap={3}
+    >
+      <AlertIcon as={MdMarkEmailUnread} />
+      <Box flex="1">
+        <AlertTitle>
+          {t('dashboard.pendingReview.title', { count: total })}
+        </AlertTitle>
+        <AlertDescription display="block" fontSize="sm">
+          {t('dashboard.pendingReview.description')}
+        </AlertDescription>
+      </Box>
+      <ButtonGroup size="sm" flexShrink={0} flexWrap="wrap" gap={2} spacing={0}>
+        {summary.pendingTransactions > 0 && (
+          <Button
+            as={NextLink}
+            href="/expenditures"
+            colorScheme="orange"
+            minH="44px"
+          >
+            {t('dashboard.pendingReview.expenses', {
+              count: summary.pendingTransactions
+            })}
+          </Button>
+        )}
+        {summary.pendingSalaries > 0 && (
+          <Button
+            as={NextLink}
+            href="/entries"
+            colorScheme="orange"
+            variant="outline"
+            minH="44px"
+          >
+            {t('dashboard.pendingReview.income', {
+              count: summary.pendingSalaries
+            })}
+          </Button>
+        )}
+      </ButtonGroup>
+    </Alert>
+  )
 }
 
 /** Usuario nuevo / sin ingreso registrado para este período: estado vacío
@@ -68,25 +139,61 @@ const BudgetEmptyState = () => {
   )
 }
 
-const Dashboard = ({ period }: DashboardProps) => {
+const Dashboard = ({ period, month, reviewQueue }: DashboardProps) => {
   const { t } = useTranslation('common')
   const router = useRouter()
   const captionColor = useColorModeValue('gray.600', 'gray.400')
+  const locale = router.locale ?? 'es'
+  // timeZone UTC: misma convención que el resto de las fechas de la app,
+  // así SSR y navegador muestran el mismo día.
+  const shortDate = new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC'
+  })
+  const monthName = month
+    ? new Intl.DateTimeFormat(locale, {
+        month: 'long',
+        timeZone: 'UTC'
+      }).format(new Date(Date.UTC(month.year, month.month - 1, 1)))
+    : ''
+
+  // El pago estimado ya pasó (no se registró el siguiente): en vez de
+  // "-25 días estimados restantes", decir qué pasa y cómo resolverlo.
+  const remaining = period?.estimatedDaysRemaining ?? null
+  const paymentOverdue =
+    remaining !== null && remaining < 0 && !!period?.estimatedNextPaymentDate
 
   const hasPeriodCaption =
     !!period &&
     (period.daysElapsed !== null || period.estimatedDaysRemaining !== null)
 
+  // Un solo párrafo: si el aviso de pago vencido va en otro bloque del flex,
+  // el texto se parte en dos columnas angostas.
   const periodCaption = hasPeriodCaption && (
-    <Flex align="center" gap={1.5} color={captionColor} fontSize="sm">
-      <Icon as={MdCalendarToday} boxSize={4} aria-hidden="true" />
-      <Text as="span" fontSize="sm">
+    <Flex align="flex-start" gap={1.5} color={captionColor} fontSize="sm">
+      <Icon as={MdCalendarToday} boxSize={4} mt={0.5} aria-hidden="true" />
+      <Text fontSize="sm">
         {period?.daysElapsed !== null &&
           t('dashboard.daysElapsed', { count: period?.daysElapsed })}
-        {period?.estimatedDaysRemaining !== null &&
-          ` · ${t('dashboard.daysRemaining', {
-            count: period?.estimatedDaysRemaining
-          })}`}
+        {remaining !== null &&
+          !paymentOverdue &&
+          ` · ${
+            remaining === 0
+              ? t('dashboard.paymentToday')
+              : t('dashboard.daysRemaining', { count: remaining })
+          }`}
+        {paymentOverdue && period?.estimatedNextPaymentDate && (
+          <>
+            {' · '}
+            {t('dashboard.paymentOverdue', {
+              date: shortDate.format(new Date(period.estimatedNextPaymentDate))
+            })}{' '}
+            <Link as={NextLink} href="/entries" color="primary.500">
+              {t('dashboard.registerPayment')}
+            </Link>
+          </>
+        )}
       </Text>
     </Flex>
   )
@@ -128,6 +235,8 @@ const Dashboard = ({ period }: DashboardProps) => {
         </Alert>
       ) : (
         <>
+          {reviewQueue && <PendingReviewAlert summary={reviewQueue} />}
+
           <GenericSection
             title={t('dashboard.budgetTitle')}
             caption={periodCaption}
@@ -167,6 +276,38 @@ const Dashboard = ({ period }: DashboardProps) => {
             </SimpleGrid>
           </GenericSection>
 
+          {month && (
+            <GenericSection
+              title={t('dashboard.month.title', { month: monthName })}
+            >
+              <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
+                <DashboardSummaryCard
+                  label={t('dashboard.month.income')}
+                  amount={month.income}
+                  // Con pago quincenal un mes puede tener 1 o 3 pagos
+                  // (spec §3.3): decirlo explica un total fuera de lo común.
+                  helpText={t('dashboard.month.payrolls', {
+                    count: month.payrollCount
+                  })}
+                  icon={MdArrowUpward}
+                  accent="teal"
+                />
+                <DashboardSummaryCard
+                  label={t('dashboard.month.spent')}
+                  amount={month.totalSpent}
+                  icon={MdArrowDownward}
+                  accent="red"
+                />
+                <DashboardSummaryCard
+                  label={t('dashboard.month.balance')}
+                  amount={month.balance}
+                  icon={MdAccountBalanceWallet}
+                  accent={month.balance < 0 ? 'red' : 'primary'}
+                />
+              </SimpleGrid>
+            </GenericSection>
+          )}
+
           <GenericSection
             title={t('dashboard.recentActivity.title')}
             caption={recentActivityCaption}
@@ -188,16 +329,26 @@ export const getServerSideProps: GetServerSideProps = async ({
   if (redirect) return redirect
 
   let period: PeriodSummary | null = null
+  let month: MonthSummary | null = null
+  let reviewQueue: ReviewQueueSummary | null = null
 
-  if (session?.accessToken)
-    try {
-      period = await getCurrentPeriod(null, {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      })
-    } catch (error) {
-      period = null
+  if (session?.accessToken) {
+    const params = {
+      authorization: `Bearer ${session.accessToken}`,
+      lang: locale
     }
+    // allSettled: si falla el resumen del mes o el de pendientes, el resto
+    // del dashboard igual se muestra (solo el período es imprescindible).
+    const [periodResult, monthResult, reviewResult] = await Promise.allSettled([
+      getCurrentPeriod(null, params),
+      getMonthSummary(null, params),
+      getReviewQueueSummary(null, params) as Promise<ReviewQueueSummary>
+    ])
+    period = periodResult.status === 'fulfilled' ? periodResult.value : null
+    month = monthResult.status === 'fulfilled' ? monthResult.value : null
+    reviewQueue =
+      reviewResult.status === 'fulfilled' ? reviewResult.value : null
+  }
 
   return {
     props: {
@@ -206,7 +357,9 @@ export const getServerSideProps: GetServerSideProps = async ({
         'sidebar',
         'mobileNav'
       ])),
-      period
+      period,
+      month,
+      reviewQueue
     }
   }
 }

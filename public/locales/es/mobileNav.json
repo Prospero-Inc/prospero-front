@@ -6,5 +6,6 @@
   "signOut": "Cerrar sesión",
   "openMenu": "Abrir menú",
   "toggleToDarkMode": "Cambiar a modo oscuro",
-  "toggleToLightMode": "Cambiar a modo claro"
+  "toggleToLightMode": "Cambiar a modo claro",
+  "userMenu": "Menú de usuario"
 }

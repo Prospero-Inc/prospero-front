@@ -153,6 +153,27 @@
       "heading": "No pudimos cargar tu período actual",
       "description": "Intentá recargar la página. Si el problema continúa, contactanos.",
       "retry": "Reintentar"
+    },
+    "paymentToday": "pago estimado hoy",
+    "paymentOverdue": "tu próximo pago se esperaba el {{date}}.",
+    "registerPayment": "Registrarlo",
+    "pendingReview": {
+      "title_one": "Tenés {{count}} movimiento detectado por Gmail sin confirmar",
+      "title_other": "Tenés {{count}} movimientos detectados por Gmail sin confirmar",
+      "description": "Ya suman en tus totales, pero sin categoría no aparecen en las barras de Necesidad, Deseo y Ahorro.",
+      "expenses_one": "Revisar {{count}} gasto",
+      "expenses_other": "Revisar {{count}} gastos",
+      "income_one": "Revisar {{count}} ingreso",
+      "income_other": "Revisar {{count}} ingresos"
+    },
+    "month": {
+      "title": "Este mes ({{month}})",
+      "income": "Ingresos del mes",
+      "spent": "Gastos del mes",
+      "balance": "Saldo del mes",
+      "payrolls_zero": "Sin pagos de nómina",
+      "payrolls_one": "{{count}} pago de nómina",
+      "payrolls_other": "{{count}} pagos de nómina"
     }
   },
   "categoryBudget": {

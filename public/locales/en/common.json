@@ -153,6 +153,27 @@
       "heading": "We couldn't load your current period",
       "description": "Try reloading the page. If the problem continues, contact us.",
       "retry": "Retry"
+    },
+    "paymentToday": "payment expected today",
+    "paymentOverdue": "your next payment was expected on {{date}}.",
+    "registerPayment": "Register it",
+    "pendingReview": {
+      "title_one": "You have {{count}} Gmail-detected movement to confirm",
+      "title_other": "You have {{count}} Gmail-detected movements to confirm",
+      "description": "They already count in your totals, but without a category they are missing from the Needs, Wants and Savings bars.",
+      "expenses_one": "Review {{count}} expense",
+      "expenses_other": "Review {{count}} expenses",
+      "income_one": "Review {{count}} income",
+      "income_other": "Review {{count}} incomes"
+    },
+    "month": {
+      "title": "This month ({{month}})",
+      "income": "Income this month",
+      "spent": "Spent this month",
+      "balance": "Balance this month",
+      "payrolls_zero": "No payroll payments",
+      "payrolls_one": "{{count}} payroll payment",
+      "payrolls_other": "{{count}} payroll payments"
     }
   },
   "categoryBudget": {

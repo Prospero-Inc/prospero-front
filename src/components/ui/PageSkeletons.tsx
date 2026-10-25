@@ -195,6 +195,15 @@ const DashboardSkeleton: FC = () => (
           ))}
         </SimpleGrid>
       </Box>
+      {/* "Este mes": mismas tarjetas que el resumen del período. */}
+      <Box>
+        <SectionTitle w="30%" />
+        <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton key={index} h="120px" borderRadius="md" />
+          ))}
+        </SimpleGrid>
+      </Box>
       <Box>
         <SectionTitle w="35%" />
         {Array.from({ length: 5 }).map((_, index) => (
@@ -350,8 +359,9 @@ const PAGE_SKELETONS: Record<string, FC> = {
 /**
  * Skeleton de la pantalla. Cualquier página con el layout de la app que no
  * esté en el mapa recibe uno genérico, así ninguna navegación queda sin
- * feedback. Las de `/auth/*` y `/profile/verify-2fa` no usan ese layout
- * (son estáticas, sin datos que esperar) y no llevan skeleton.
+ * feedback. Sin skeleton: `/auth/*` y `/500`, que no usan ese layout (son
+ * estáticas, sin datos que esperar), y `/profile/verify-2fa`, que solo
+ * redirige a `/profile/2fa`.
  */
 const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/profile/verify-2fa', '/500']
 

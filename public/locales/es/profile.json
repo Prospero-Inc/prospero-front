@@ -22,13 +22,55 @@
     }
   },
   "securitySection": {
-    "title": "Security",
+    "title": "Seguridad",
     "twoFactorAuth": "Autenticación de Dos Factores",
     "enabled": "Activado",
     "disabled": "Desactivado",
     "buttonAction": {
       "enable": "Activar 2FA",
       "disable": "Desactivar 2FA"
+    },
+    "disableConfirm": "¿Desactivar la autenticación de dos factores? Tu cuenta va a quedar protegida solo con tu contraseña.",
+    "toast": {
+      "disabling": "Desactivando 2FA…",
+      "disabled": "2FA desactivado",
+      "error": "No pudimos desactivar el 2FA"
+    }
+  },
+  "twoFactorSetup": {
+    "title": "Activar autenticación de dos factores",
+    "description": "Además de tu contraseña, al iniciar sesión vas a necesitar un código de 6 dígitos de una app en tu celular.",
+    "back": "Volver al perfil",
+    "step1": {
+      "title": "1. Vinculá tu app de autenticación",
+      "qrAlt": "Código QR para configurar la autenticación de dos factores",
+      "scan": "Escaneá este código QR con tu app de autenticación.",
+      "manual": "¿Estás configurando desde este mismo celular? Copiá la clave e ingresala a mano en la app:",
+      "secretLabel": "Clave para ingresar a mano",
+      "copy": "Copiar clave",
+      "copied": "Copiada"
+    },
+    "help": {
+      "toggle": "¿Necesitás ayuda?",
+      "install": "Instalá una app de autenticación, como Google Authenticator, Microsoft Authenticator o Authy.",
+      "add": "En la app, tocá \"Agregar cuenta\" y escaneá el código QR (o ingresá la clave a mano).",
+      "code": "La app va a mostrar un código de 6 dígitos que cambia cada 30 segundos. Escribilo abajo.",
+      "lost": "Guardá la clave de arriba en tu gestor de contraseñas: si perdés o cambiás el celular, con esa clave podés volver a vincular la app."
+    },
+    "step2": {
+      "title": "2. Confirmá con un código",
+      "label": "Código de 6 dígitos que muestra tu app",
+      "submit": "Activar 2FA"
+    },
+    "errors": {
+      "invalidCode": "El código no es correcto. Usá el que muestra tu app ahora mismo (cambia cada 30 segundos).",
+      "generic": "No pudimos verificar el código. Probá de nuevo."
+    },
+    "toast": {
+      "enabled": {
+        "title": "2FA activado",
+        "description": "Desde ahora vas a necesitar un código de tu app para iniciar sesión."
+      }
     }
   }
 }
