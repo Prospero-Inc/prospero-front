@@ -78,9 +78,13 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton
+              aria-label={t('userMenu')}
               py={2}
               transition="all 0.3s"
-              _focus={{ boxShadow: 'none' }}
+              borderRadius="full"
+              // Anillo solo con teclado (WCAG 2.4.7): los navegadores no
+              // activan :focus-visible al hacer clic con el mouse.
+              _focusVisible={{ boxShadow: 'outline' }}
             >
               <HStack>
                 <Avatar size={'sm'} name={session?.user?.name ?? undefined} />
