@@ -55,7 +55,7 @@
       "install": "Install an authenticator app, such as Google Authenticator, Microsoft Authenticator or Authy.",
       "add": "In the app, tap \"Add account\" and scan the QR code (or enter the key manually).",
       "code": "The app will show a 6-digit code that changes every 30 seconds. Type it below.",
-      "lost": "If you lose your phone, you'll need that code to sign in: don't delete the account from the app."
+      "lost": "Save the key above in your password manager: if you lose or change your phone, you can link the app again with it."
     },
     "step2": {
       "title": "2. Confirm with a code",
