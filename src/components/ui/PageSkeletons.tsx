@@ -350,8 +350,9 @@ const PAGE_SKELETONS: Record<string, FC> = {
 /**
  * Skeleton de la pantalla. Cualquier página con el layout de la app que no
  * esté en el mapa recibe uno genérico, así ninguna navegación queda sin
- * feedback. Las de `/auth/*` y `/profile/verify-2fa` no usan ese layout
- * (son estáticas, sin datos que esperar) y no llevan skeleton.
+ * feedback. Sin skeleton: `/auth/*` y `/500`, que no usan ese layout (son
+ * estáticas, sin datos que esperar), y `/profile/verify-2fa`, que solo
+ * redirige a `/profile/2fa`.
  */
 const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/profile/verify-2fa', '/500']
 

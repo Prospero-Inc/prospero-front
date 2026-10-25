@@ -26,24 +26,32 @@ export const Security = ({ enable2FA }: Partial<Profile>) => {
     router.push('/profile/2fa')
   }
   const desactivate2FA = () => {
+    // Desactivar 2FA baja la seguridad de la cuenta: pedir confirmación.
+    if (!window.confirm(t('securitySection.disableConfirm'))) return
+
     toast.promise(
       localApiService.request({
         method: 'GET',
         endPoint: '/proxy/disable-2fa',
         headers: {
-          'x-lang': 'en',
+          'x-lang': router.locale ?? 'es',
           Authorization: `Bearer ${data?.accessToken}`
         }
       }),
       {
         success: () => {
-          return { title: '2FA desactivated successfully', status: 'success' }
+          // Refresca el perfil para que el estado deje de decir "Activado".
+          router.replace(router.asPath)
+          return {
+            title: t('securitySection.toast.disabled'),
+            status: 'success'
+          }
         },
         loading: {
-          title: 'Desactivating 2FA'
+          title: t('securitySection.toast.disabling')
         },
         error: () => {
-          return { title: 'An error occurred', status: 'error' }
+          return { title: t('securitySection.toast.error'), status: 'error' }
         }
       }
     )
