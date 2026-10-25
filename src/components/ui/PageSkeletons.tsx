@@ -195,6 +195,15 @@ const DashboardSkeleton: FC = () => (
           ))}
         </SimpleGrid>
       </Box>
+      {/* "Este mes": mismas tarjetas que el resumen del período. */}
+      <Box>
+        <SectionTitle w="30%" />
+        <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton key={index} h="120px" borderRadius="md" />
+          ))}
+        </SimpleGrid>
+      </Box>
       <Box>
         <SectionTitle w="35%" />
         {Array.from({ length: 5 }).map((_, index) => (
