@@ -82,9 +82,12 @@ detail of this design.
   return redirect`. `fixed-expenses.tsx` and `profile/2fa.tsx` still call `getSession` directly and
   haven't been migrated to this helper — same gap, lower priority since those pages weren't in
   scope for the refresh-token rollout.
-- Explicit "cerrar sesión" actions (`settings.tsx`, `MobileNav.tsx`) just call NextAuth's
-  `signOut()` as before — server-side revocation happens automatically via `authConfig.ts`'s
-  `events.signOut`, which `POST`s `/proxy/logout` with the session's refresh token so it can't be
+- Explicit "cerrar sesión" actions (`settings.tsx`, `MobileNav.tsx`) call
+  `signOutAndUnsubscribePush(session?.accessToken, opts)` (`src/lib/signOutAndUnsubscribePush.ts`),
+  which best-effort unsubscribes this browser from Web Push (bounded by a timeout, errors
+  swallowed) and then calls NextAuth's `signOut()` — so the next user of the same browser
+  doesn't get the previous user's pushes. Use it for any new explicit logout button.
+  Server-side revocation happens automatically via `authConfig.ts`'s `events.signOut`, which `POST`s `/proxy/logout` with the session's refresh token so it can't be
   replayed after the user logs out.
 - The `jwt`/`logout` callbacks call this app's own `/api/proxy/refresh-token` and
   `/api/proxy/logout` routes (not the backend directly) via an absolute self-URL built from
@@ -120,6 +123,35 @@ call happens:
   create/update/delete, these pages call `router.replace(router.asPath)` to force
   `getServerSideProps` to refetch rather than keeping separate client-side cache state.
 
+### Web Push notifications
+
+Standard Web Push (VAPID, **not** Firebase). Pieces:
+
+- `worker/index.js` (repo root) — custom service worker code. next-pwa 5.6 picks up
+  `worker/index.{js,ts}` by default (`customWorkerDir: 'worker'`), bundles it as
+  `public/worker-<buildId>.js` and adds it to the generated `public/sw.js` via
+  `importScripts(...)`. Handles `push` (JSON payload `{ title, body, url, tag }`, tolerant of
+  empty/malformed payloads) and `notificationclick` (focuses + navigates an existing same-origin
+  tab, or opens one; non-same-origin `url`s fall back to `/dashboard`). Not linted/type-checked
+  (outside `src/`).
+  next-pwa compiles it with `babel-loader`, resolved from the project root — under pnpm's strict
+  layout it isn't hoisted, which is why `babel-loader` is an explicit devDependency. If the build
+  log says `[PWA] Failed to build custom worker`, `sw.js` ships without push handlers.
+- `src/lib/webPush.ts` — browser-side logic: support/iOS/standalone detection, VAPID key
+  decoding, subscribe/unsubscribe against the proxies, typed `PushSubscriptionError` codes.
+- `src/hooks/usePushSubscription.ts` — React state over that lib (availability, permission,
+  `isSubscribed`, `enable`/`disable`); consumed by `components/views/settings/PushDeviceToggle.tsx`
+  inside `NotificationPreferences`.
+- Proxies `push-vapid-public-key` (GET, no auth; `publicKey: null` means the server has no VAPID
+  configured), `push-subscribe` and `push-unsubscribe` (POST, Bearer) → `services/notifications.ts`.
+- Product rule: while the user has push active on any device, the backend sends the Gmail
+  "items to review" alert by push instead of email (falls back to email only if push fails).
+
+**Testing locally:** next-pwa is disabled under `NODE_ENV=development`, so `pnpm dev` has no
+service worker and the toggle shows the "no service worker" state. Use `pnpm build && pnpm start`
+instead; browsers allow push on `http://localhost` without HTTPS (any other host needs HTTPS).
+iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+).
+
 ### Structure
 
 - `src/pages/` — routed pages: `auth/*` (login/register/forgot-password/verify-2fa),
@@ -133,9 +165,15 @@ call happens:
   `profile`), separate from `components/ui` (design-system primitives) and `components/layouts`.
 - `src/services/` — backend-calling functions, either wrapped by a proxy route or called
   directly from `getServerSideProps`: `2fa.ts`, `budgetCalculator.ts`, `userService.ts`,
-  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`.
+  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`,
+  `notifications.ts` (preferences + Web Push subscriptions), among others.
+- `src/lib/` — shared non-React helpers (`apiService`, `createHandler`, `session`, `webPush`,
+  `signOutAndUnsubscribePush`, …).
 - `src/hooks`, `src/interfaces`, `src/types`, `src/enums` — shared frontend-only types/enums
-  (e.g. `HttpMethod`) and hooks.
+  (e.g. `HttpMethod`) and hooks (e.g. `usePushSubscription`).
+- `worker/` — custom service worker source bundled into `public/sw.js` by next-pwa (see Web Push
+  above). `public/sw.js`, `public/workbox-*.js` and `public/worker-*.js` are build output
+  (gitignored).
 
 ### Related repo
 
