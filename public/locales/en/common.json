@@ -103,12 +103,12 @@
     "backToLogin": "Back to login",
     "toast": {
       "success": {
-        "title": "Email Sent!",
-        "description": "We have sent an email with instructions to reset your password."
+        "title": "Done!",
+        "description": "If an account exists for that email, we sent instructions to reset your password."
       },
       "error": {
         "title": "Error!",
-        "description": "We could not find an account with that email address."
+        "description": "We couldn't send the email. Please try again in a minute."
       },
       "loading": {
         "title": "Loading...",
@@ -206,5 +206,42 @@
     "loadMore": "Show {{count}} more ({{remaining}} left)",
     "dayTotalPartial": "{{total}} · {{count}} not shown"
   },
-  "routeLoading": "Loading…"
+  "routeLoading": "Loading…",
+  "verifyAccount": {
+    "verifying": "Verifying your account…",
+    "success": {
+      "heading": "Account verified!",
+      "text": "Your email is confirmed. You can now log in and start planning your budget."
+    },
+    "error": {
+      "heading": "This link isn't valid",
+      "text": "It may have already been used or expired. If your account is already active, just log in; otherwise we'll send you a new link."
+    },
+    "pending": {
+      "heading": "Check your email",
+      "text": "We sent you a link to activate your account. Open it from your inbox (check spam too). Didn't get it? We'll send another one."
+    },
+    "sent": {
+      "heading": "Link sent",
+      "text": "If there's an account pending activation for that email, a new link will arrive in a few minutes.",
+      "useAnotherEmail": "Use a different email"
+    },
+    "goToLogin": "Log in",
+    "backToLogin": "Back to log in",
+    "resend": {
+      "label": "Email",
+      "submit": "Resend verification link",
+      "invalidEmail": "Enter a valid email",
+      "error": "We couldn't send the email. Please try again in a minute."
+    },
+    "registered": {
+      "title": "Account created",
+      "description": "Check your email to activate your account."
+    },
+    "retry": {
+      "heading": "We couldn't verify right now",
+      "text": "There was a connection problem or the server is busy. Your link is still valid — please try again.",
+      "button": "Try again"
+    }
+  }
 }
