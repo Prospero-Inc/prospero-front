@@ -88,10 +88,13 @@ export const RegisterView = () => {
         {
           success: () => {
             setIsLoading(false)
-            router.push('/auth/login')
+            router.push({
+              pathname: '/auth/verify-account',
+              query: { email }
+            })
             return {
-              title: 'Cuenta creada',
-              description: 'Cuenta creada con exito',
+              title: t('verifyAccount.registered.title'),
+              description: t('verifyAccount.registered.description'),
               status: 'success',
               isClosable: true
             }

@@ -103,12 +103,12 @@
     "backToLogin": "Volver a iniciar sesión",
     "toast": {
       "success": {
-        "title": "¡Correo electrónico enviado!",
-        "description": "Hemos enviado un correo electrónico con instrucciones para restablecer su contraseña."
+        "title": "¡Listo!",
+        "description": "Si existe una cuenta con ese correo, te enviamos instrucciones para restablecer tu contraseña."
       },
       "error": {
         "title": "¡Error!",
-        "description": "No pudimos encontrar una cuenta con ese correo electrónico."
+        "description": "No pudimos enviar el correo. Inténtalo de nuevo en un minuto."
       },
       "loading": {
         "title": "Cargando...",
@@ -206,5 +206,42 @@
     "loadMore": "Mostrar {{count}} más (quedan {{remaining}})",
     "dayTotalPartial": "{{total}} · {{count}} sin mostrar"
   },
-  "routeLoading": "Cargando…"
+  "routeLoading": "Cargando…",
+  "verifyAccount": {
+    "verifying": "Verificando tu cuenta…",
+    "success": {
+      "heading": "¡Cuenta verificada!",
+      "text": "Tu correo quedó confirmado. Ya puedes iniciar sesión y empezar a organizar tu presupuesto."
+    },
+    "error": {
+      "heading": "El enlace no es válido",
+      "text": "Puede que ya lo hayas usado o que haya caducado. Si tu cuenta ya está activa, simplemente inicia sesión; si no, te enviamos un enlace nuevo."
+    },
+    "pending": {
+      "heading": "Revisa tu correo",
+      "text": "Te enviamos un enlace para activar tu cuenta. Ábrelo desde tu bandeja de entrada (revisa también spam). ¿No te llegó? Te mandamos otro."
+    },
+    "sent": {
+      "heading": "Enlace enviado",
+      "text": "Si hay una cuenta pendiente de activar con ese correo, te llegará un enlace nuevo en unos minutos.",
+      "useAnotherEmail": "Usar otro correo"
+    },
+    "goToLogin": "Iniciar sesión",
+    "backToLogin": "Volver a iniciar sesión",
+    "resend": {
+      "label": "Correo electrónico",
+      "submit": "Reenviar enlace de verificación",
+      "invalidEmail": "Ingresa un correo válido",
+      "error": "No pudimos enviar el correo. Inténtalo de nuevo en un minuto."
+    },
+    "registered": {
+      "title": "Cuenta creada",
+      "description": "Revisa tu correo para activar tu cuenta."
+    },
+    "retry": {
+      "heading": "No pudimos verificar ahora",
+      "text": "Hubo un problema de conexión o el servidor está ocupado. Tu enlace sigue siendo válido: inténtalo de nuevo.",
+      "button": "Reintentar"
+    }
+  }
 }

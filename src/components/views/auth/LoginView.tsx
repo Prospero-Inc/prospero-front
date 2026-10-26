@@ -7,6 +7,7 @@ import {
   PRE_AUTH_TOKEN_STORAGE_KEY
 } from '@/interfaces'
 import { localApiService } from '@/lib'
+import { HttpError } from '@/lib/apiService'
 import { cookiesPlugin } from '@/plugins'
 import { Stack, useToast } from '@chakra-ui/react'
 import {
@@ -99,6 +100,14 @@ export const LoginView = () => {
 
       if (resp?.url) return router.replace('/dashboard')
     } catch (error) {
+      // 403 = correct credentials but the account was never activated —
+      // send them to the page that explains it and can resend the link.
+      if (error instanceof HttpError && error.status === 403)
+        return router.push({
+          pathname: '/auth/verify-account',
+          query: { email: data.email }
+        })
+
       toast({
         title: t('login.toast.error.title'),
         description:
