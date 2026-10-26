@@ -96,7 +96,12 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/auth/forgot-password') ||
     pathname.startsWith('/auth/verify-2fa')
 
-  const isProtectedPage = !isAuthPage
+  // Reachable with or without a session: the email link must activate the
+  // account even when the browser is logged into another one, and
+  // `redirectTo` would drop the `id`/`code` query on the way to /dashboard.
+  const isPublicPage = pathname.startsWith('/auth/verify-account')
+
+  const isProtectedPage = !isAuthPage && !isPublicPage
   if (pathname === '/') return redirectTo('/dashboard')
 
   // A session whose refresh failed (dead/revoked refresh token) carries
