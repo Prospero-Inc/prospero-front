@@ -8,6 +8,7 @@ import {
 import { HttpMethod } from '@/enums'
 import { PayFrequency } from '@/interfaces'
 import { getValidSession, localApiService } from '@/lib'
+import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
   FinancialInstitution,
   getFinancialInstitutions,
@@ -34,7 +35,7 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useState } from 'react'
@@ -73,6 +74,7 @@ const defaultGmailConnection: GmailConnectionStatus = {
 
 const defaultNotificationPreferences: NotificationPreferencesData = {
   gmailReviewEmailEnabled: false,
+  gmailReviewPushEnabled: false,
   budgetAlertEmailEnabled: false
 }
 
@@ -256,7 +258,11 @@ export default function SettingsPage({
           alignSelf="flex-start"
           colorScheme="red"
           variant="outline"
-          onClick={() => signOut({ callbackUrl: '/auth/login' })}
+          onClick={() =>
+            signOutAndUnsubscribePush(session?.accessToken, {
+              callbackUrl: '/auth/login'
+            })
+          }
         >
           {t('logout')}
         </Button>
@@ -313,10 +319,15 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   if (session?.accessToken)
     try {
-      notificationPreferences = (await getNotificationPreferences(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as NotificationPreferencesData
+      // Merge con defaults: un backend sin `gmailReviewPushEnabled` todavía
+      // no rompe el switch (queda en false en vez de undefined).
+      notificationPreferences = {
+        ...defaultNotificationPreferences,
+        ...((await getNotificationPreferences(
+          {},
+          { authorization: `Bearer ${session.accessToken}`, lang: locale }
+        )) as Partial<NotificationPreferencesData>)
+      }
     } catch (error) {
       notificationPreferences = defaultNotificationPreferences
     }

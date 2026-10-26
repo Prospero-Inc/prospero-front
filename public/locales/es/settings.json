@@ -84,7 +84,8 @@
     "toggles": {
       "gmailReview": "Avisarme por correo cuando un movimiento de Gmail necesite revisión",
       "budgetAlert": "Avisarme por correo sobre alertas de presupuesto",
-      "budgetAlertNotice": "Próximamente: todavía no enviamos nada, solo guardamos tu preferencia para cuando esté disponible."
+      "budgetAlertNotice": "Próximamente: todavía no enviamos nada, solo guardamos tu preferencia para cuando esté disponible.",
+      "gmailReviewReplacedByPush": "Si tenés push activo en algún dispositivo, este aviso te llega por push en lugar de por correo (si el push falla, te mandamos el correo igual)."
     },
     "toast": {
       "success": {
@@ -94,6 +95,39 @@
       "error": {
         "title": "Error",
         "description": "No pudimos guardar tus preferencias de notificación"
+      }
+    },
+    "push": {
+      "device": "Notificaciones push en este dispositivo",
+      "deviceHelp": {
+        "loading": "Comprobando si este navegador admite notificaciones push…",
+        "available": "Recibí avisos en este navegador aunque Prospero esté cerrado. Se activa por dispositivo: activalo en cada navegador donde quieras recibirlos.",
+        "unsupported": "Este navegador no admite notificaciones push.",
+        "iosRequiresInstall": "En iPhone y iPad, Safari solo permite notificaciones push si instalás Prospero en la pantalla de inicio (iOS 16.4 o posterior): tocá Compartir → \"Agregar a pantalla de inicio\" y abrí la app desde ese ícono.",
+        "noServiceWorker": "Las notificaciones push no están disponibles en esta versión de la app (falta el service worker). Recargá la página e intentá de nuevo.",
+        "serverDisabled": "Las notificaciones push todavía no están habilitadas en Prospero.",
+        "denied": "Bloqueaste las notificaciones para este sitio. Para reactivarlas, abrí la configuración del sitio en tu navegador (el ícono junto a la dirección), permití las notificaciones y recargá la página."
+      },
+      "gmailReview": "Avisarme por push de movimientos detectados en Gmail",
+      "gmailReviewHelp": "Te enviamos un push por cada sincronización con movimientos por revisar, a todos tus dispositivos con push activo. Mientras tengas push activo, este aviso reemplaza al correo.",
+      "toast": {
+        "enabled": {
+          "title": "Push activado",
+          "description": "Este dispositivo va a recibir notificaciones push"
+        },
+        "disabled": {
+          "title": "Push desactivado",
+          "description": "Este dispositivo dejó de recibir notificaciones push"
+        }
+      },
+      "errors": {
+        "unsupported": "Este navegador no admite notificaciones push",
+        "noServiceWorker": "El service worker no está disponible, recargá la página e intentá de nuevo",
+        "serverDisabled": "Las notificaciones push no están habilitadas en el servidor",
+        "permissionDenied": "Bloqueaste las notificaciones; reactivalas desde la configuración del sitio en tu navegador",
+        "permissionDismissed": "No diste permiso para mostrar notificaciones",
+        "subscribeFailed": "No pudimos activar las notificaciones push en este dispositivo",
+        "backendFailed": "No pudimos guardar la suscripción push, intentá de nuevo"
       }
     }
   },

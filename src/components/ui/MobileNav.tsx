@@ -1,3 +1,4 @@
+import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
   FlexProps,
   Flex,
@@ -17,7 +18,7 @@ import {
   Button,
   useColorMode
 } from '@chakra-ui/react'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { FiMenu, FiChevronDown } from 'react-icons/fi'
@@ -119,7 +120,7 @@ export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem
                 as={Button}
                 onClick={() =>
-                  signOut({
+                  signOutAndUnsubscribePush(session?.accessToken, {
                     redirect: true
                   })
                 }

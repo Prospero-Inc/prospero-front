@@ -114,6 +114,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^7.16.1
         version: 7.16.1(eslint@8.45.0)(typescript@5.5.3)
+      babel-loader:
+        specifier: ^8.2.5
+        version: 8.4.1(@babel/core@7.29.7)(webpack@5.111.1(sharp@0.33.5))
       eslint:
         specifier: 8.45.0
         version: 8.45.0
