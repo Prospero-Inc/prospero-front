@@ -82,10 +82,8 @@
   "notifications": {
     "title": "Notifications",
     "toggles": {
-      "gmailReview": "Email me when a Gmail item needs review",
-      "budgetAlert": "Email me budget alerts",
-      "budgetAlertNotice": "Coming soon: this doesn't send anything yet, we're just saving your preference for when it launches.",
-      "gmailReviewReplacedByPush": "If you have push enabled on any device, this alert reaches you by push instead of email (if the push fails, we still send the email)."
+      "gmailReview": "Email me",
+      "gmailReviewReplacedByPush": "Only if you don't have push on any device (or if push fails)."
     },
     "toast": {
       "success": {
@@ -101,15 +99,13 @@
       "device": "Push notifications on this device",
       "deviceHelp": {
         "loading": "Checking whether this browser supports push notifications…",
-        "available": "Get alerts in this browser even when Prospero is closed. This is per device: turn it on in every browser where you want them.",
+        "available": "We'll notify you even when Prospero is closed. Turn it on on each device where you want alerts.",
         "unsupported": "This browser doesn't support push notifications.",
         "iosRequiresInstall": "On iPhone and iPad, Safari only allows push notifications if you add Prospero to your Home Screen (iOS 16.4 or later): tap Share → \"Add to Home Screen\" and open the app from that icon.",
         "noServiceWorker": "Push notifications aren't available in this version of the app (the service worker is missing). Reload the page and try again.",
         "serverDisabled": "Push notifications aren't enabled in Prospero yet.",
         "denied": "You blocked notifications for this site. To turn them back on, open this site's settings in your browser (the icon next to the address bar), allow notifications and reload the page."
       },
-      "gmailReview": "Send me a push for items detected in Gmail",
-      "gmailReviewHelp": "We send one push per sync that has items to review, to every device with push enabled. While push is enabled, it replaces the email alert.",
       "toast": {
         "enabled": {
           "title": "Push enabled",
@@ -129,7 +125,8 @@
         "subscribeFailed": "We couldn't enable push notifications on this device",
         "backendFailed": "We couldn't save the push subscription, please try again"
       }
-    }
+    },
+    "gmailSection": "Alerts when we detect new transactions in your Gmail."
   },
   "financialInstitutions": {
     "title": "Banks",
