@@ -14,6 +14,29 @@ import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+/** Visible at least this long so a fast load doesn't flash the logo. */
+const SPLASH_MIN_VISIBLE_MS = 350
+const SPLASH_FADE_MS = 300
+
+/** Fades out and removes the static splash from `_document.tsx` once React
+ * has hydrated — the first moment the real UI is interactive. */
+const useHideAppSplash = () => {
+  useEffect(() => {
+    const splash = document.getElementById('app-splash')
+    if (!splash) return
+    const timers: number[] = []
+    const wait = Math.max(0, SPLASH_MIN_VISIBLE_MS - performance.now())
+    timers.push(
+      window.setTimeout(() => {
+        splash.classList.add('is-hidden')
+        timers.push(window.setTimeout(() => splash.remove(), SPLASH_FADE_MS))
+      }, wait)
+    )
+    return () => timers.forEach(timer => window.clearTimeout(timer))
+  }, [])
+}
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter()
@@ -24,6 +47,8 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   // layout real, con el menú) en vez de dejar la pantalla vieja quieta
   // mientras llegan los datos. Recargar la misma pantalla (cambiar de
   // período, guardar) solo muestra la barra: un skeleton ahí sería un salto.
+  useHideAppSplash()
+
   const PageSkeleton =
     isLoading && targetPathname && targetPathname !== router.pathname
       ? getPageSkeleton(targetPathname)

@@ -2,10 +2,11 @@ services:
   app:
     container_name: prospero-frontend
     image: ghcr.io/prospero-inc/prospero-front:latest
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-      - /usr/src/app/.next
+    # No volumes on purpose: the image already contains the full build. A
+    # `.:/usr/src/app` bind mount here overlaid the runner's git checkout on
+    # top of it, hiding every build-generated file under public/ (next-pwa's
+    # sw.js, workbox-*.js, worker-*.js are gitignored) → /sw.js was a 404 in
+    # prod, so the PWA/Web Push service worker never registered.
     ports:
       - '4000:3000'
     networks:
