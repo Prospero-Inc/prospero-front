@@ -49,5 +49,11 @@ COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
 COPY --from=builder /usr/src/app/public ./public
+# Read by `next start` at runtime, not only at build time: next.config.js
+# (i18n routing) requires next-i18next.config.js, which serverSideTranslations
+# also loads on every request. Until the prod compose stopped bind-mounting
+# the checkout these came from the host — without them every page 500s.
+COPY --from=builder /usr/src/app/next.config.js ./next.config.js
+COPY --from=builder /usr/src/app/next-i18next.config.js ./next-i18next.config.js
 
 CMD pnpm start
