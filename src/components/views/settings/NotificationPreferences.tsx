@@ -9,6 +9,7 @@ import {
   Heading,
   Stack,
   Switch,
+  Text,
   useToast
 } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
@@ -32,9 +33,6 @@ export const NotificationPreferences = ({
   const authHeader = { Authorization: `Bearer ${session?.accessToken}` }
 
   const [isTogglingGmailReview, setIsTogglingGmailReview] = useState(false)
-  const [isTogglingGmailReviewPush, setIsTogglingGmailReviewPush] =
-    useState(false)
-  const [isTogglingBudgetAlert, setIsTogglingBudgetAlert] = useState(false)
 
   const showError = (error: unknown) => {
     toast({
@@ -78,44 +76,22 @@ export const NotificationPreferences = ({
       setIsTogglingGmailReview
     )
 
-  const onToggleGmailReviewPush = () =>
-    updatePreference(
-      { gmailReviewPushEnabled: !preferences.gmailReviewPushEnabled },
-      setIsTogglingGmailReviewPush
-    )
-
-  const onToggleBudgetAlert = () =>
-    updatePreference(
-      { budgetAlertEmailEnabled: !preferences.budgetAlertEmailEnabled },
-      setIsTogglingBudgetAlert
-    )
-
+  // Deliberately only two controls. The device switch *is* the push opt-in
+  // (the account-level `gmailReviewPushEnabled` stays at its default `true`
+  // and isn't exposed — a second push switch only confused which one wins),
+  // and `budgetAlertEmailEnabled` stays hidden until budget alerts actually
+  // exist; showing a switch that never sends anything was misleading.
   return (
     <Box>
-      <Heading size="md" mb={3}>
+      <Heading size="md" mb={1}>
         {t('title')}
       </Heading>
+      <Text color="gray.500" fontSize="sm" mb={4}>
+        {t('gmailSection')}
+      </Text>
 
-      <Stack spacing={4}>
+      <Stack spacing={5}>
         <PushDeviceToggle />
-
-        <FormControl maxW="sm">
-          <Stack
-            direction="row"
-            align="center"
-            justify="space-between"
-            spacing={4}
-          >
-            <FormLabel mb={0}>{t('push.gmailReview')}</FormLabel>
-            <Switch
-              isChecked={preferences.gmailReviewPushEnabled}
-              isDisabled={isTogglingGmailReviewPush}
-              aria-busy={isTogglingGmailReviewPush}
-              onChange={onToggleGmailReviewPush}
-            />
-          </Stack>
-          <FormHelperText>{t('push.gmailReviewHelp')}</FormHelperText>
-        </FormControl>
 
         <FormControl maxW="sm">
           <Stack
@@ -135,23 +111,6 @@ export const NotificationPreferences = ({
           <FormHelperText>
             {t('toggles.gmailReviewReplacedByPush')}
           </FormHelperText>
-        </FormControl>
-
-        <FormControl maxW="sm">
-          <Stack
-            direction="row"
-            align="center"
-            justify="space-between"
-            spacing={4}
-          >
-            <FormLabel mb={0}>{t('toggles.budgetAlert')}</FormLabel>
-            <Switch
-              isChecked={preferences.budgetAlertEmailEnabled}
-              isDisabled={isTogglingBudgetAlert}
-              onChange={onToggleBudgetAlert}
-            />
-          </Stack>
-          <FormHelperText>{t('toggles.budgetAlertNotice')}</FormHelperText>
         </FormControl>
       </Stack>
     </Box>
