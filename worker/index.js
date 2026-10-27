@@ -119,3 +119,15 @@ self.addEventListener('notificationclick', event => {
     })()
   )
 })
+
+// Cachés de datos de usuario que versiones anteriores del SW llenaban (ver
+// NETWORK_ONLY_CACHES en next.config.js). El SW actual ya no las usa; se
+// borran para no dejar en disco props/HTML/respuestas de API con datos
+// personales — y el `{}` de prefetch que rompía la navegación.
+const LEGACY_USER_DATA_CACHES = ['next-data', 'apis', 'others']
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    Promise.all(LEGACY_USER_DATA_CACHES.map(name => self.caches.delete(name)))
+  )
+})
