@@ -8,6 +8,7 @@ import {
 import { HttpMethod } from '@/enums'
 import { PayFrequency } from '@/interfaces'
 import { getValidSession, localApiService } from '@/lib'
+import { withClientIp } from '@/lib/server/clientIp'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
   FinancialInstitution,
@@ -271,103 +272,102 @@ export default function SettingsPage({
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  let account: SettingsProps['account'] = null
-  let budget: SettingsProps['budget'] = null
-  let institutions: SettingsProps['institutions'] = []
-  let supportedParsers: SettingsProps['supportedParsers'] = []
-  let gmailConnection: SettingsProps['gmailConnection'] = defaultGmailConnection
-  let notificationPreferences: SettingsProps['notificationPreferences'] =
-    defaultNotificationPreferences
+    let account: SettingsProps['account'] = null
+    let budget: SettingsProps['budget'] = null
+    let institutions: SettingsProps['institutions'] = []
+    let supportedParsers: SettingsProps['supportedParsers'] = []
+    let gmailConnection: SettingsProps['gmailConnection'] =
+      defaultGmailConnection
+    let notificationPreferences: SettingsProps['notificationPreferences'] =
+      defaultNotificationPreferences
 
-  if (session?.accessToken)
-    try {
-      institutions = (await getFinancialInstitutions(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as FinancialInstitution[]
-    } catch (error) {
-      institutions = []
-    }
-
-  if (session?.accessToken)
-    try {
-      supportedParsers = (await getSupportedParsers(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as SupportedParser[]
-    } catch (error) {
-      supportedParsers = []
-    }
-
-  if (session?.accessToken)
-    try {
-      gmailConnection = (await getGmailConnection(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as GmailConnectionStatus
-    } catch (error) {
-      gmailConnection = defaultGmailConnection
-    }
-
-  if (session?.accessToken)
-    try {
-      // Merge con defaults: un backend sin `gmailReviewPushEnabled` todavía
-      // no rompe el switch (queda en false en vez de undefined).
-      notificationPreferences = {
-        ...defaultNotificationPreferences,
-        ...((await getNotificationPreferences(
+    if (session?.accessToken)
+      try {
+        institutions = (await getFinancialInstitutions(
           {},
           { authorization: `Bearer ${session.accessToken}`, lang: locale }
-        )) as Partial<NotificationPreferencesData>)
+        )) as FinancialInstitution[]
+      } catch (error) {
+        institutions = []
       }
-    } catch (error) {
-      notificationPreferences = defaultNotificationPreferences
-    }
 
-  if (session?.accessToken)
-    try {
-      const profile = (await requestProfile(null, {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      })) as { user: BudgetSettings & { email: string; username: string } }
-      account = profile?.user
-        ? { email: profile.user.email, username: profile.user.username }
-        : null
-      budget = profile?.user
-        ? {
-            payFrequency: profile.user.payFrequency,
-            needsPercent: profile.user.needsPercent,
-            wantsPercent: profile.user.wantsPercent,
-            savingsPercent: profile.user.savingsPercent
-          }
-        : null
-    } catch (error) {
-      account = null
-      budget = null
-    }
+    if (session?.accessToken)
+      try {
+        supportedParsers = (await getSupportedParsers(
+          {},
+          { authorization: `Bearer ${session.accessToken}`, lang: locale }
+        )) as SupportedParser[]
+      } catch (error) {
+        supportedParsers = []
+      }
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'settings'
-      ])),
-      account,
-      budget,
-      institutions,
-      supportedParsers,
-      gmailConnection,
-      notificationPreferences
+    if (session?.accessToken)
+      try {
+        gmailConnection = (await getGmailConnection(
+          {},
+          { authorization: `Bearer ${session.accessToken}`, lang: locale }
+        )) as GmailConnectionStatus
+      } catch (error) {
+        gmailConnection = defaultGmailConnection
+      }
+
+    if (session?.accessToken)
+      try {
+        // Merge con defaults: un backend sin `gmailReviewPushEnabled` todavía
+        // no rompe el switch (queda en false en vez de undefined).
+        notificationPreferences = {
+          ...defaultNotificationPreferences,
+          ...((await getNotificationPreferences(
+            {},
+            { authorization: `Bearer ${session.accessToken}`, lang: locale }
+          )) as Partial<NotificationPreferencesData>)
+        }
+      } catch (error) {
+        notificationPreferences = defaultNotificationPreferences
+      }
+
+    if (session?.accessToken)
+      try {
+        const profile = (await requestProfile(null, {
+          authorization: `Bearer ${session.accessToken}`,
+          lang: locale
+        })) as { user: BudgetSettings & { email: string; username: string } }
+        account = profile?.user
+          ? { email: profile.user.email, username: profile.user.username }
+          : null
+        budget = profile?.user
+          ? {
+              payFrequency: profile.user.payFrequency,
+              needsPercent: profile.user.needsPercent,
+              wantsPercent: profile.user.wantsPercent,
+              savingsPercent: profile.user.savingsPercent
+            }
+          : null
+      } catch (error) {
+        account = null
+        budget = null
+      }
+
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav',
+          'settings'
+        ])),
+        account,
+        budget,
+        institutions,
+        supportedParsers,
+        gmailConnection,
+        notificationPreferences
+      }
     }
   }
-}
+)

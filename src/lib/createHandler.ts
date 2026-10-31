@@ -3,6 +3,8 @@ import { HttpError } from '@/lib/apiService'
 import { HttpStatusCode } from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
+import { runWithClientIp } from './server/clientIp'
+
 interface HandlerFunction<T, R> {
   (_data: T, ..._params: unknown[]): Promise<R>
 }
@@ -23,11 +25,13 @@ const createHandler =
           .status(HttpStatusCode.MethodNotAllowed)
           .json({ error: 'Method Not Allowed' })
 
-      const data = await handlerFn(body, {
-        lang: lang || '',
-        authorization: authorization || '',
-        ...query
-      })
+      const data = await runWithClientIp(req, () =>
+        handlerFn(body, {
+          lang: lang || '',
+          authorization: authorization || '',
+          ...query
+        })
+      )
       return res.status(HttpStatusCode.Ok).json(data)
     } catch (error) {
       if (error instanceof HttpError)

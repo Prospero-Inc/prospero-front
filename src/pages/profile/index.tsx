@@ -2,6 +2,7 @@ import { ProsperoLayout } from '@/components/layouts'
 import { PersonalInformation, Security } from '@/components/views/profile'
 import { Profile } from '@/interfaces'
 import { getValidSession } from '@/lib'
+import { withClientIp } from '@/lib/server/clientIp'
 import { requestProfile } from '@/services/request-profile'
 import { Container } from '@chakra-ui/react'
 import { GetServerSideProps } from 'next'
@@ -27,38 +28,36 @@ interface ProfileResponse {
   user: Profile
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  const token = session?.accessToken
+    const token = session?.accessToken
 
-  let profile: ProfileResponse | null = null
-  if (token) {
-    profile = (await requestProfile(null, {
-      authorization: `Bearer ${token}`,
-      lang: locale
-    })) as ProfileResponse
+    let profile: ProfileResponse | null = null
+    if (token) {
+      profile = (await requestProfile(null, {
+        authorization: `Bearer ${token}`,
+        lang: locale
+      })) as ProfileResponse
 
-    if (profile === undefined) profile = null
-  }
+      if (profile === undefined) profile = null
+    }
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'budgetCalculator',
-        'profile'
-      ])),
-      profile: profile?.user ?? null
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav',
+          'budgetCalculator',
+          'profile'
+        ])),
+        profile: profile?.user ?? null
+      }
     }
   }
-}
+)
 
 export default index
