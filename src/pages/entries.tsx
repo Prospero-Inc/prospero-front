@@ -86,8 +86,11 @@ interface EntriesProps {
   periods: PeriodSummary[]
 }
 
-const emptyForm: SalaryData = {
-  amount: 0,
+// The amount starts empty, not 0: a prefilled 0 had to be deleted first.
+type SalaryForm = Omit<SalaryData, 'amount'> & { amount: number | '' }
+
+const emptyForm: SalaryForm = {
+  amount: '',
   date: getTodayLocalDate(),
   type: 'Payroll',
   budgetCategory: '',
@@ -110,7 +113,7 @@ export default function EntriesPage({
     Record<number, IncomeCategory | ''>
   >({})
   const [confirmingId, setConfirmingId] = useState<number | null>(null)
-  const { control, handleSubmit, reset, watch } = useForm<SalaryData>({
+  const { control, handleSubmit, reset, watch } = useForm<SalaryForm>({
     defaultValues: emptyForm
   })
 
@@ -215,7 +218,7 @@ export default function EntriesPage({
     setEditingId(null)
   }
 
-  const onSubmit = async (data: SalaryData) => {
+  const onSubmit = async (data: SalaryForm) => {
     setIsLoading(true)
     try {
       const basePayload = {
@@ -334,7 +337,7 @@ export default function EntriesPage({
           cancelLabel={t('form.cancel')}
           initialFocusRef={amountInputRef}
         >
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"

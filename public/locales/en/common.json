@@ -243,5 +243,42 @@
       "text": "There was a connection problem or the server is busy. Your link is still valid — please try again.",
       "button": "Try again"
     }
+  },
+  "authPages": {
+    "login": {
+      "title": "Sign in · Prospero",
+      "description": "Access your budget"
+    },
+    "verifyAccount": {
+      "title": "Verify account · Prospero",
+      "description": "Account verification"
+    },
+    "verify2fa": {
+      "title": "Two-step verification · Prospero",
+      "description": "Code from your authenticator app"
+    },
+    "forgotPassword": {
+      "title": "Reset password · Prospero",
+      "description": "Get back into your account"
+    }
+  },
+  "passwordInput": {
+    "toggle": "Show or hide the password"
+  },
+  "registerToast": {
+    "loading": {
+      "title": "Creating account",
+      "description": "We're creating your account, please wait"
+    },
+    "error": {
+      "title": "Error",
+      "description": "We couldn't create the account"
+    }
+  },
+  "offline": {
+    "title": "Offline · Prospero",
+    "heading": "You're offline",
+    "text": "We couldn't load this screen. Check your connection and try again; your data is safe in your account.",
+    "retry": "Try again"
   }
 }

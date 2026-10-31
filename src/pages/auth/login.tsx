@@ -1,14 +1,18 @@
 import { AuthLayout } from '@/components/layouts'
-import { MotionDiv } from '@/components/ui/MotionDiv'
 import { LoginView } from '@/components/views/auth'
-import { Box, Image, Show } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 const login = () => {
+  const { t } = useTranslation('common')
   return (
-    <AuthLayout title="Login" pageDescription="Login page">
+    <AuthLayout
+      title={t('authPages.login.title')}
+      pageDescription={t('authPages.login.description')}
+    >
       <Box
         width={'100%'}
         display="flex"
@@ -17,23 +21,7 @@ const login = () => {
         justifyContent="center"
         p={4}
       >
-        <Box
-          flex={{ base: 'none', md: 1 }}
-          display="flex"
-          justifyContent="center"
-          mb={{ base: 4, md: 0 }}
-        >
-          <Show above="md">
-            <MotionDiv>
-              <Image src={'/assets/Saly-1.svg'} alt="Sali-1" />
-            </MotionDiv>
-          </Show>
-        </Box>
-        <Box
-          flex={{ base: 'none', md: 1 }}
-          display="flex"
-          justifyContent="center"
-        >
+        <Box w="full" maxW="md" display="flex" justifyContent="center">
           <LoginView />
         </Box>
       </Box>

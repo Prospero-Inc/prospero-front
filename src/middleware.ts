@@ -99,7 +99,10 @@ export async function middleware(req: NextRequest) {
   // Reachable with or without a session: the email link must activate the
   // account even when the browser is logged into another one, and
   // `redirectTo` would drop the `id`/`code` query on the way to /dashboard.
-  const isPublicPage = pathname.startsWith('/auth/verify-account')
+  // `/_offline` is the service worker's fallback page: precached at install
+  // time whether or not anyone is logged in, so it must never redirect.
+  const isPublicPage =
+    pathname.startsWith('/auth/verify-account') || pathname === '/_offline'
 
   const isProtectedPage = !isAuthPage && !isPublicPage
   if (pathname === '/') return redirectTo('/dashboard')

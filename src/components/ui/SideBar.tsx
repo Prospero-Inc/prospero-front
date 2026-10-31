@@ -30,7 +30,9 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       <MobileNav onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      {/* On phones the page container (ProsperoLayout) owns the single 16 px
+          gutter; padding here too used to stack three layers of it. */}
+      <Box ml={{ base: 0, md: 60 }} p={{ base: 0, md: 4 }}>
         {children}
       </Box>
     </Box>

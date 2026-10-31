@@ -76,10 +76,14 @@ interface FixedExpensesProps {
 }
 
 /** El formulario pide el día del mes, no una fecha: ver `fixedExpenseDue`. */
-type FixedExpenseForm = Omit<FixedExpenseData, 'dueDate'> & { dueDay: string }
+// The amount starts empty, not 0: a prefilled 0 had to be deleted first.
+type FixedExpenseForm = Omit<FixedExpenseData, 'dueDate' | 'amount'> & {
+  dueDay: string
+  amount: number | ''
+}
 
 const emptyForm: FixedExpenseForm = {
-  amount: 0,
+  amount: '',
   name: '',
   budgetCategory: 'Necesidad',
   dueDay: '1',
@@ -391,7 +395,7 @@ export default function FixedExpensesPage({
               )}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"
