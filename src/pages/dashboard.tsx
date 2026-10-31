@@ -4,6 +4,7 @@ import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { DashboardSummaryCard } from '@/components/ui/DashboardSummaryCard'
 import { RecentActivityList } from '@/components/ui/RecentActivityList'
 import { getValidSession } from '@/lib'
+import { withClientIp } from '@/lib/server/clientIp'
 import {
   getCurrentPeriod,
   getMonthSummary,
@@ -320,48 +321,47 @@ const Dashboard = ({ period, month, reviewQueue }: DashboardProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  let period: PeriodSummary | null = null
-  let month: MonthSummary | null = null
-  let reviewQueue: ReviewQueueSummary | null = null
+    let period: PeriodSummary | null = null
+    let month: MonthSummary | null = null
+    let reviewQueue: ReviewQueueSummary | null = null
 
-  if (session?.accessToken) {
-    const params = {
-      authorization: `Bearer ${session.accessToken}`,
-      lang: locale
+    if (session?.accessToken) {
+      const params = {
+        authorization: `Bearer ${session.accessToken}`,
+        lang: locale
+      }
+      // allSettled: si falla el resumen del mes o el de pendientes, el resto
+      // del dashboard igual se muestra (solo el período es imprescindible).
+      const [periodResult, monthResult, reviewResult] =
+        await Promise.allSettled([
+          getCurrentPeriod(null, params),
+          getMonthSummary(null, params),
+          getReviewQueueSummary(null, params) as Promise<ReviewQueueSummary>
+        ])
+      period = periodResult.status === 'fulfilled' ? periodResult.value : null
+      month = monthResult.status === 'fulfilled' ? monthResult.value : null
+      reviewQueue =
+        reviewResult.status === 'fulfilled' ? reviewResult.value : null
     }
-    // allSettled: si falla el resumen del mes o el de pendientes, el resto
-    // del dashboard igual se muestra (solo el período es imprescindible).
-    const [periodResult, monthResult, reviewResult] = await Promise.allSettled([
-      getCurrentPeriod(null, params),
-      getMonthSummary(null, params),
-      getReviewQueueSummary(null, params) as Promise<ReviewQueueSummary>
-    ])
-    period = periodResult.status === 'fulfilled' ? periodResult.value : null
-    month = monthResult.status === 'fulfilled' ? monthResult.value : null
-    reviewQueue =
-      reviewResult.status === 'fulfilled' ? reviewResult.value : null
-  }
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav'
-      ])),
-      period,
-      month,
-      reviewQueue
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav'
+        ])),
+        period,
+        month,
+        reviewQueue
+      }
     }
   }
-}
+)
 
 export default Dashboard

@@ -13,6 +13,7 @@ import {
   dueDayOf,
   resolveDueStatus
 } from '@/lib/fixedExpenseDue'
+import { withClientIp } from '@/lib/server/clientIp'
 import { FixedExpenseData, getFixedExpenses } from '@/services/fixedExpenses'
 import { BudgetCategory } from '@/services/transactions'
 import {
@@ -649,35 +650,33 @@ export default function FixedExpensesPage({
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  let fixedExpenses: FixedExpense[] = []
+    let fixedExpenses: FixedExpense[] = []
 
-  if (session?.accessToken)
-    try {
-      fixedExpenses = (await getFixedExpenses(
-        {},
-        { authorization: `Bearer ${session.accessToken}`, lang: locale }
-      )) as FixedExpense[]
-    } catch (error) {
-      fixedExpenses = []
-    }
+    if (session?.accessToken)
+      try {
+        fixedExpenses = (await getFixedExpenses(
+          {},
+          { authorization: `Bearer ${session.accessToken}`, lang: locale }
+        )) as FixedExpense[]
+      } catch (error) {
+        fixedExpenses = []
+      }
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'fixedExpenses'
-      ])),
-      fixedExpenses
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav',
+          'fixedExpenses'
+        ])),
+        fixedExpenses
+      }
     }
   }
-}
+)
