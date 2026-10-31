@@ -3,6 +3,8 @@ import { ProsperoLayout } from '@/components/layouts'
 import { SessionWatcher } from '@/components/ui'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
+import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
+import { UserScopedSWR } from '@/components/ui/UserScopedSWR'
 import {
   PendingRouteContext,
   RouteLoadingContext,
@@ -77,22 +79,26 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
       </Head>
-      <SessionProvider session={session} refetchInterval={60}>
+      {/* 5 min: the access token lasts 15, and each poll is a request. */}
+      <SessionProvider session={session} refetchInterval={300}>
         <SessionWatcher />
+        <ServiceWorkerUpdater />
         <RouteProgress isLoading={isLoading} />
-        <RouteLoadingContext.Provider value={routeLoading}>
-          <PendingRouteContext.Provider
-            value={PageSkeleton ? targetPathname : null}
-          >
-            {PageSkeleton ? (
-              <ProsperoLayout title={t('routeLoading')} pageDescription="">
-                <PageSkeleton />
-              </ProsperoLayout>
-            ) : (
-              <Component {...pageProps} />
-            )}
-          </PendingRouteContext.Provider>
-        </RouteLoadingContext.Provider>
+        <UserScopedSWR>
+          <RouteLoadingContext.Provider value={routeLoading}>
+            <PendingRouteContext.Provider
+              value={PageSkeleton ? targetPathname : null}
+            >
+              {PageSkeleton ? (
+                <ProsperoLayout title={t('routeLoading')} pageDescription="">
+                  <PageSkeleton />
+                </ProsperoLayout>
+              ) : (
+                <Component {...pageProps} />
+              )}
+            </PendingRouteContext.Provider>
+          </RouteLoadingContext.Provider>
+        </UserScopedSWR>
       </SessionProvider>
     </ChakraProvider>
   )

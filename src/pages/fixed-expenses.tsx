@@ -4,8 +4,9 @@ import {
   CategoryBadge,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
+import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
-import { getValidSession, localApiService } from '@/lib'
+import { localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
   DueStatus,
@@ -13,8 +14,8 @@ import {
   dueDayOf,
   resolveDueStatus
 } from '@/lib/fixedExpenseDue'
-import { withClientIp } from '@/lib/server/clientIp'
-import { FixedExpenseData, getFixedExpenses } from '@/services/fixedExpenses'
+import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
+import { FixedExpenseData } from '@/services/fixedExpenses'
 import { BudgetCategory } from '@/services/transactions'
 import {
   Badge,
@@ -51,7 +52,7 @@ import {
   useToast,
   VisuallyHidden
 } from '@chakra-ui/react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -69,10 +70,6 @@ import {
 interface FixedExpense extends FixedExpenseData {
   id: number
   paidThisCycle: boolean
-}
-
-interface FixedExpensesProps {
-  fixedExpenses: FixedExpense[]
 }
 
 /** El formulario pide el día del mes, no una fecha: ver `fixedExpenseDue`. */
@@ -109,11 +106,17 @@ const useToday = () => {
   return today
 }
 
-export default function FixedExpensesPage({
-  fixedExpenses
-}: FixedExpensesProps) {
+export default function FixedExpensesPage() {
   const { t } = useTranslation('fixedExpenses')
   const router = useRouter()
+  // Client-side data (SWR): saving or paying doesn't reload the page.
+  const fixedExpensesQuery = useApi<FixedExpense[]>('fixed-expenses')
+  const fixedExpenses = fixedExpensesQuery.data ?? []
+  const revalidateApi = useRevalidateApi()
+  const updateApiCache = useUpdateApiCache()
+  /** Paying one creates a transaction, so periods and movements change too. */
+  const refreshFixedExpenses = () =>
+    revalidateApi('fixed-expenses', 'periods', 'transactions')
   const toast = useToast()
   const { data: session } = useSession()
   const { formatAmount } = useMovementFormatters()
@@ -211,7 +214,7 @@ export default function FixedExpensesPage({
         isClosable: true
       })
       closeForm()
-      router.replace(router.asPath)
+      await refreshFixedExpenses()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -229,6 +232,11 @@ export default function FixedExpensesPage({
     if (!window.confirm(t('list.confirmDelete', { name: fixedExpense.name })))
       return
 
+    // Gone from the list at once; the refresh restores it if the delete fails.
+    updateApiCache<FixedExpense[]>('fixed-expenses', rows =>
+      rows.filter(row => row.id !== fixedExpense.id)
+    )
+
     try {
       await localApiService.request({
         endPoint: `/proxy/delete-fixed-expense?id=${fixedExpense.id}`,
@@ -241,7 +249,7 @@ export default function FixedExpensesPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshFixedExpenses()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -267,7 +275,7 @@ export default function FixedExpensesPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshFixedExpenses()
     } catch (error) {
       if (error instanceof HttpError && error.status === 409) {
         toast({
@@ -276,7 +284,7 @@ export default function FixedExpensesPage({
           status: 'warning',
           isClosable: true
         })
-        router.replace(router.asPath)
+        await refreshFixedExpenses()
       } else
         toast({
           title: t('toast.error.title'),
@@ -352,6 +360,18 @@ export default function FixedExpensesPage({
     </Box>
   )
 
+  // First load: the page's skeleton, not its empty states.
+  const PageSkeleton = getPageSkeleton(router.pathname)
+  if (
+    fixedExpensesQuery.data === undefined &&
+    !fixedExpensesQuery.error &&
+    PageSkeleton
+  )
+    return (
+      <ProsperoLayout title={t('title')} pageDescription={t('title')}>
+        <PageSkeleton />
+      </ProsperoLayout>
+    )
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
@@ -654,33 +674,15 @@ export default function FixedExpensesPage({
   )
 }
 
-export const getServerSideProps: GetServerSideProps = withClientIp(
-  async ({ req, res, locale }) => {
-    const { session, redirect } = await getValidSession(req, res)
-    if (redirect) return redirect
-
-    let fixedExpenses: FixedExpense[] = []
-
-    if (session?.accessToken)
-      try {
-        fixedExpenses = (await getFixedExpenses(
-          {},
-          { authorization: `Bearer ${session.accessToken}`, lang: locale }
-        )) as FixedExpense[]
-      } catch (error) {
-        fixedExpenses = []
-      }
-
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, [
-          'common',
-          'sidebar',
-          'mobileNav',
-          'fixedExpenses'
-        ])),
-        fixedExpenses
-      }
-    }
+// Translations only: the data is loaded client-side (see useApi above) and
+// the middleware already guards the route.
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale as string, [
+      'common',
+      'sidebar',
+      'mobileNav',
+      'fixedExpenses'
+    ]))
   }
-)
+})

@@ -280,5 +280,9 @@
     "heading": "Sin conexión",
     "text": "No pudimos cargar esta pantalla. Revisá tu conexión e intentá de nuevo; tus datos siguen guardados en tu cuenta.",
     "retry": "Reintentar"
+  },
+  "swUpdate": {
+    "text": "Hay una nueva versión de Prospero.",
+    "action": "Actualizar"
   }
 }

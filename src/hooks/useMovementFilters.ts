@@ -86,11 +86,13 @@ export const useMovementFilters = (allowedGroups: readonly string[]) => {
       setSearchInput('')
       return setFilters(EMPTY_MOVEMENT_FILTERS)
     },
+    // Shallow: the screens load their data with SWR keyed by the period, so
+    // switching periods doesn't need a server round trip.
     setPeriod: (nextPeriod: string | undefined) =>
       router.push(
         { pathname: router.pathname, query: buildQuery(filters, nextPeriod) },
         undefined,
-        { scroll: false }
+        { shallow: true, scroll: false }
       )
   }
 }

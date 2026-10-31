@@ -31,7 +31,7 @@ commits must follow Conventional Commits.
 
 ## Architecture
 
-Next.js **Pages Router** (not App Router) frontend for **Prospero**, a personal-finance /
+Next.js 15 **Pages Router** (not App Router, React 18, Node 22) frontend for **Prospero**, a personal-finance /
 budgeting app that talks to `prospero-backend`. Chakra UI + Emotion for styling/theming
 (`src/themes`), `next-i18next` for i18n (`public/locales`, `next-i18next.config.js`).
 
@@ -55,6 +55,15 @@ with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthTo
 `POST /proxy/login-verify-2fa` for the real token set before calling `signIn` the same way. Don't
 confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
 already-authenticated session; it's unrelated to the login gate.
+
+#### Deploy
+
+The image only gets non-secret build args (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`);
+`NEXTAUTH_SECRET` reaches the container at runtime through `docker-compose.yml` (the deploy
+job's env, from GitHub secrets) — middleware and NextAuth read it at runtime. The deploy job
+deploys the commit-SHA image (`IMAGE_TAG`), tags the running one `:rollback` first, runs
+`docker compose up -d --wait` against the `GET /api/health` healthcheck and rolls back if the
+new container never turns healthy.
 
 #### Server-side calls to the backend
 
@@ -135,27 +144,37 @@ call happens:
   handling was also fixed to stop swallowing the real status/message — see git history).
   `apiService.ts`'s `HttpError` class carries the real upstream status end-to-end through this
   chain; don't go back to throwing plain `Error`s there.
-- **`getServerSideProps`** (page-load data fetching) calls the same `src/services/*` functions
-  **directly**, no proxy hop needed since it already runs on the server — see
-  `requestProfile`/`getSalaryDetails`/`getTransactions` used this way in `profile/index.tsx`,
-  `dashboard.tsx`, `entries.tsx`, `expenditures.tsx`, `settings.tsx`. After a client-side
-  create/update/delete, these pages call `router.replace(router.asPath)` to force
-  `getServerSideProps` to refetch rather than keeping separate client-side cache state.
+- **Main screens load data client-side with SWR** — `dashboard`, `expenditures`, `entries`,
+  `fixed-expenses` (and the sidebar's pending badge) use `useApi(path, query)` from
+  `src/lib/useApi.ts`, which GETs `/api/proxy/read/<path>`: a read-only pass-through with a
+  closed allowlist of backend paths (`pages/api/proxy/read/[...path].ts`). Those pages only have
+  `getStaticProps` for translations (the middleware guards them), so navigating, switching
+  periods (`setPeriod` is shallow) and saving never go through the server. After a mutation they
+  call `useRevalidateApi()(...prefixes)` (e.g. `'periods', 'transactions', 'review-queue'`);
+  deletes first drop the row with `useUpdateApiCache()` and the revalidation restores it if the
+  request failed. The SWR cache is **in memory only** and scoped to the signed-in user
+  (`components/ui/UserScopedSWR.tsx` in `_app`) — never persist it. First load shows the page's
+  skeleton (`getPageSkeleton`), not its empty state.
+- **`getServerSideProps`** remains on `profile/*` and `settings.tsx`: it calls the same
+  `src/services/*` functions **directly** (no proxy hop on the server), and those pages still
+  `router.replace(router.asPath)` after a mutation.
 
 ### Web Push notifications
 
 Standard Web Push (VAPID, **not** Firebase). Pieces:
 
-- `worker/index.js` (repo root) — custom service worker code. next-pwa 5.6 picks up
-  `worker/index.{js,ts}` by default (`customWorkerDir: 'worker'`), bundles it as
-  `public/worker-<buildId>.js` and adds it to the generated `public/sw.js` via
-  `importScripts(...)`. Handles `push` (JSON payload `{ title, body, url, tag }`, tolerant of
+- `src/sw.ts` — the service worker, built by **Serwist** (`@serwist/next`, configured in
+  `next.config.js`) into `public/sw.js` — the same URL next-pwa used, so existing push
+  subscriptions survive. Handles `push` (JSON payload `{ title, body, url, tag }`, tolerant of
   empty/malformed payloads) and `notificationclick` (focuses + navigates an existing same-origin
-  tab, or opens one; non-same-origin `url`s fall back to `/dashboard`). Not linted/type-checked
-  (outside `src/`).
-  next-pwa compiles it with `babel-loader`, resolved from the project root — under pnpm's strict
-  layout it isn't hoisted, which is why `babel-loader` is an explicit devDependency. If the build
-  log says `[PWA] Failed to build custom worker`, `sw.js` ships without push handlers.
+  tab, or opens one; non-same-origin `url`s fall back to `/dashboard`). Caching: Serwist's
+  `defaultCache` for static assets, but every cache that would hold user data (`next-data`,
+  `apis`, `pages*`, `others`) is `NetworkOnly`, and those caches are deleted on activate. Offline
+  navigations fall back to the precached `/_offline` page. Precache from `public/` is limited to
+  `icons/`, `manifest.json`, `favicon.ico` (never `assets/`). `skipWaiting: false`:
+  `components/ui/ServiceWorkerUpdater.tsx` registers the worker and, when a new one is waiting,
+  shows a "new version" toast; accepting posts SKIP_WAITING and reloads once it takes control.
+  `@serwist/next` is ESM-only — `next.config.js` `require`s it, which needs Node 22.12+.
 - `src/lib/webPush.ts` — browser-side logic: support/iOS/standalone detection, VAPID key
   decoding, subscribe/unsubscribe against the proxies, typed `PushSubscriptionError` codes.
 - `src/hooks/usePushSubscription.ts` — React state over that lib (availability, permission,
@@ -166,7 +185,7 @@ Standard Web Push (VAPID, **not** Firebase). Pieces:
 - Product rule: while the user has push active on any device, the backend sends the Gmail
   "items to review" alert by push instead of email (falls back to email only if push fails).
 
-**Testing locally:** next-pwa is disabled under `NODE_ENV=development`, so `pnpm dev` has no
+**Testing locally:** Serwist is disabled under `NODE_ENV=development`, so `pnpm dev` has no
 service worker and the toggle shows the "no service worker" state. Use `pnpm build && pnpm start`
 instead; browsers allow push on `http://localhost` without HTTPS (any other host needs HTTPS).
 iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+).
@@ -190,9 +209,10 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
   `signOutAndUnsubscribePush`, …).
 - `src/hooks`, `src/interfaces`, `src/types`, `src/enums` — shared frontend-only types/enums
   (e.g. `HttpMethod`) and hooks (e.g. `usePushSubscription`).
-- `worker/` — custom service worker source bundled into `public/sw.js` by next-pwa (see Web Push
-  above). `public/sw.js`, `public/workbox-*.js` and `public/worker-*.js` are build output
-  (gitignored).
+- `src/sw.ts` — service worker source, built into `public/sw.js` by Serwist (see Web Push
+  above). `public/sw.js` is build output (gitignored).
+- `src/themes/fonts/` — Montserrat 400/600/700 (OFL), loaded with `next/font/local` in
+  `themes/fonts.tsx` (not `next/font/google`: the build must not depend on reaching Google).
 
 ### Related repo
 

@@ -2,19 +2,11 @@ import { ProsperoLayout } from '@/components/layouts'
 import { GenericSection } from '@/components/layouts/GenericSection'
 import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { DashboardSummaryCard } from '@/components/ui/DashboardSummaryCard'
+import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RecentActivityList } from '@/components/ui/RecentActivityList'
-import { getValidSession } from '@/lib'
-import { withClientIp } from '@/lib/server/clientIp'
-import {
-  getCurrentPeriod,
-  getMonthSummary,
-  MonthSummary,
-  PeriodSummary
-} from '@/services/periods'
-import {
-  getReviewQueueSummary,
-  ReviewQueueSummary
-} from '@/services/reviewQueue'
+import { useApi } from '@/lib/useApi'
+import { MonthSummary, PeriodSummary } from '@/services/periods'
+import { ReviewQueueSummary } from '@/services/reviewQueue'
 import {
   Alert,
   AlertDescription,
@@ -30,7 +22,7 @@ import {
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
@@ -43,13 +35,6 @@ import {
   MdCalendarToday,
   MdMarkEmailUnread
 } from 'react-icons/md'
-
-interface DashboardProps {
-  period: PeriodSummary | null
-  /** `null` si falló: la sección del mes simplemente no se muestra. */
-  month: MonthSummary | null
-  reviewQueue: ReviewQueueSummary | null
-}
 
 /** Movimientos que Gmail detectó y esperan confirmación (spec §6): arriba
  * de todo. Ya suman en los totales (el backend no los excluye), pero sin
@@ -140,9 +125,20 @@ const BudgetEmptyState = () => {
   )
 }
 
-const Dashboard = ({ period, month, reviewQueue }: DashboardProps) => {
+const Dashboard = () => {
   const { t } = useTranslation('common')
   const router = useRouter()
+  // Client-side data (SWR), each part independent: if the month summary or
+  // the review queue fails, the rest of the dashboard still shows (only the
+  // current period is essential). No current period yet (no payroll) is a
+  // 404 and shows the empty state.
+  const periodQuery = useApi<PeriodSummary>('periods/current')
+  const monthQuery = useApi<MonthSummary>('periods/month')
+  const reviewQueueQuery = useApi<ReviewQueueSummary>('review-queue/summary')
+  const period = periodQuery.data ?? null
+  /** `null` si falló: la sección del mes simplemente no se muestra. */
+  const month = monthQuery.data ?? null
+  const reviewQueue = reviewQueueQuery.data ?? null
   const captionColor = useColorModeValue('gray.600', 'gray.400')
   const locale = router.locale ?? 'es'
   // timeZone UTC: misma convención que el resto de las fechas de la app,
@@ -205,6 +201,17 @@ const Dashboard = ({ period, month, reviewQueue }: DashboardProps) => {
     </Link>
   )
 
+  // First load: the dashboard's skeleton, not the "no period yet" state.
+  const PageSkeleton = getPageSkeleton(router.pathname)
+  if (periodQuery.data === undefined && !periodQuery.error && PageSkeleton)
+    return (
+      <ProsperoLayout
+        title={t('dashboard.pageTitle')}
+        pageDescription={t('dashboard.pageDescription')}
+      >
+        <PageSkeleton />
+      </ProsperoLayout>
+    )
   return (
     <ProsperoLayout
       title={t('dashboard.pageTitle')}
@@ -321,47 +328,16 @@ const Dashboard = ({ period, month, reviewQueue }: DashboardProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = withClientIp(
-  async ({ req, res, locale }) => {
-    const { session, redirect } = await getValidSession(req, res)
-    if (redirect) return redirect
-
-    let period: PeriodSummary | null = null
-    let month: MonthSummary | null = null
-    let reviewQueue: ReviewQueueSummary | null = null
-
-    if (session?.accessToken) {
-      const params = {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      }
-      // allSettled: si falla el resumen del mes o el de pendientes, el resto
-      // del dashboard igual se muestra (solo el período es imprescindible).
-      const [periodResult, monthResult, reviewResult] =
-        await Promise.allSettled([
-          getCurrentPeriod(null, params),
-          getMonthSummary(null, params),
-          getReviewQueueSummary(null, params) as Promise<ReviewQueueSummary>
-        ])
-      period = periodResult.status === 'fulfilled' ? periodResult.value : null
-      month = monthResult.status === 'fulfilled' ? monthResult.value : null
-      reviewQueue =
-        reviewResult.status === 'fulfilled' ? reviewResult.value : null
-    }
-
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, [
-          'common',
-          'sidebar',
-          'mobileNav'
-        ])),
-        period,
-        month,
-        reviewQueue
-      }
-    }
+// Translations only: the data is loaded client-side (see useApi above) and
+// the middleware already guards the route.
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale as string, [
+      'common',
+      'sidebar',
+      'mobileNav'
+    ]))
   }
-)
+})
 
 export default Dashboard

@@ -8,7 +8,7 @@ const SHOW_DELAY_MS = 150
 
 /** "/en/expenditures?period=initial" → "/expenditures": el pathname de
  * página, comparable con `router.pathname`. */
-const toPathname = (url: string, locales: string[] = []): string => {
+const toPathname = (url: string, locales: readonly string[] = []): string => {
   const path = url.split(/[?#]/)[0]
   const prefix = locales.find(
     locale => path === `/${locale}` || path.startsWith(`/${locale}/`)

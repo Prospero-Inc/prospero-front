@@ -1,7 +1,9 @@
 services:
   app:
     container_name: prospero-frontend
-    image: ghcr.io/prospero-inc/prospero-front:latest
+    # IMAGE_TAG = the commit SHA in the deploy job (or `rollback`);
+    # `latest` only for a manual run without it.
+    image: ghcr.io/prospero-inc/prospero-front:${IMAGE_TAG:-latest}
     # No volumes on purpose: the image already contains the full build. A
     # `.:/usr/src/app` bind mount here overlaid the runner's git checkout on
     # top of it, hiding every build-generated file under public/ (next-pwa's
@@ -13,10 +15,24 @@ services:
       # out through Caddy (which would replace the client's X-Forwarded-For).
       API_INTERNAL_URL: http://prospero-service:3000/api
       NEXTAUTH_URL_INTERNAL: http://localhost:3000
+      # Runtime only (from the deploy job's secrets), never baked into the image.
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
     # Loopback only: Caddy on the host is the only client, and the server
     # trusts the X-Forwarded-For it receives (see src/lib/server/clientIp.ts).
     ports:
       - '127.0.0.1:4000:3000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       - prospero
 networks:
