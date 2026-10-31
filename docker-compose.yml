@@ -7,8 +7,16 @@ services:
     # top of it, hiding every build-generated file under public/ (next-pwa's
     # sw.js, workbox-*.js, worker-*.js are gitignored) → /sw.js was a 404 in
     # prod, so the PWA/Web Push service worker never registered.
+    environment:
+      # Server-side calls reach the backend over the `prospero` network and
+      # NextAuth's self-calls stay inside the container, so neither goes back
+      # out through Caddy (which would replace the client's X-Forwarded-For).
+      API_INTERNAL_URL: http://prospero-service:3000/api
+      NEXTAUTH_URL_INTERNAL: http://localhost:3000
+    # Loopback only: Caddy on the host is the only client, and the server
+    # trusts the X-Forwarded-For it receives (see src/lib/server/clientIp.ts).
     ports:
-      - '4000:3000'
+      - '127.0.0.1:4000:3000'
     networks:
       - prospero
 networks:

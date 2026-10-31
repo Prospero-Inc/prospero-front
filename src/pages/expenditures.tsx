@@ -21,6 +21,7 @@ import {
   hasActiveMovementFilters,
   matchesMovementFilters
 } from '@/lib/movementFilters'
+import { withClientIp } from '@/lib/server/clientIp'
 import {
   getPeriods,
   getPeriodTransactions,
@@ -870,69 +871,65 @@ export default function ExpendituresPage({
 
 const PENDING_STATUSES = ['Detected', 'PendingReview']
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale,
-  defaultLocale,
-  query
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale, defaultLocale, query }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  const period = typeof query.period === 'string' ? query.period : undefined
-  let transactions: Transaction[] = []
-  let pendingTransactions: Transaction[] = []
-  let periods: PeriodSummary[] = []
+    const period = typeof query.period === 'string' ? query.period : undefined
+    let transactions: Transaction[] = []
+    let pendingTransactions: Transaction[] = []
+    let periods: PeriodSummary[] = []
 
-  if (session?.accessToken) {
-    const params = {
-      authorization: `Bearer ${session.accessToken}`,
-      lang: locale
-    }
-    try {
-      const [periodTransactions, pending, allPeriods] = await Promise.all([
-        getPeriodTransactions(period, params),
-        getTransactions(
-          { reviewStatus: PENDING_STATUSES.join(',') },
-          params
-        ) as Promise<Transaction[]>,
-        getPeriods(null, params)
-      ])
+    if (session?.accessToken) {
+      const params = {
+        authorization: `Bearer ${session.accessToken}`,
+        lang: locale
+      }
+      try {
+        const [periodTransactions, pending, allPeriods] = await Promise.all([
+          getPeriodTransactions(period, params),
+          getTransactions(
+            { reviewStatus: PENDING_STATUSES.join(',') },
+            params
+          ) as Promise<Transaction[]>,
+          getPeriods(null, params)
+        ])
 
-      // Los pendientes se muestran todos arriba, sin importar el período,
-      // así que se sacan de la lista del período para no duplicarlos.
-      transactions = periodTransactions.filter(
-        transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
-      )
-      pendingTransactions = pending
-      periods = allPeriods
-    } catch (error) {
-      // Link a un período que ya no existe (p. ej. se borró su nómina):
-      // volver al período actual en vez de mostrar la vista vacía.
-      if (period && error instanceof HttpError && error.status === 404)
-        return {
-          redirect: {
-            destination: `${
-              locale && locale !== defaultLocale ? `/${locale}` : ''
-            }/expenditures`,
-            permanent: false
+        // Los pendientes se muestran todos arriba, sin importar el período,
+        // así que se sacan de la lista del período para no duplicarlos.
+        transactions = periodTransactions.filter(
+          transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
+        )
+        pendingTransactions = pending
+        periods = allPeriods
+      } catch (error) {
+        // Link a un período que ya no existe (p. ej. se borró su nómina):
+        // volver al período actual en vez de mostrar la vista vacía.
+        if (period && error instanceof HttpError && error.status === 404)
+          return {
+            redirect: {
+              destination: `${
+                locale && locale !== defaultLocale ? `/${locale}` : ''
+              }/expenditures`,
+              permanent: false
+            }
           }
-        }
+      }
     }
-  }
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'expenditures'
-      ])),
-      transactions,
-      pendingTransactions,
-      periods
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, [
+          'common',
+          'sidebar',
+          'mobileNav',
+          'expenditures'
+        ])),
+        transactions,
+        pendingTransactions,
+        periods
+      }
     }
   }
-}
+)

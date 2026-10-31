@@ -1,6 +1,7 @@
 import { ProsperoLayout } from '@/components/layouts'
 import { HttpMethod } from '@/enums'
 import { getValidSession, localApiService } from '@/lib'
+import { withClientIp } from '@/lib/server/clientIp'
 import { activate2FA } from '@/services'
 import {
   Box,
@@ -271,41 +272,39 @@ const TwoFactorSetup = ({ data: { qr, secret } }: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  locale
-}) => {
-  const { session, redirect } = await getValidSession(req, res)
-  if (redirect) return redirect
+export const getServerSideProps: GetServerSideProps = withClientIp(
+  async ({ req, res, locale }) => {
+    const { session, redirect } = await getValidSession(req, res)
+    if (redirect) return redirect
 
-  try {
-    const data = await activate2FA(
-      {},
-      {
-        lang: locale as string,
-        authorization: `Bearer ${session?.accessToken}`
+    try {
+      const data = await activate2FA(
+        {},
+        {
+          lang: locale as string,
+          authorization: `Bearer ${session?.accessToken}`
+        }
+      )
+      return {
+        props: {
+          ...(await serverSideTranslations(locale as string, [
+            'common',
+            'sidebar',
+            'mobileNav',
+            'profile'
+          ])),
+          data
+        }
       }
-    )
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, [
-          'common',
-          'sidebar',
-          'mobileNav',
-          'profile'
-        ])),
-        data
-      }
-    }
-  } catch (error) {
-    return {
-      redirect: {
-        destination: '/profile',
-        permanent: false
+    } catch (error) {
+      return {
+        redirect: {
+          destination: '/profile',
+          permanent: false
+        }
       }
     }
   }
-}
+)
 
 export default TwoFactorSetup
