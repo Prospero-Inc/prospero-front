@@ -1,3 +1,4 @@
+import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
@@ -38,6 +39,8 @@ export const GmailConnection = ({ connection }: GmailConnectionProps) => {
   const { t } = useTranslation('settings', { keyPrefix: 'gmail' })
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
+  const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const authHeader = { Authorization: `Bearer ${session?.accessToken}` }
 
@@ -178,7 +181,14 @@ export const GmailConnection = ({ connection }: GmailConnectionProps) => {
   }
 
   const onDisconnect = async () => {
-    if (!window.confirm(t('confirmDisconnect'))) return
+    if (
+      !(await confirm({
+        title: t('confirmDisconnect'),
+        confirmLabel: tCommon('confirmSheet.disconnect'),
+        destructive: true
+      }))
+    )
+      return
 
     setIsDisconnecting(true)
     try {

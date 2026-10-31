@@ -79,6 +79,10 @@ const defaultNotificationPreferences: NotificationPreferencesData = {
   budgetAlertEmailEnabled: false
 }
 
+// Sections the "Más" tab links to (#budget, #gmail, #notifications) land
+// below the sticky top bar instead of under it.
+const ANCHOR_OFFSET = '80px'
+
 export default function SettingsPage({
   account,
   budget,
@@ -162,7 +166,13 @@ export default function SettingsPage({
 
         <Divider />
 
-        <Box as="form" method="post" onSubmit={handleSubmit(onSubmit)}>
+        <Box
+          id="budget"
+          scrollMarginTop={ANCHOR_OFFSET}
+          as="form"
+          method="post"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <Heading size="md" mb={3}>
             {t('budget.title')}
           </Heading>
@@ -240,11 +250,15 @@ export default function SettingsPage({
 
         <Divider />
 
-        <GmailConnection connection={gmailConnection} />
+        <Box id="gmail" scrollMarginTop={ANCHOR_OFFSET}>
+          <GmailConnection connection={gmailConnection} />
+        </Box>
 
         <Divider />
 
-        <NotificationPreferences preferences={notificationPreferences} />
+        <Box id="notifications" scrollMarginTop={ANCHOR_OFFSET}>
+          <NotificationPreferences preferences={notificationPreferences} />
+        </Box>
 
         <Divider />
 

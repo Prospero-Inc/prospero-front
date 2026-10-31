@@ -1,6 +1,12 @@
 import '@/styles/globals.css'
 import { ProsperoLayout } from '@/components/layouts'
+import {
+  AppShell,
+  AppShellTitleProvider,
+  usesAppShell
+} from '@/components/layouts/shell'
 import { SessionWatcher } from '@/components/ui'
+import { ConfirmProvider } from '@/components/ui/ConfirmSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
 import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
@@ -61,6 +67,18 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   // (ver `middleware.ts`) antes de renderizar: acá antes se cambiaba del
   // lado del cliente después del primer render, lo que hacía "saltar" de
   // idioma y forzaba inglés a quien entraba por primera vez.
+  const page = PageSkeleton ? (
+    <ProsperoLayout title={t('routeLoading')} pageDescription="">
+      <PageSkeleton />
+    </ProsperoLayout>
+  ) : (
+    <Component {...pageProps} />
+  )
+  // The shell is mounted once and stays while moving between app screens
+  // (same element in the same place), so only the page inside re-renders.
+  const shellPathname =
+    PageSkeleton && targetPathname ? targetPathname : router.pathname
+
   return (
     <ChakraProvider
       theme={theme}
@@ -89,13 +107,15 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             <PendingRouteContext.Provider
               value={PageSkeleton ? targetPathname : null}
             >
-              {PageSkeleton ? (
-                <ProsperoLayout title={t('routeLoading')} pageDescription="">
-                  <PageSkeleton />
-                </ProsperoLayout>
-              ) : (
-                <Component {...pageProps} />
-              )}
+              <ConfirmProvider>
+                <AppShellTitleProvider>
+                  {usesAppShell(shellPathname) ? (
+                    <AppShell>{page}</AppShell>
+                  ) : (
+                    page
+                  )}
+                </AppShellTitleProvider>
+              </ConfirmProvider>
             </PendingRouteContext.Provider>
           </RouteLoadingContext.Provider>
         </UserScopedSWR>

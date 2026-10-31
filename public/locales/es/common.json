@@ -284,5 +284,44 @@
   "swUpdate": {
     "text": "Hay una nueva versión de Prospero.",
     "action": "Actualizar"
+  },
+  "confirmSheet": {
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "disconnect": "Desconectar",
+    "dismiss": "Descartar"
+  },
+  "tabBar": {
+    "label": "Navegación principal",
+    "home": "Inicio",
+    "movements": "Movimientos",
+    "add": "Agregar movimiento",
+    "fixed": "Fijos",
+    "more": "Más",
+    "pending_one": "{{count}} movimiento por revisar",
+    "pending_other": "{{count}} movimientos por revisar"
+  },
+  "more": {
+    "title": "Más",
+    "payFrequency": {
+      "Biweekly": "Pago quincenal",
+      "Monthly": "Pago mensual"
+    },
+    "sections": {
+      "connections": "Conexiones",
+      "account": "Cuenta",
+      "preferences": "Preferencias"
+    },
+    "gmail": "Gmail y bancos",
+    "notifications": "Notificaciones",
+    "budget": "Reparto y frecuencia de pago",
+    "security": "Seguridad y 2FA",
+    "twoFaOn": "Activado",
+    "twoFaOff": "Desactivado",
+    "calculator": "Calculadora de presupuesto",
+    "language": "Idioma",
+    "darkMode": "Modo oscuro",
+    "signOut": "Cerrar sesión"
   }
 }

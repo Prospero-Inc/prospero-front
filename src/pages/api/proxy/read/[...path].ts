@@ -9,6 +9,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 // with SWR (see src/lib/useApi.ts). GET only, and only these backend paths:
 // anything else is a 404 here, so this can't be used to reach other routes.
 const READABLE_PATHS = new Set([
+  'auth/profile',
   'periods',
   'periods/current',
   'periods/month',
