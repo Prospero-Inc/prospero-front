@@ -1,6 +1,7 @@
+import { BalanceHero } from '@/components/dashboard/BalanceHero'
+import { BudgetSplitCard } from '@/components/dashboard/BudgetSplitCard'
 import { ProsperoLayout } from '@/components/layouts'
 import { GenericSection } from '@/components/layouts/GenericSection'
-import { CategoryBudgetBars } from '@/components/ui/CategoryBudgetBars'
 import { DashboardSummaryCard } from '@/components/ui/DashboardSummaryCard'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RecentActivityList } from '@/components/ui/RecentActivityList'
@@ -243,47 +244,20 @@ const Dashboard = () => {
         </Alert>
       ) : (
         <>
-          {reviewQueue && <PendingReviewAlert summary={reviewQueue} />}
-
-          <GenericSection
-            title={t('dashboard.budgetTitle')}
-            caption={periodCaption}
-          >
-            {period.income === 0 ? (
+          {period.income === 0 ? (
+            <GenericSection
+              title={t('dashboard.budgetTitle')}
+              caption={periodCaption}
+            >
               <BudgetEmptyState />
-            ) : (
-              <CategoryBudgetBars
-                necesidad={period.budget.necesidad}
-                deseo={period.budget.deseo}
-                ahorro={period.budget.ahorro}
-              />
-            )}
-          </GenericSection>
-
-          <GenericSection title={t('dashboard.summary.title')}>
-            <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
-              <DashboardSummaryCard
-                label={t('dashboard.summary.income.label')}
-                amount={period.income}
-                icon={MdArrowUpward}
-                accent="teal"
-              />
-              <DashboardSummaryCard
-                label={t('dashboard.summary.spent.label')}
-                amount={period.totalSpent}
-                icon={MdArrowDownward}
-                accent="red"
-              />
-              <DashboardSummaryCard
-                label={t('dashboard.summary.balance.label')}
-                amount={period.balance}
-                helpText={t('dashboard.summary.balance.helpText')}
-                icon={MdAccountBalanceWallet}
-                accent={period.balance < 0 ? 'red' : 'primary'}
-              />
-            </SimpleGrid>
-          </GenericSection>
-
+            </GenericSection>
+          ) : (
+            <BalanceHero period={period} caption={periodCaption} />
+          )}
+          {reviewQueue && <PendingReviewAlert summary={reviewQueue} />}
+          {period.income > 0 && (
+            <BudgetSplitCard budget={period.budget} income={period.income} />
+          )}
           {month && (
             <GenericSection
               title={t('dashboard.month.title', { month: monthName })}

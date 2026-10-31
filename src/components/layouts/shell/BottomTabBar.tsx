@@ -1,3 +1,4 @@
+import { useOpenQuickAdd } from '@/components/quick-add'
 import { useApi } from '@/lib/useApi'
 import type { ReviewQueueSummary } from '@/services/reviewQueue'
 import {
@@ -59,6 +60,7 @@ const TABS: [Tab, Tab, Tab, Tab] = [
 export const BottomTabBar = (props: FlexProps) => {
   const { t } = useTranslation('common')
   const router = useRouter()
+  const openQuickAdd = useOpenQuickAdd()
   const { data: summary } = useApi<ReviewQueueSummary>('review-queue/summary')
   const pending =
     (summary?.pendingTransactions ?? 0) + (summary?.pendingSalaries ?? 0)
@@ -132,8 +134,7 @@ export const BottomTabBar = (props: FlexProps) => {
       {renderTab(TABS[1])}
       <Flex flex={1} justify="center">
         <IconButton
-          as={NextLink}
-          href="/expenditures?new=1"
+          onClick={openQuickAdd}
           aria-label={t('tabBar.add')}
           icon={<Icon as={MdAdd} boxSize={7} />}
           isRound
