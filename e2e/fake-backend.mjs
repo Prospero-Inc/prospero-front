@@ -13,7 +13,29 @@ const user = {
   username: 'ana',
   firstName: 'Ana',
   lastName: 'Martínez',
-  enable2FA: false
+  enable2FA: false,
+  payFrequency: 'Biweekly',
+  needsPercent: 0.5,
+  wantsPercent: 0.3,
+  savingsPercent: 0.2
+}
+
+// Like the real API for a new user: an open period with no income yet
+// (the backend never 404s on /periods/current).
+const emptyBudget = { budgeted: 0, spent: 0, remaining: 0 }
+const emptyCurrentPeriod = {
+  key: 'initial',
+  startDate: null,
+  endDate: null,
+  isOpen: true,
+  income: 0,
+  totalSpent: 0,
+  balance: 0,
+  budget: { necesidad: emptyBudget, deseo: emptyBudget, ahorro: emptyBudget },
+  daysElapsed: null,
+  estimatedNextPaymentDate: null,
+  estimatedDaysRemaining: null,
+  recentTransactions: []
 }
 
 const tokens = () => ({
@@ -34,8 +56,8 @@ const routes = {
   'POST /api/auth/logout': () => [200, {}],
   'GET /api/auth/profile': () => [200, { msg: 'Profile', user }],
   'POST /api/transactions': body => [201, { id: requests.length, ...body }],
-  // Screens load these with SWR. Empty lists; no current period (no payroll
-  // yet) is a 404, which the dashboard shows as its empty state.
+  // Screens load these with SWR: a new user with no data yet.
+  'GET /api/periods/current': () => [200, emptyCurrentPeriod],
   'GET /api/periods': () => [200, []],
   'GET /api/periods/transactions': () => [200, []],
   'GET /api/periods/salary': () => [200, []],

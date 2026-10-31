@@ -114,7 +114,7 @@ export default function MorePage() {
   const { data } = useApi<{ user: Profile }>('auth/profile')
   const profile = data?.user
 
-  const splitSummary = profile
+  const splitSummary = profile?.payFrequency
     ? `${t(`more.payFrequency.${profile.payFrequency}`)} · ${percent(
         profile.needsPercent
       )} / ${percent(profile.wantsPercent)} / ${percent(
