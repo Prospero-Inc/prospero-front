@@ -147,7 +147,7 @@
     "budgetEmpty": {
       "heading": "Aún no registraste un ingreso para este período",
       "description": "Prospero calcula tu presupuesto a partir de tu último pago. Registrá uno para ver el desglose.",
-      "cta": "Registrar ingreso"
+      "cta": "Configurar mi presupuesto"
     },
     "error": {
       "heading": "No pudimos cargar tu período actual",
@@ -410,6 +410,38 @@
     "empty": {
       "title": "Sin movimientos en este período",
       "description": "Lo que registres con el botón + va a aparecer acá."
+    }
+  },
+  "welcome": {
+    "pageTitle": "Primeros pasos · Prospero",
+    "step": "Paso {{step}} de {{total}}",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "error": "No pudimos guardar. Intentá de nuevo.",
+    "frequency": {
+      "title": "¿Cada cuánto te pagan?",
+      "hint": "Prospero arma tu presupuesto desde la fecha de cada pago, no desde el mes del calendario.",
+      "Biweekly": "Cada quincena",
+      "Monthly": "Una vez al mes"
+    },
+    "split": {
+      "title": "¿Cómo querés repartir cada pago?",
+      "hint": "Podés cambiarlo cuando quieras en Más → Reparto y frecuencia de pago.",
+      "recommended": "Recomendado: 50 / 30 / 20",
+      "custom": "Personalizado",
+      "needs": "Necesidades",
+      "wants": "Deseos",
+      "savings": "Ahorro",
+      "increase": "Subir {{name}}",
+      "decrease": "Bajar {{name}}"
+    },
+    "income": {
+      "title": "Registrá tu último pago",
+      "hint": "Con eso ya ves cuánto te queda para este período.",
+      "amount": "Monto",
+      "date": "Fecha del pago",
+      "save": "Guardar y empezar",
+      "later": "Lo hago después"
     }
   }
 }

@@ -147,7 +147,7 @@
     "budgetEmpty": {
       "heading": "You haven't logged an income for this period yet",
       "description": "Prospero calculates your budget from your last payment. Log one to see the breakdown.",
-      "cta": "Log income"
+      "cta": "Set up my budget"
     },
     "error": {
       "heading": "We couldn't load your current period",
@@ -410,6 +410,38 @@
     "empty": {
       "title": "No movements in this period",
       "description": "What you log with the + button shows up here."
+    }
+  },
+  "welcome": {
+    "pageTitle": "First steps · Prospero",
+    "step": "Step {{step}} of {{total}}",
+    "continue": "Continue",
+    "back": "Back",
+    "error": "We couldn't save. Please try again.",
+    "frequency": {
+      "title": "How often are you paid?",
+      "hint": "Prospero builds your budget from each payday, not from the calendar month.",
+      "Biweekly": "Every two weeks",
+      "Monthly": "Once a month"
+    },
+    "split": {
+      "title": "How do you want to split each payment?",
+      "hint": "You can change it anytime in More → Split and pay frequency.",
+      "recommended": "Recommended: 50 / 30 / 20",
+      "custom": "Custom",
+      "needs": "Needs",
+      "wants": "Wants",
+      "savings": "Savings",
+      "increase": "Raise {{name}}",
+      "decrease": "Lower {{name}}"
+    },
+    "income": {
+      "title": "Log your last payment",
+      "hint": "That's all it takes to see what's left this period.",
+      "amount": "Amount",
+      "date": "Payment date",
+      "save": "Save and start",
+      "later": "I'll do it later"
     }
   }
 }
