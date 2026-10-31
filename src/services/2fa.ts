@@ -20,16 +20,23 @@ const activate2FA = async (_ignore: unknown, params: Params | unknown) => {
     })
 }
 
-const disable2FA = async (_ignore: unknown, params: Params | unknown) => {
+const disable2FA = async (
+  data: { token: string },
+  params: Params | unknown
+) => {
   const { lang, authorization } = params as Params
+  const { token } = data
 
   return await externalApiService
     .request({
-      method: HttpMethod.GET,
+      method: HttpMethod.POST,
       endPoint: '/auth/disable-2fa',
       headers: {
         'x-lang': `${lang}`,
         Authorization: authorization
+      },
+      data: {
+        token
       }
     })
     .catch((error: unknown) => {

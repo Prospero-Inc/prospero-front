@@ -157,7 +157,7 @@ const refreshAccessToken = async (token: JWT): Promise<JWT> => {
 
 export const config: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
+  debug: process.env.NODE_ENV !== 'production',
   providers: [
     CredentialsProvider({
       name: 'Credentials',
