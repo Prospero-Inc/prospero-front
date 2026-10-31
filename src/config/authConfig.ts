@@ -40,6 +40,37 @@ interface RefreshTokenResponse {
 // `localApiService` uses in the browser) doesn't resolve here — build an
 // absolute one from the same env vars `.env.example` documents for that
 // purpose.
+interface ProfileResponse {
+  user: {
+    id: number
+    email: string
+    firstName: string | null
+    lastName: string | null
+  }
+}
+
+/**
+ * Resolves an access token to its user via GET /auth/profile, or null when
+ * the backend rejects it (forged, expired or not an access token).
+ */
+const fetchVerifiedUser = async (accessToken: string): Promise<User | null> => {
+  try {
+    const { user } = await externalApiService.request<ProfileResponse>({
+      endPoint: '/auth/profile',
+      method: HttpMethod.GET,
+      headers: { Authorization: `Bearer ${accessToken}` }
+    })
+
+    return {
+      id: String(user.id),
+      name: [user.firstName, user.lastName].filter(Boolean).join(' '),
+      email: user.email
+    }
+  } catch {
+    return null
+  }
+}
+
 const getSelfBaseUrl = () =>
   (process.env.NEXTAUTH_URL_INTERNAL || process.env.NEXTAUTH_URL || '').replace(
     /\/$/,
@@ -173,7 +204,6 @@ export const config: AuthOptions = {
         // required, the 2FA challenge) has already been resolved against
         // the backend by the login pages — see LoginView / verify-2fa.tsx.
         accessToken: { label: 'Access Token', type: 'text' },
-        user: { label: 'User', type: 'text' },
         refreshToken: { label: 'Refresh Token', type: 'text' },
         accessTokenExpiresIn: {
           label: 'Access Token Expires In',
@@ -185,15 +215,22 @@ export const config: AuthOptions = {
       ): Promise<UserExtended | null> => {
         if (!credentials) throw new Error('No credentials provided')
 
-        if (credentials.accessToken && credentials.user)
+        // This endpoint is public: anyone can post an arbitrary token and
+        // user here. Never trust them — the session's user is whoever the
+        // backend says the token belongs to.
+        if (credentials.accessToken) {
+          const user = await fetchVerifiedUser(credentials.accessToken)
+          if (!user) return null
+
           return {
-            ...(JSON.parse(credentials.user) as User),
+            ...user,
             accessToken: credentials.accessToken,
             refreshToken: credentials.refreshToken,
             accessTokenExpiresIn: credentials.accessTokenExpiresIn
               ? Number(credentials.accessTokenExpiresIn)
               : undefined
           }
+        }
 
         const { email, password, lang } = credentials
         const response = await externalApiService.request<UserResponse>({

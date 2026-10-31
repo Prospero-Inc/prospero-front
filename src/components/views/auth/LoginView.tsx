@@ -85,7 +85,6 @@ export const LoginView = () => {
         accessToken: loginResponse.accessToken,
         refreshToken: loginResponse.refreshToken,
         accessTokenExpiresIn: String(loginResponse.accessTokenExpiresIn),
-        user: JSON.stringify(loginResponse.user),
         redirect: false,
         callbackUrl: '/dashboard'
       })
