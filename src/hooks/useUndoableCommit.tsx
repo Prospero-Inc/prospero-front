@@ -72,23 +72,32 @@ export const useUndoableCommit = () => {
         duration: UNDO_WINDOW_MS,
         position: 'bottom',
         render: ({ onClose }) => (
+          // docs/diseno-mobile.html .toast: 52 px dark pill, "Deshacer" in
+          // light brand. Screens using it (Por revisar) have no tab bar.
           <Flex
-            bg="gray.800"
+            bg="toast.bg"
             color="white"
-            p={3}
-            pl={4}
-            borderRadius="lg"
+            h="52px"
+            w="calc(100vw - 32px)"
+            maxW="md"
+            px="16px"
+            borderRadius="16px"
             align="center"
             gap={3}
+            fontSize="14px"
             boxShadow="lg"
-            mb="calc(72px + env(safe-area-inset-bottom))"
+            mb="calc(26px + env(safe-area-inset-bottom))"
           >
-            <Text flex={1}>{message}</Text>
+            <Text flex={1} noOfLines={1}>
+              {message}
+            </Text>
             <Button
-              size="sm"
-              variant="ghost"
-              color="white"
-              _hover={{ bg: 'whiteAlpha.200' }}
+              variant="unstyled"
+              minW="44px"
+              h="44px"
+              fontSize="14px"
+              fontWeight="bold"
+              color="#A9A8FF"
               onClick={() => {
                 const entry = pending.current.get(key)
                 if (entry) {

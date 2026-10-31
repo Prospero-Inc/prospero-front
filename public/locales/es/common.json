@@ -33,7 +33,11 @@
         "minLength": "Contraseña debe tener almenos 8 caracteres",
         "matches": "Contraseña debe contener al menos una minuscula,una mayuscula,un digito,un caracter especial, y un punto"
       }
-    }
+    },
+    "welcome": "Hola de nuevo",
+    "tagline": "Tu presupuesto, anclado a tus fechas de pago.",
+    "noAccount": "¿No tenés cuenta?",
+    "createAccount": "Crear cuenta"
   },
   "register": {
     "heading": "Crear una Cuenta",
@@ -349,7 +353,14 @@
     "calculator": "Calculadora de presupuesto",
     "language": "Idioma",
     "darkMode": "Modo oscuro",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "gmailConnected": "Conectado",
+    "gmailDisconnected": "Sin conectar",
+    "push": "Push",
+    "languageName": {
+      "es": "Español",
+      "en": "English"
+    }
   },
   "quickAdd": {
     "title": "Nuevo movimiento",
@@ -404,7 +415,16 @@
       "title": "Todo al día",
       "description": "No hay movimientos de Gmail esperando tu revisión.",
       "action": "Ver movimientos"
-    }
+    },
+    "progress": "{{done}} de {{total}} revisados",
+    "confirmedItem": "{{name}} confirmado",
+    "discardedItem": "{{name}} descartado",
+    "purchase": "Compra",
+    "possibleIncome": "Posible ingreso",
+    "discard": "Descartar",
+    "editFirst": "Editar antes de guardar",
+    "today": "hoy",
+    "yesterday": "ayer"
   },
   "movements": {
     "title": "Movimientos",
@@ -452,18 +472,22 @@
       "title": "¿Cada cuánto te pagan?",
       "hint": "Prospero arma tu presupuesto desde la fecha de cada pago, no desde el mes del calendario.",
       "Biweekly": "Cada quincena",
-      "Monthly": "Una vez al mes"
+      "Monthly": "Una vez al mes",
+      "BiweeklyHint": "Dos pagos al mes, aunque las fechas varíen",
+      "MonthlyHint": "Un solo pago cada mes"
     },
     "split": {
       "title": "¿Cómo querés repartir cada pago?",
-      "hint": "Podés cambiarlo cuando quieras en Más → Reparto y frecuencia de pago.",
+      "hint": "Podés cambiarlo cuando quieras en Más → Perfil.",
       "recommended": "Recomendado: 50 / 30 / 20",
       "custom": "Personalizado",
       "needs": "Necesidades",
       "wants": "Deseos",
       "savings": "Ahorro",
       "increase": "Subir {{name}}",
-      "decrease": "Bajar {{name}}"
+      "decrease": "Bajar {{name}}",
+      "recommendedHint": "Necesidades, deseos y ahorro",
+      "customHint": "Elegí tus propios porcentajes"
     },
     "income": {
       "title": "Registrá tu último pago",

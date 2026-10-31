@@ -10,7 +10,12 @@ interface ShellTitle {
   title: string
   /** Small line above the title (e.g. "Hola, Ana" on Inicio). */
   greeting?: string
+  /** Right side of the phone top bar: the avatar menu (default), nothing,
+   * or a round close button back to `closeHref` (sub-screens). */
+  trailing?: TopBarTrailing
 }
+
+export type TopBarTrailing = 'avatar' | 'none' | { closeHref: string }
 
 const TitleContext = createContext<{
   value: ShellTitle
@@ -34,7 +39,15 @@ export const AppShellTitleProvider = ({
 export const useAppShellTitle = () => useContext(TitleContext).value
 
 /** Pages (through ProsperoLayout) announce their title to the top bar. */
-export const useSetAppShellTitle = (title: string, greeting?: string) => {
+export const useSetAppShellTitle = (
+  title: string,
+  greeting?: string,
+  trailing: TopBarTrailing = 'avatar'
+) => {
   const { setValue } = useContext(TitleContext)
-  useEffect(() => setValue({ title, greeting }), [title, greeting, setValue])
+  const trailingKey = JSON.stringify(trailing)
+  useEffect(
+    () => setValue({ title, greeting, trailing: JSON.parse(trailingKey) }),
+    [title, greeting, trailingKey, setValue]
+  )
 }

@@ -66,7 +66,10 @@ test('"Más" gathers profile, connections and preferences', async ({ page }) => 
   ).toBeVisible()
   await expect(page.getByRole('link', { name: 'Ana Martínez' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Gmail y bancos' })).toBeVisible()
-  await expect(page.getByLabel('Modo oscuro', { exact: true })).toBeVisible()
+  const darkMode = page.getByRole('switch', { name: 'Modo oscuro' })
+  await expect(darkMode).toHaveAttribute('aria-checked', 'false')
+  await darkMode.click()
+  await expect(darkMode).toHaveAttribute('aria-checked', 'true')
   await expect(
     page.getByRole('button', { name: 'Cerrar sesión' })
   ).toBeVisible()

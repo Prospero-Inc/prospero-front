@@ -1,3 +1,4 @@
+import { CloseIcon } from '@/components/icons/app'
 import { useAppShellTitle } from '@/components/layouts/shell/AppShellTitle'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
@@ -21,6 +22,7 @@ import {
 } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { FiChevronDown } from 'react-icons/fi'
 import { GoSun, GoMoon } from 'react-icons/go'
@@ -38,7 +40,8 @@ export const MobileNav = (props: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
-  const { title, greeting } = useAppShellTitle()
+  const { title, greeting, trailing = 'avatar' } = useAppShellTitle()
+  const closeHref = typeof trailing === 'object' ? trailing.closeHref : null
   if (status === 'loading') return null
 
   const handleChangeColorMode = () => {
@@ -97,7 +100,29 @@ export const MobileNav = (props: MobileProps) => {
         <Box display={{ base: 'none', md: 'block' }}>
           <SwitchLanguage />
         </Box>
-        <Flex alignItems={'center'}>
+        {closeHref && (
+          <IconButton
+            as={NextLink}
+            href={closeHref}
+            display={{ base: 'flex', md: 'none' }}
+            aria-label={t('close')}
+            icon={<CloseIcon boxSize="16px" />}
+            boxSize="36px"
+            minW="36px"
+            borderRadius="full"
+            bg="button.soft"
+            color="text.primary"
+          />
+        )}
+        {/* Phone: only the screens that keep the avatar show it (Más and
+            sub-screens like Por revisar don't, per the design). */}
+        <Flex
+          alignItems={'center'}
+          display={{
+            base: trailing === 'avatar' ? 'flex' : 'none',
+            md: 'flex'
+          }}
+        >
           <Menu>
             <MenuButton
               aria-label={t('userMenu')}

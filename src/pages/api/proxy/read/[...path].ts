@@ -18,7 +18,8 @@ const READABLE_PATHS = new Set([
   'transactions',
   'salary',
   'fixed-expenses',
-  'review-queue/summary'
+  'review-queue/summary',
+  'gmail/connection'
 ])
 
 const toQuery = (query: NextApiRequest['query']): Record<string, string> =>

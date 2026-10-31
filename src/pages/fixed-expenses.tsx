@@ -1,10 +1,10 @@
+import { DayHeader } from '@/components/design'
+import { CheckIcon, PlusIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
-import {
-  CategoryBadge,
-  useMovementFormatters
-} from '@/components/ui/MovementSummary'
+import { useMovementFormatters } from '@/components/ui/MovementSummary'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
@@ -17,41 +17,20 @@ import {
 } from '@/lib/fixedExpenseDue'
 import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
 import { FixedExpenseData } from '@/services/fixedExpenses'
-import { BudgetCategory } from '@/services/transactions'
 import {
-  Badge,
   Box,
   Button,
-  Card,
-  CardBody,
   Checkbox,
-  Divider,
   Flex,
   FormControl,
   FormHelperText,
   FormLabel,
-  Heading,
-  Icon,
-  IconButton,
   Input,
   Select,
-  SimpleGrid,
   Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue,
   useDisclosure,
-  useToast,
-  VisuallyHidden
+  useToast
 } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
@@ -60,13 +39,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  MdAdd,
-  MdCheckCircle,
-  MdDelete,
-  MdEdit,
-  MdEventRepeat
-} from 'react-icons/md'
+import { MdEventRepeat } from 'react-icons/md'
 
 interface FixedExpense extends FixedExpenseData {
   id: number
@@ -124,12 +97,12 @@ export default function FixedExpensesPage() {
   const { data: session } = useSession()
   const { formatAmount } = useMovementFormatters()
   const today = useToday()
-  const mutedColor = useColorModeValue('gray.600', 'gray.400')
-  const summaryBg = useColorModeValue('gray.50', 'gray.700')
   const [isLoading, setIsLoading] = useState(false)
   const [payingId, setPayingId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const formDrawer = useDisclosure()
+  const editingFixedExpense =
+    fixedExpenses.find(item => item.id === editingId) ?? null
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const { control, handleSubmit, reset } = useForm<FixedExpenseForm>({
     defaultValues: emptyForm
@@ -309,64 +282,161 @@ export default function FixedExpensesPage() {
     }
   }
 
-  /** Texto + color, nunca solo color (WCAG 1.4.1). */
-  const renderStatus = (status: DueStatus | null) => {
+  const money = (value: number) => formatAmount(value)
+  const monthLabel = today
+    ? new Intl.DateTimeFormat(router.locale ?? 'es', { month: 'short' })
+        .format(today)
+        .replace('.', '')
+    : ''
+
+  /** "vence mañana", "venció el día 3": only when it's close or late, as
+   * text next to the category (never color alone, WCAG 1.4.1). */
+  const statusText = (status: DueStatus | null) => {
     if (!status) return null
+    const lower = (text: string) =>
+      text.charAt(0).toLocaleLowerCase() + text.slice(1)
     switch (status.kind) {
-      case 'paid':
-        return (
-          <Badge
-            colorScheme="green"
-            display="inline-flex"
-            alignItems="center"
-            gap={1}
-          >
-            <Icon as={MdCheckCircle} aria-hidden="true" />
-            {t('status.paid')}
-          </Badge>
-        )
       case 'overdue':
-        return (
-          <Badge colorScheme="red">
-            {t('status.overdue', { day: status.day })}
-          </Badge>
-        )
+        return lower(t('status.overdue', { day: status.day }))
       case 'today':
-        return <Badge colorScheme="orange">{t('status.today')}</Badge>
+        return lower(t('status.today'))
       case 'upcoming':
-        return (
-          <Badge colorScheme="gray" variant="outline">
-            {t('status.upcoming', { count: status.daysLeft })}
-          </Badge>
-        )
+        return status.daysLeft <= 3
+          ? lower(t('status.upcoming', { count: status.daysLeft }))
+          : null
+      case 'paid':
+        return null
     }
   }
 
-  const renderPayButton = (fixedExpense: FixedExpense) =>
-    !fixedExpense.paidThisCycle && (
-      <Button
-        size="sm"
-        minH={{ base: '44px', md: '32px' }}
-        leftIcon={<MdCheckCircle />}
-        colorScheme="green"
-        variant="outline"
-        isLoading={payingId === fixedExpense.id}
-        onClick={() => onPay(fixedExpense.id)}
-      >
-        {t('list.actions.pay')}
-      </Button>
-    )
+  /** Overdue, today or tomorrow: outlined in the pending color (`.fx.due`). */
+  const isDueSoon = (status: DueStatus | null) =>
+    status?.kind === 'overdue' ||
+    status?.kind === 'today' ||
+    (status?.kind === 'upcoming' && status.daysLeft <= 1)
 
-  const renderSummary = (fixedExpense: FixedExpense) => (
-    <Box minW={0}>
-      <Text fontWeight="semibold" noOfLines={1} title={fixedExpense.name}>
-        {fixedExpense.name}
-      </Text>
-      <Text fontSize="sm" color={mutedColor}>
-        {t('list.dueDay', { day: dueDayOf(fixedExpense.dueDate) })}
-        {fixedExpense.description ? ` · ${fixedExpense.description}` : ''}
-      </Text>
-    </Box>
+  /** docs/diseno-mobile.html `.fx`: date block, name + category, amount and
+   * "Pagar" (or "✓ Pagado"). Tapping the name opens its edit form. */
+  const renderFixedExpense = (fixedExpense: FixedExpense) => {
+    const status = statusOf(fixedExpense)
+    const inline = statusText(status)
+    const isPaid = fixedExpense.paidThisCycle
+    return (
+      <Flex
+        key={fixedExpense.id}
+        align="center"
+        gap="12px"
+        bg="bg.surface"
+        borderRadius="18px"
+        py="12px"
+        px="14px"
+        boxShadow={
+          isDueSoon(status)
+            ? 'inset 0 0 0 1.5px var(--chakra-colors-status-pendingSolid)'
+            : undefined
+        }
+      >
+        <Flex
+          as="button"
+          type="button"
+          onClick={() => startEdit(fixedExpense)}
+          aria-label={`${t('list.actions.edit')}: ${fixedExpense.name}`}
+          flex={1}
+          minW={0}
+          align="center"
+          gap="12px"
+          textAlign="left"
+          minH="44px"
+          _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
+        >
+          <Box w="46px" flexShrink={0} textAlign="center" aria-hidden>
+            <Text
+              fontSize="20px"
+              fontWeight="bold"
+              lineHeight="1"
+              color="text.primary"
+            >
+              {dueDayOf(fixedExpense.dueDate)}
+            </Text>
+            <Text
+              fontSize="11px"
+              fontWeight={600}
+              color="text.secondary"
+              textTransform="uppercase"
+              mt="3px"
+            >
+              {monthLabel}
+            </Text>
+          </Box>
+          <Box flex={1} minW={0}>
+            <Text
+              fontSize="14.5px"
+              fontWeight={650}
+              color="text.primary"
+              noOfLines={1}
+            >
+              {fixedExpense.name}
+            </Text>
+            <Text fontSize="12px" color="text.secondary" mt="2px" noOfLines={2}>
+              {t(`categories.${fixedExpense.budgetCategory}`)}
+              {inline ? ` · ${inline}` : ''}
+            </Text>
+          </Box>
+          <Text
+            mr="6px"
+            fontSize="14.5px"
+            fontWeight={isPaid ? 'normal' : 'bold'}
+            color={isPaid ? 'text.secondary' : 'text.primary'}
+            flexShrink={0}
+            sx={{ fontVariantNumeric: 'tabular-nums' }}
+          >
+            {money(fixedExpense.amount)}
+          </Text>
+        </Flex>
+        {isPaid ? (
+          <Flex
+            h="40px"
+            align="center"
+            gap="5px"
+            color="money.incomeText"
+            fontSize="13px"
+            fontWeight="bold"
+            flexShrink={0}
+          >
+            <CheckIcon boxSize="16px" />
+            {t('status.paid')}
+          </Flex>
+        ) : (
+          <Button
+            h="44px"
+            my="-2px"
+            px="14px"
+            borderRadius="12px"
+            bg="brand.subtle"
+            color="brand.strong"
+            fontSize="13px"
+            fontWeight="bold"
+            flexShrink={0}
+            _hover={{ bg: 'brand.subtle' }}
+            _active={{ opacity: 0.8 }}
+            isLoading={payingId === fixedExpense.id}
+            aria-label={`${t('list.actions.pay')}: ${fixedExpense.name}`}
+            onClick={() => onPay(fixedExpense.id)}
+          >
+            {t('list.actions.payShort')}
+          </Button>
+        )}
+      </Flex>
+    )
+  }
+
+  const toPay = sorted.filter(item => !item.paidThisCycle)
+  const paidItems = sorted.filter(item => item.paidThisCycle)
+
+  const layout = (children: React.ReactNode) => (
+    <ProsperoLayout title={t('title')} pageDescription={t('title')}>
+      {children}
+    </ProsperoLayout>
   )
 
   // First load: the page's skeleton, not its empty states.
@@ -376,310 +446,236 @@ export default function FixedExpensesPage() {
     !fixedExpensesQuery.error &&
     PageSkeleton
   )
-    return (
-      <ProsperoLayout title={t('title')} pageDescription={t('title')}>
-        <PageSkeleton />
-      </ProsperoLayout>
-    )
-  return (
-    <ProsperoLayout title={t('title')} pageDescription={t('title')}>
-      <Stack spacing={6}>
-        <Flex justify="flex-end">
-          <Button
-            colorScheme="primary"
-            leftIcon={<MdAdd />}
-            onClick={openCreate}
-            minH="44px"
-            w={{ base: 'full', md: 'auto' }}
-          >
-            {t('form.openCreate')}
-          </Button>
-        </Flex>
+    return layout(<PageSkeleton />)
 
-        <MovementFormDrawer
-          isOpen={formDrawer.isOpen}
-          onClose={closeForm}
-          title={editingId ? t('form.editTitle') : t('form.createTitle')}
-          formId="fixed-expense-form"
-          onSubmit={handleSubmit(onSubmit)}
-          isSubmitting={isLoading}
-          submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
-          cancelLabel={t('form.cancel')}
-          initialFocusRef={nameInputRef}
-        >
-          <FormControl>
-            <FormLabel>{t('form.labelName')}</FormLabel>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field: { ref, ...field } }) => (
-                <Input
-                  {...field}
-                  ref={element => {
-                    ref(element)
-                    nameInputRef.current = element
-                  }}
-                  placeholder={t('form.namePlaceholder')}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel>{t('form.labelAmount')}</FormLabel>
-            <Controller
-              name="amount"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  min={0}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>{t('form.labelBudgetCategory')}</FormLabel>
-            <Controller
-              name="budgetCategory"
-              control={control}
-              render={({ field }) => (
-                <Select {...field}>
-                  <option value="Necesidad">{t('categories.Necesidad')}</option>
-                  <option value="Deseo">{t('categories.Deseo')}</option>
-                  <option value="Ahorro">{t('categories.Ahorro')}</option>
-                </Select>
-              )}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>{t('form.labelDueDate')}</FormLabel>
-            <Controller
-              name="dueDay"
-              control={control}
-              render={({ field }) => (
-                <Select {...field}>
-                  {DAYS_OF_MONTH.map(day => (
-                    <option key={day} value={day}>
-                      {t('form.dueDayOption', { day })}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            />
-            <FormHelperText>{t('form.dueDayHelper')}</FormHelperText>
-          </FormControl>
-          <FormControl>
-            <FormLabel>{t('form.labelDescription')}</FormLabel>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => <Input {...field} />}
-            />
-          </FormControl>
-          <FormControl display="flex" alignItems="center">
-            <Controller
-              name="reminder"
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Checkbox
-                  {...field}
-                  isChecked={value}
-                  onChange={e => onChange(e.target.checked)}
-                >
-                  {t('form.labelReminder')}
-                </Checkbox>
-              )}
-            />
-          </FormControl>
-        </MovementFormDrawer>
-
-        <Box>
-          <Heading size="md" mb={3}>
-            {t('list.title')}
-          </Heading>
-
-          {fixedExpenses.length === 0 ? (
-            <Flex
-              direction="column"
-              align="center"
-              gap={2}
-              py={10}
-              textAlign="center"
-            >
-              <Icon
-                as={MdEventRepeat}
-                boxSize={8}
-                color="gray.400"
-                aria-hidden="true"
+  return layout(
+    <Stack spacing="12px" maxW="lg" pb={4}>
+      <MovementFormDrawer
+        isOpen={formDrawer.isOpen}
+        onClose={closeForm}
+        title={editingId ? t('form.editTitle') : t('form.createTitle')}
+        formId="fixed-expense-form"
+        onSubmit={handleSubmit(onSubmit)}
+        isSubmitting={isLoading}
+        submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
+        cancelLabel={t('form.cancel')}
+        initialFocusRef={nameInputRef}
+      >
+        <FormControl>
+          <FormLabel>{t('form.labelName')}</FormLabel>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field: { ref, ...field } }) => (
+              <Input
+                {...field}
+                ref={element => {
+                  ref(element)
+                  nameInputRef.current = element
+                }}
+                placeholder={t('form.namePlaceholder')}
               />
-              <Text fontWeight="semibold">{t('list.empty')}</Text>
-              <Text fontSize="sm" color={mutedColor} maxW="sm">
-                {t('list.emptyHint')}
-              </Text>
-            </Flex>
-          ) : (
-            <>
-              <SimpleGrid
-                columns={{ base: 2, sm: 3 }}
-                spacingX={6}
-                spacingY={3}
-                bg={summaryBg}
-                borderRadius="md"
-                p={4}
-                mb={4}
-              >
-                <Stat>
-                  <StatLabel color={mutedColor}>{t('summary.total')}</StatLabel>
-                  <StatNumber fontSize="xl">{formatAmount(total)}</StatNumber>
-                </Stat>
-                <Stat>
-                  <StatLabel color={mutedColor}>
-                    {t('summary.paid', {
-                      paid: paidCount,
-                      total: fixedExpenses.length
-                    })}
-                  </StatLabel>
-                  <StatNumber fontSize="xl">{formatAmount(paid)}</StatNumber>
-                </Stat>
-                <Stat>
-                  <StatLabel color={mutedColor}>
-                    {t('summary.pending')}
-                  </StatLabel>
-                  <StatNumber fontSize="xl">
-                    {formatAmount(total - paid)}
-                  </StatNumber>
-                </Stat>
-              </SimpleGrid>
-
-              {/* Desktop/tablet */}
-              <TableContainer display={{ base: 'none', md: 'block' }}>
-                <Table variant="simple" size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>{t('form.labelName')}</Th>
-                      <Th>{t('form.labelBudgetCategory')}</Th>
-                      <Th>{t('list.columnStatus')}</Th>
-                      <Th isNumeric>{t('form.labelAmount')}</Th>
-                      <Th>
-                        <VisuallyHidden>
-                          {t('list.columnActions')}
-                        </VisuallyHidden>
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {sorted.map(fixedExpense => (
-                      <Tr key={fixedExpense.id}>
-                        <Td maxW="xs" whiteSpace="normal">
-                          {renderSummary(fixedExpense)}
-                        </Td>
-                        <Td>
-                          <CategoryBadge
-                            category={
-                              fixedExpense.budgetCategory as BudgetCategory
-                            }
-                            label={t(
-                              `categories.${fixedExpense.budgetCategory}`
-                            )}
-                          />
-                        </Td>
-                        <Td>{renderStatus(statusOf(fixedExpense))}</Td>
-                        <Td isNumeric fontWeight="semibold">
-                          {formatAmount(fixedExpense.amount)}
-                        </Td>
-                        <Td>
-                          <Flex justify="flex-end" align="center" gap={1}>
-                            {renderPayButton(fixedExpense)}
-                            <IconButton
-                              aria-label={t('list.actions.edit')}
-                              icon={<MdEdit />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="blue"
-                              onClick={() => startEdit(fixedExpense)}
-                            />
-                            <IconButton
-                              aria-label={t('list.actions.delete')}
-                              icon={<MdDelete />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="red"
-                              onClick={() => onDelete(fixedExpense)}
-                            />
-                          </Flex>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-
-              {/* Mobile */}
-              <Stack spacing={3} display={{ base: 'flex', md: 'none' }}>
-                {sorted.map(fixedExpense => (
-                  <Card key={fixedExpense.id} variant="outline">
-                    <CardBody>
-                      <Stack spacing={2}>
-                        <Flex
-                          justify="space-between"
-                          align="flex-start"
-                          gap={3}
-                        >
-                          {renderSummary(fixedExpense)}
-                          <Text fontWeight="semibold" whiteSpace="nowrap">
-                            {formatAmount(fixedExpense.amount)}
-                          </Text>
-                        </Flex>
-                        <Flex gap={2} wrap="wrap">
-                          <CategoryBadge
-                            category={
-                              fixedExpense.budgetCategory as BudgetCategory
-                            }
-                            label={t(
-                              `categories.${fixedExpense.budgetCategory}`
-                            )}
-                          />
-                          {renderStatus(statusOf(fixedExpense))}
-                        </Flex>
-
-                        <Divider />
-
-                        <Flex justify="space-between" align="center" gap={2}>
-                          {renderPayButton(fixedExpense) || <span />}
-                          <Stack direction="row" spacing={1}>
-                            <IconButton
-                              aria-label={t('list.actions.edit')}
-                              icon={<MdEdit />}
-                              boxSize="44px"
-                              minW="44px"
-                              variant="ghost"
-                              colorScheme="blue"
-                              onClick={() => startEdit(fixedExpense)}
-                            />
-                            <IconButton
-                              aria-label={t('list.actions.delete')}
-                              icon={<MdDelete />}
-                              boxSize="44px"
-                              minW="44px"
-                              variant="ghost"
-                              colorScheme="red"
-                              onClick={() => onDelete(fixedExpense)}
-                            />
-                          </Stack>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
+            )}
+          />
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>{t('form.labelAmount')}</FormLabel>
+          <Controller
+            name="amount"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min={0}
+              />
+            )}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>{t('form.labelBudgetCategory')}</FormLabel>
+          <Controller
+            name="budgetCategory"
+            control={control}
+            render={({ field }) => (
+              <Select {...field}>
+                <option value="Necesidad">{t('categories.Necesidad')}</option>
+                <option value="Deseo">{t('categories.Deseo')}</option>
+                <option value="Ahorro">{t('categories.Ahorro')}</option>
+              </Select>
+            )}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>{t('form.labelDueDate')}</FormLabel>
+          <Controller
+            name="dueDay"
+            control={control}
+            render={({ field }) => (
+              <Select {...field}>
+                {DAYS_OF_MONTH.map(day => (
+                  <option key={day} value={day}>
+                    {t('form.dueDayOption', { day })}
+                  </option>
                 ))}
-              </Stack>
+              </Select>
+            )}
+          />
+          <FormHelperText>{t('form.dueDayHelper')}</FormHelperText>
+        </FormControl>
+        <FormControl>
+          <FormLabel>{t('form.labelDescription')}</FormLabel>
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => <Input {...field} />}
+          />
+        </FormControl>
+        <FormControl display="flex" alignItems="center">
+          <Controller
+            name="reminder"
+            control={control}
+            render={({ field: { value, onChange, ...field } }) => (
+              <Checkbox
+                {...field}
+                isChecked={value}
+                onChange={e => onChange(e.target.checked)}
+              >
+                {t('form.labelReminder')}
+              </Checkbox>
+            )}
+          />
+        </FormControl>
+        {editingFixedExpense && (
+          <Button
+            variant="ghost"
+            colorScheme="red"
+            alignSelf="flex-start"
+            minH="44px"
+            onClick={() => {
+              closeForm()
+              onDelete(editingFixedExpense)
+            }}
+          >
+            {t('list.actions.delete')}
+          </Button>
+        )}
+      </MovementFormDrawer>
+
+      {fixedExpenses.length === 0 ? (
+        <EmptyState
+          icon={MdEventRepeat}
+          title={t('list.empty')}
+          description={t('list.emptyHint')}
+          action={
+            <Button colorScheme="primary" minH="44px" onClick={openCreate}>
+              {t('form.openCreate')}
+            </Button>
+          }
+        />
+      ) : (
+        <>
+          <Flex
+            bg="bg.surface"
+            borderRadius="20px"
+            p="16px"
+            justify="space-between"
+            align="center"
+          >
+            <Box>
+              <Text fontSize="12.5px" color="text.secondary">
+                {t('summary.thisPeriod')}
+              </Text>
+              <Text
+                fontSize="22px"
+                fontWeight="bold"
+                lineHeight="1.25"
+                color="text.primary"
+                sx={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                {money(total)}
+              </Text>
+            </Box>
+            <Box textAlign="right">
+              <Text fontSize="12.5px" color="text.secondary">
+                {t('status.paid')}
+              </Text>
+              <Text
+                fontSize="22px"
+                fontWeight="bold"
+                lineHeight="1.25"
+                color="money.incomeText"
+                sx={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                {money(paid)}
+              </Text>
+            </Box>
+          </Flex>
+          <Box
+            h="8px"
+            mt="-4px"
+            borderRadius="5px"
+            bg="track.bg"
+            overflow="hidden"
+            role="progressbar"
+            aria-label={t('summary.paid', {
+              paid: paidCount,
+              total: fixedExpenses.length
+            })}
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-valuenow={paid}
+          >
+            <Box
+              h="full"
+              w={`${total > 0 ? (paid / total) * 100 : 0}%`}
+              bg="money.income"
+              borderRadius="5px"
+            />
+          </Box>
+
+          {toPay.length > 0 && (
+            <>
+              <Box mt="6px">
+                <DayHeader>{t('list.toPay')}</DayHeader>
+              </Box>
+              {toPay.map(renderFixedExpense)}
             </>
           )}
-        </Box>
-      </Stack>
-    </ProsperoLayout>
+          {paidItems.length > 0 && (
+            <>
+              <Box mt="6px">
+                <DayHeader>{t('list.paidSection')}</DayHeader>
+              </Box>
+              {paidItems.map(renderFixedExpense)}
+            </>
+          )}
+
+          <Flex
+            as="button"
+            type="button"
+            onClick={openCreate}
+            h="52px"
+            align="center"
+            justify="center"
+            gap="8px"
+            borderRadius="18px"
+            borderWidth="1.5px"
+            borderStyle="dashed"
+            borderColor="border.subtle"
+            color="brand.text"
+            fontSize="14px"
+            fontWeight="bold"
+            _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
+          >
+            <PlusIcon boxSize="18px" />
+            {t('form.openCreate')}
+          </Flex>
+        </>
+      )}
+    </Stack>
   )
 }
 

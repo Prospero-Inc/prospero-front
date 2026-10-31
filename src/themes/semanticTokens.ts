@@ -18,6 +18,8 @@ export const semanticTokens = {
 
     'brand.solid': { default: '#5352ED', _dark: '#5352ED' },
     'brand.text': { default: '#5352ED', _dark: '#A9A8FF' },
+    // Text on brand.subtle buttons (design --primary-700).
+    'brand.strong': { default: '#3F3FC8', _dark: '#C8C8FC' },
     'brand.subtle': { default: '#EBEBFE', _dark: '#2A2A55' },
     'hero.bg': { default: '#5352ED', _dark: '#3E3DC4' },
     'track.bg': { default: '#EEEEF5', _dark: '#2C2C40' },
@@ -38,6 +40,23 @@ export const semanticTokens = {
     'tint.Deseo': { default: '#FFF4DE', _dark: '#3A2E14' },
     'tint.Ahorro': { default: '#E6F8F1', _dark: '#14302A' },
     'tint.income': { default: '#E6F8F1', _dark: '#14302A' },
+    'tint.expense': { default: '#FDECEC', _dark: '#3A1A1E' },
+    // Chevrons and the off state of toggles (decorative, not text).
+    // Gmail review: bank badges alternate between these two palettes.
+    'bank.aBg': { default: '#FFF4D6', _dark: '#3A2E10' },
+    'bank.aText': { default: '#A86B00', _dark: '#F5C451' },
+    'bank.bBg': { default: '#E3F4EA', _dark: '#14302A' },
+    'bank.bText': { default: '#1C7C45', _dark: '#63E6BE' },
+    'toast.bg': { default: '#1B1B2F', _dark: '#2C2C40' },
+    // Onboarding/login (docs/diseno-mobile.html .choice, .lfield).
+    'choice.onBg': { default: '#F7F7FF', _dark: '#23234A' },
+    'choice.border': { default: '#E6E6EF', _dark: '#2C2C40' },
+    'radio.off': { default: '#C9C9D8', _dark: '#4A4A63' },
+    'steps.off': { default: '#E1E1EC', _dark: '#2C2C40' },
+    'field.border': { default: '#DADAE6', _dark: '#3A3A52' },
+    'field.label': { default: '#3B3D52', _dark: '#C9CADB' },
+    'icon.subtle': { default: '#A0A2B5', _dark: '#6E7085' },
+    'toggle.off': { default: '#D3D4E0', _dark: '#3A3A52' },
 
     // Fills (bars, dots, icons) and their AA text variants.
     'money.income': { default: '#12B886', _dark: '#38D9A9' },

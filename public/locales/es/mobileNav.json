@@ -7,5 +7,6 @@
   "openMenu": "Abrir menú",
   "toggleToDarkMode": "Cambiar a modo oscuro",
   "toggleToLightMode": "Cambiar a modo claro",
-  "userMenu": "Menú de usuario"
+  "userMenu": "Menú de usuario",
+  "close": "Cerrar"
 }

@@ -33,7 +33,11 @@
         "minLength": "Password must be at least 8 characters long",
         "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
       }
-    }
+    },
+    "welcome": "Welcome back",
+    "tagline": "Your budget, anchored to your paydays.",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account"
   },
   "register": {
     "heading": "Create an Account",
@@ -349,7 +353,14 @@
     "calculator": "Budget calculator",
     "language": "Language",
     "darkMode": "Dark mode",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "gmailConnected": "Connected",
+    "gmailDisconnected": "Not connected",
+    "push": "Push",
+    "languageName": {
+      "es": "Español",
+      "en": "English"
+    }
   },
   "quickAdd": {
     "title": "New movement",
@@ -404,7 +415,16 @@
       "title": "All caught up",
       "description": "No Gmail movements are waiting for your review.",
       "action": "See movements"
-    }
+    },
+    "progress": "{{done}} of {{total}} reviewed",
+    "confirmedItem": "{{name}} confirmed",
+    "discardedItem": "{{name}} discarded",
+    "purchase": "Purchase",
+    "possibleIncome": "Possible income",
+    "discard": "Discard",
+    "editFirst": "Edit before saving",
+    "today": "today",
+    "yesterday": "yesterday"
   },
   "movements": {
     "title": "Activity",
@@ -452,18 +472,22 @@
       "title": "How often are you paid?",
       "hint": "Prospero builds your budget from each payday, not from the calendar month.",
       "Biweekly": "Every two weeks",
-      "Monthly": "Once a month"
+      "Monthly": "Once a month",
+      "BiweeklyHint": "Two payments a month, even if the dates vary",
+      "MonthlyHint": "A single payment every month"
     },
     "split": {
       "title": "How do you want to split each payment?",
-      "hint": "You can change it anytime in More → Split and pay frequency.",
+      "hint": "You can change it anytime in More → Profile.",
       "recommended": "Recommended: 50 / 30 / 20",
       "custom": "Custom",
       "needs": "Needs",
       "wants": "Wants",
       "savings": "Savings",
       "increase": "Raise {{name}}",
-      "decrease": "Lower {{name}}"
+      "decrease": "Lower {{name}}",
+      "recommendedHint": "Needs, wants and savings",
+      "customHint": "Choose your own percentages"
     },
     "income": {
       "title": "Log your last payment",

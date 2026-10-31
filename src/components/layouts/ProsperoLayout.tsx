@@ -2,7 +2,7 @@ import { Container } from '@chakra-ui/react'
 import Head from 'next/head'
 import { FC, PropsWithChildren } from 'react'
 
-import { useSetAppShellTitle } from './shell/AppShellTitle'
+import { type TopBarTrailing, useSetAppShellTitle } from './shell/AppShellTitle'
 
 interface Props {
   title: string
@@ -10,6 +10,8 @@ interface Props {
   imageFullUrl?: string
   /** Shown above the title in the phone top bar (e.g. "Hola, Ana"). */
   greeting?: string
+  /** Right side of the phone top bar (see AppShellTitle). */
+  topBarTrailing?: TopBarTrailing
 }
 
 export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
@@ -17,11 +19,12 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   title,
   pageDescription,
   imageFullUrl,
-  greeting
+  greeting,
+  topBarTrailing
 }) => {
   // The shell (menus, tab bar) lives in _app so it persists across pages;
   // here only the title and the page container.
-  useSetAppShellTitle(title, greeting)
+  useSetAppShellTitle(title, greeting, topBarTrailing)
 
   return (
     <>

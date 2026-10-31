@@ -5,10 +5,10 @@ import {
   DrawerBody,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
   DrawerOverlay,
   type DrawerProps,
   Flex,
-  Text,
   useBreakpointValue
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
@@ -73,9 +73,16 @@ export const BottomSheet = ({
           />
         )}
         <Flex justify="space-between" align="center" px="18px" mb="14px">
-          <Text as="h2" fontSize="18px" fontWeight="bold" color="text.primary">
+          {/* DrawerHeader names the dialog (aria-labelledby). */}
+          <DrawerHeader
+            as="h2"
+            p={0}
+            fontSize="18px"
+            fontWeight="bold"
+            color="text.primary"
+          >
             {title}
-          </Text>
+          </DrawerHeader>
           <Box
             as="button"
             type="button"
