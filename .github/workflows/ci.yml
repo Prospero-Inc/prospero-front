@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.16.0
+          node-version: 22.23.4
 
       - name: Install dependencies
         run: |
@@ -42,12 +42,6 @@ jobs:
 
       - name: Build
         run: pnpm build
-
-      # Playwright needs Node 20+; lint/type check/build above stay on the
-      # production Node version until Fase 2 moves everything to 22.
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium

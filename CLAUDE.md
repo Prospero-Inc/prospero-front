@@ -31,7 +31,7 @@ commits must follow Conventional Commits.
 
 ## Architecture
 
-Next.js **Pages Router** (not App Router) frontend for **Prospero**, a personal-finance /
+Next.js 15 **Pages Router** (not App Router, React 18, Node 22) frontend for **Prospero**, a personal-finance /
 budgeting app that talks to `prospero-backend`. Chakra UI + Emotion for styling/theming
 (`src/themes`), `next-i18next` for i18n (`public/locales`, `next-i18next.config.js`).
 
@@ -55,6 +55,15 @@ with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthTo
 `POST /proxy/login-verify-2fa` for the real token set before calling `signIn` the same way. Don't
 confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
 already-authenticated session; it's unrelated to the login gate.
+
+#### Deploy
+
+The image only gets non-secret build args (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`);
+`NEXTAUTH_SECRET` reaches the container at runtime through `docker-compose.yml` (the deploy
+job's env, from GitHub secrets) — middleware and NextAuth read it at runtime. The deploy job
+deploys the commit-SHA image (`IMAGE_TAG`), tags the running one `:rollback` first, runs
+`docker compose up -d --wait` against the `GET /api/health` healthcheck and rolls back if the
+new container never turns healthy.
 
 #### Server-side calls to the backend
 
