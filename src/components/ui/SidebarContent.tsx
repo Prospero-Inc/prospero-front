@@ -1,5 +1,4 @@
-import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
+import { useApi } from '@/lib/useApi'
 import { ReviewQueueSummary } from '@/services/reviewQueue'
 import {
   BoxProps,
@@ -11,10 +10,7 @@ import {
   Text,
   useColorMode
 } from '@chakra-ui/react'
-import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import { IconType } from 'react-icons'
 import { BsStopCircle } from 'react-icons/bs'
 
@@ -69,9 +65,6 @@ interface SidebarProps extends BoxProps {
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const { colorMode } = useColorMode()
   const { t } = useTranslation('sidebar')
-  const router = useRouter()
-  const { data: session } = useSession()
-  const [summary, setSummary] = useState<ReviewQueueSummary>(emptySummary)
   const variant = useBreakpointValue(
     {
       base: 'center',
@@ -85,33 +78,12 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     }
   )
 
-  // Sincroniza el badge de pendientes con el backend: al montar y cada vez
-  // que termina una navegación client-side (ej. confirmar un pendiente en
-  // entries/expenditures hace router.replace, que dispara esto de nuevo).
-  useEffect(() => {
-    if (!session?.accessToken) return
-
-    let isMounted = true
-    const fetchSummary = async () => {
-      try {
-        const data = await localApiService.request<ReviewQueueSummary>({
-          endPoint: '/proxy/get-review-queue-summary',
-          method: HttpMethod.GET,
-          headers: { Authorization: `Bearer ${session.accessToken}` }
-        })
-        if (isMounted) setSummary(data)
-      } catch (error) {
-        // El badge es informativo; si falla, simplemente no se muestra.
-      }
-    }
-
-    fetchSummary()
-    router.events.on('routeChangeComplete', fetchSummary)
-    return () => {
-      isMounted = false
-      router.events.off('routeChangeComplete', fetchSummary)
-    }
-  }, [session?.accessToken, router.events])
+  // Pending-review badge. Shared SWR cache with the dashboard (one request
+  // for both menus), refreshed when the screens save a movement (they
+  // revalidate 'review-queue'). Informative only: on error it just hides.
+  const { data: summary = emptySummary } = useApi<ReviewQueueSummary>(
+    'review-queue/summary'
+  )
 
   return (
     <Box

@@ -4,6 +4,7 @@ import { SessionWatcher } from '@/components/ui'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
 import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
+import { UserScopedSWR } from '@/components/ui/UserScopedSWR'
 import {
   PendingRouteContext,
   RouteLoadingContext,
@@ -83,19 +84,21 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         <SessionWatcher />
         <ServiceWorkerUpdater />
         <RouteProgress isLoading={isLoading} />
-        <RouteLoadingContext.Provider value={routeLoading}>
-          <PendingRouteContext.Provider
-            value={PageSkeleton ? targetPathname : null}
-          >
-            {PageSkeleton ? (
-              <ProsperoLayout title={t('routeLoading')} pageDescription="">
-                <PageSkeleton />
-              </ProsperoLayout>
-            ) : (
-              <Component {...pageProps} />
-            )}
-          </PendingRouteContext.Provider>
-        </RouteLoadingContext.Provider>
+        <UserScopedSWR>
+          <RouteLoadingContext.Provider value={routeLoading}>
+            <PendingRouteContext.Provider
+              value={PageSkeleton ? targetPathname : null}
+            >
+              {PageSkeleton ? (
+                <ProsperoLayout title={t('routeLoading')} pageDescription="">
+                  <PageSkeleton />
+                </ProsperoLayout>
+              ) : (
+                <Component {...pageProps} />
+              )}
+            </PendingRouteContext.Provider>
+          </RouteLoadingContext.Provider>
+        </UserScopedSWR>
       </SessionProvider>
     </ChakraProvider>
   )

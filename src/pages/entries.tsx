@@ -11,20 +11,22 @@ import {
   MovementSummary,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
-import { MovementListSkeleton } from '@/components/ui/PageSkeletons'
+import {
+  MovementListSkeleton,
+  getPageSkeleton
+} from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { useIsReloadingPage } from '@/hooks/useRouteLoading'
-import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
+import { getTodayLocalDate, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
   hasActiveMovementFilters,
   matchesMovementFilters
 } from '@/lib/movementFilters'
-import { withClientIp } from '@/lib/server/clientIp'
-import { getPeriodSalary, getPeriods, PeriodSummary } from '@/services/periods'
+import { useApi, useRevalidateApi } from '@/lib/useApi'
+import { PeriodSummary } from '@/services/periods'
 import {
-  getSalaryList,
   IncomeCategory,
   IncomeType,
   SalaryData,
@@ -56,12 +58,12 @@ import {
   useToast,
   VisuallyHidden
 } from '@chakra-ui/react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { MdAdd, MdEdit } from 'react-icons/md'
 
@@ -78,14 +80,6 @@ const INCOME_CATEGORIES: IncomeCategory[] = [
 
 const INCOME_TYPES: IncomeType[] = ['Payroll', 'Extra']
 
-interface EntriesProps {
-  /** Ingresos del período seleccionado, sin los pendientes de revisión. */
-  salary: SalaryEntry[]
-  /** Pendientes de revisión de cualquier período. */
-  pendingSalary: SalaryEntry[]
-  periods: PeriodSummary[]
-}
-
 // The amount starts empty, not 0: a prefilled 0 had to be deleted first.
 type SalaryForm = Omit<SalaryData, 'amount'> & { amount: number | '' }
 
@@ -98,11 +92,7 @@ const emptyForm: SalaryForm = {
   description: ''
 }
 
-export default function EntriesPage({
-  salary,
-  pendingSalary,
-  periods
-}: EntriesProps) {
+export default function EntriesPage() {
   const { t } = useTranslation('entries')
   const router = useRouter()
   const toast = useToast()
@@ -126,7 +116,7 @@ export default function EntriesPage({
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
 
   const { formatAmount } = useMovementFormatters()
-  const isReloading = useIsReloadingPage()
+  const isChangingRoute = useIsReloadingPage()
   const {
     filters,
     period,
@@ -136,6 +126,40 @@ export default function EntriesPage({
     clearFilters,
     setPeriod
   } = useMovementFilters(INCOME_TYPES)
+
+  // Client-side data (SWR): navigating, switching periods and saving don't
+  // reload the page. Waits for the router so the period from the URL is in
+  // the first request.
+  const periodSalary = useApi<SalaryEntry[]>(
+    router.isReady ? 'periods/salary' : null,
+    { period }
+  )
+  const pendingQuery = useApi<SalaryEntry[]>('salary', {
+    status: PENDING_STATUSES.join(',')
+  })
+  const periodsQuery = useApi<PeriodSummary[]>('periods')
+  const revalidateApi = useRevalidateApi()
+  /** Fresh data for everything an income change can affect. */
+  const refreshIncome = () => revalidateApi('periods', 'salary', 'review-queue')
+
+  // Pending rows are listed on their own at the top, whatever their period.
+  const salary = (periodSalary.data ?? []).filter(
+    entry => !PENDING_STATUSES.includes(entry.status)
+  )
+  const pendingSalary = pendingQuery.data ?? []
+  const periods = periodsQuery.data ?? []
+  const isReloading = isChangingRoute || periodSalary.isLoading
+
+  // Link to a period that no longer exists: back to the current period.
+  const periodError = periodSalary.error
+  useEffect(() => {
+    if (
+      period &&
+      periodError instanceof HttpError &&
+      periodError.status === 404
+    )
+      setPeriod(undefined)
+  }, [period, periodError, setPeriod])
 
   const selectedPeriod =
     periods.find(summary => summary.key === period) ??
@@ -265,7 +289,7 @@ export default function EntriesPage({
         isClosable: true
       })
       closeForm()
-      router.replace(router.asPath)
+      await refreshIncome()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -297,7 +321,7 @@ export default function EntriesPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshIncome()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -311,6 +335,14 @@ export default function EntriesPage({
     }
   }
 
+  // First load: the page's skeleton, not its empty states.
+  const PageSkeleton = getPageSkeleton(router.pathname)
+  if (periodsQuery.data === undefined && !periodsQuery.error && PageSkeleton)
+    return (
+      <ProsperoLayout title={t('title')} pageDescription={t('title')}>
+        <PageSkeleton />
+      </ProsperoLayout>
+    )
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
@@ -672,65 +704,15 @@ export default function EntriesPage({
 
 const PENDING_STATUSES = ['Detected', 'PendingReview']
 
-export const getServerSideProps: GetServerSideProps = withClientIp(
-  async ({ req, res, locale, defaultLocale, query }) => {
-    const { session, redirect } = await getValidSession(req, res)
-    if (redirect) return redirect
-
-    const period = typeof query.period === 'string' ? query.period : undefined
-    let salary: SalaryEntry[] = []
-    let pendingSalary: SalaryEntry[] = []
-    let periods: PeriodSummary[] = []
-
-    if (session?.accessToken) {
-      const params = {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      }
-      try {
-        const [periodSalary, pending, allPeriods] = await Promise.all([
-          getPeriodSalary(period, params),
-          getSalaryList(
-            { status: PENDING_STATUSES.join(',') },
-            params
-          ) as Promise<SalaryEntry[]>,
-          getPeriods(null, params)
-        ])
-
-        // Los pendientes se muestran todos arriba, sin importar el período,
-        // así que se sacan de la lista del período para no duplicarlos.
-        salary = periodSalary.filter(
-          entry => !PENDING_STATUSES.includes(entry.status)
-        )
-        pendingSalary = pending
-        periods = allPeriods
-      } catch (error) {
-        // Link a un período que ya no existe (p. ej. se borró su nómina):
-        // volver al período actual en vez de mostrar la vista vacía.
-        if (period && error instanceof HttpError && error.status === 404)
-          return {
-            redirect: {
-              destination: `${
-                locale && locale !== defaultLocale ? `/${locale}` : ''
-              }/entries`,
-              permanent: false
-            }
-          }
-      }
-    }
-
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, [
-          'common',
-          'sidebar',
-          'mobileNav',
-          'entries'
-        ])),
-        salary,
-        pendingSalary,
-        periods
-      }
-    }
+// Translations only: the data is loaded client-side (see useApi above) and
+// the middleware already guards the route.
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale as string, [
+      'common',
+      'sidebar',
+      'mobileNav',
+      'entries'
+    ]))
   }
-)
+})

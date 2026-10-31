@@ -144,12 +144,20 @@ call happens:
   handling was also fixed to stop swallowing the real status/message — see git history).
   `apiService.ts`'s `HttpError` class carries the real upstream status end-to-end through this
   chain; don't go back to throwing plain `Error`s there.
-- **`getServerSideProps`** (page-load data fetching) calls the same `src/services/*` functions
-  **directly**, no proxy hop needed since it already runs on the server — see
-  `requestProfile`/`getSalaryDetails`/`getTransactions` used this way in `profile/index.tsx`,
-  `dashboard.tsx`, `entries.tsx`, `expenditures.tsx`, `settings.tsx`. After a client-side
-  create/update/delete, these pages call `router.replace(router.asPath)` to force
-  `getServerSideProps` to refetch rather than keeping separate client-side cache state.
+- **Main screens load data client-side with SWR** — `dashboard`, `expenditures`, `entries`,
+  `fixed-expenses` (and the sidebar's pending badge) use `useApi(path, query)` from
+  `src/lib/useApi.ts`, which GETs `/api/proxy/read/<path>`: a read-only pass-through with a
+  closed allowlist of backend paths (`pages/api/proxy/read/[...path].ts`). Those pages only have
+  `getStaticProps` for translations (the middleware guards them), so navigating, switching
+  periods (`setPeriod` is shallow) and saving never go through the server. After a mutation they
+  call `useRevalidateApi()(...prefixes)` (e.g. `'periods', 'transactions', 'review-queue'`);
+  deletes first drop the row with `useUpdateApiCache()` and the revalidation restores it if the
+  request failed. The SWR cache is **in memory only** and scoped to the signed-in user
+  (`components/ui/UserScopedSWR.tsx` in `_app`) — never persist it. First load shows the page's
+  skeleton (`getPageSkeleton`), not its empty state.
+- **`getServerSideProps`** remains on `profile/*` and `settings.tsx`: it calls the same
+  `src/services/*` functions **directly** (no proxy hop on the server), and those pages still
+  `router.replace(router.asPath)` after a mutation.
 
 ### Web Push notifications
 

@@ -11,25 +11,23 @@ import {
   MovementSummary,
   useMovementFormatters
 } from '@/components/ui/MovementSummary'
-import { MovementListSkeleton } from '@/components/ui/PageSkeletons'
+import {
+  MovementListSkeleton,
+  getPageSkeleton
+} from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { useMovementFilters } from '@/hooks/useMovementFilters'
 import { useIsReloadingPage } from '@/hooks/useRouteLoading'
-import { getTodayLocalDate, getValidSession, localApiService } from '@/lib'
+import { getTodayLocalDate, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
   hasActiveMovementFilters,
   matchesMovementFilters
 } from '@/lib/movementFilters'
-import { withClientIp } from '@/lib/server/clientIp'
-import {
-  getPeriods,
-  getPeriodTransactions,
-  PeriodSummary
-} from '@/services/periods'
+import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
+import { PeriodSummary } from '@/services/periods'
 import {
   BudgetCategory,
-  getTransactions,
   TransactionData,
   TransactionListItem
 } from '@/services/transactions'
@@ -64,26 +62,18 @@ import {
   useToast,
   VisuallyHidden
 } from '@chakra-ui/react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { MdAdd, MdDelete, MdEdit } from 'react-icons/md'
 
 type Transaction = TransactionListItem
 
 const BUDGET_CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
-
-interface ExpendituresProps {
-  /** Filas del período seleccionado, sin las pendientes de revisión. */
-  transactions: Transaction[]
-  /** Pendientes de revisión de cualquier período. */
-  pendingTransactions: Transaction[]
-  periods: PeriodSummary[]
-}
 
 // The amount starts empty, not 0: a prefilled 0 had to be deleted first.
 type TransactionForm = Omit<TransactionData, 'amount'> & { amount: number | '' }
@@ -160,11 +150,7 @@ const PossibleDuplicateBadge = ({
   )
 }
 
-export default function ExpendituresPage({
-  transactions,
-  pendingTransactions,
-  periods
-}: ExpendituresProps) {
+export default function ExpendituresPage() {
   const { t } = useTranslation('expenditures')
   const router = useRouter()
   const toast = useToast()
@@ -193,7 +179,7 @@ export default function ExpendituresPage({
   )
   const pendingReviewCardBg = useColorModeValue('white', 'gray.700')
   const { formatAmount } = useMovementFormatters()
-  const isReloading = useIsReloadingPage()
+  const isChangingRoute = useIsReloadingPage()
   const {
     filters,
     period,
@@ -203,6 +189,43 @@ export default function ExpendituresPage({
     clearFilters,
     setPeriod
   } = useMovementFilters(BUDGET_CATEGORIES)
+
+  // Client-side data (SWR): navigating, switching periods and saving don't
+  // reload the page. Waits for the router so the period from the URL is in
+  // the first request.
+  const periodTransactions = useApi<Transaction[]>(
+    router.isReady ? 'periods/transactions' : null,
+    { period }
+  )
+  const pendingQuery = useApi<Transaction[]>('transactions', {
+    reviewStatus: PENDING_STATUSES.join(',')
+  })
+  const periodsQuery = useApi<PeriodSummary[]>('periods')
+  const revalidateApi = useRevalidateApi()
+  const updateApiCache = useUpdateApiCache()
+  /** Fresh data for everything a movement change can affect. */
+  const refreshMovements = () =>
+    revalidateApi('periods', 'transactions', 'review-queue')
+
+  // Pending rows are listed on their own at the top, whatever their period.
+  const transactions = (periodTransactions.data ?? []).filter(
+    transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
+  )
+  const pendingTransactions = pendingQuery.data ?? []
+  const periods = periodsQuery.data ?? []
+  const isReloading = isChangingRoute || periodTransactions.isLoading
+
+  // Link to a period that no longer exists (e.g. its payroll was deleted):
+  // back to the current period instead of an empty screen.
+  const periodError = periodTransactions.error
+  useEffect(() => {
+    if (
+      period &&
+      periodError instanceof HttpError &&
+      periodError.status === 404
+    )
+      setPeriod(undefined)
+  }, [period, periodError, setPeriod])
 
   const selectedPeriod =
     periods.find(summary => summary.key === period) ??
@@ -341,7 +364,7 @@ export default function ExpendituresPage({
         isClosable: true
       })
       closeForm()
-      router.replace(router.asPath)
+      await refreshMovements()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -358,6 +381,13 @@ export default function ExpendituresPage({
   const onDelete = async (id: number) => {
     if (!window.confirm(t('list.confirmDelete'))) return
 
+    // Gone from the list at once; the refresh below restores it if the
+    // delete fails.
+    const withoutDeleted = (rows: Transaction[]) =>
+      rows.filter(row => row.id !== id)
+    updateApiCache('periods/transactions', withoutDeleted)
+    updateApiCache('transactions', withoutDeleted)
+
     try {
       await localApiService.request({
         endPoint: `/proxy/delete-transaction?id=${id}`,
@@ -370,7 +400,7 @@ export default function ExpendituresPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshMovements()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -398,7 +428,7 @@ export default function ExpendituresPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshMovements()
     } catch (error) {
       if (error instanceof HttpError && error.status === 409)
         toast({
@@ -445,7 +475,7 @@ export default function ExpendituresPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshMovements()
     } catch (error) {
       if (error instanceof HttpError && error.status === 409)
         toast({
@@ -487,7 +517,7 @@ export default function ExpendituresPage({
         status: 'success',
         isClosable: true
       })
-      router.replace(router.asPath)
+      await refreshMovements()
     } catch (error) {
       toast({
         title: t('toast.error.title'),
@@ -501,6 +531,14 @@ export default function ExpendituresPage({
     }
   }
 
+  // First load: the page's skeleton, not its empty states.
+  const PageSkeleton = getPageSkeleton(router.pathname)
+  if (periodsQuery.data === undefined && !periodsQuery.error && PageSkeleton)
+    return (
+      <ProsperoLayout title={t('title')} pageDescription={t('title')}>
+        <PageSkeleton />
+      </ProsperoLayout>
+    )
   return (
     <ProsperoLayout title={t('title')} pageDescription={t('title')}>
       <Stack spacing={6}>
@@ -874,65 +912,15 @@ export default function ExpendituresPage({
 
 const PENDING_STATUSES = ['Detected', 'PendingReview']
 
-export const getServerSideProps: GetServerSideProps = withClientIp(
-  async ({ req, res, locale, defaultLocale, query }) => {
-    const { session, redirect } = await getValidSession(req, res)
-    if (redirect) return redirect
-
-    const period = typeof query.period === 'string' ? query.period : undefined
-    let transactions: Transaction[] = []
-    let pendingTransactions: Transaction[] = []
-    let periods: PeriodSummary[] = []
-
-    if (session?.accessToken) {
-      const params = {
-        authorization: `Bearer ${session.accessToken}`,
-        lang: locale
-      }
-      try {
-        const [periodTransactions, pending, allPeriods] = await Promise.all([
-          getPeriodTransactions(period, params),
-          getTransactions(
-            { reviewStatus: PENDING_STATUSES.join(',') },
-            params
-          ) as Promise<Transaction[]>,
-          getPeriods(null, params)
-        ])
-
-        // Los pendientes se muestran todos arriba, sin importar el período,
-        // así que se sacan de la lista del período para no duplicarlos.
-        transactions = periodTransactions.filter(
-          transaction => !PENDING_STATUSES.includes(transaction.reviewStatus)
-        )
-        pendingTransactions = pending
-        periods = allPeriods
-      } catch (error) {
-        // Link a un período que ya no existe (p. ej. se borró su nómina):
-        // volver al período actual en vez de mostrar la vista vacía.
-        if (period && error instanceof HttpError && error.status === 404)
-          return {
-            redirect: {
-              destination: `${
-                locale && locale !== defaultLocale ? `/${locale}` : ''
-              }/expenditures`,
-              permanent: false
-            }
-          }
-      }
-    }
-
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, [
-          'common',
-          'sidebar',
-          'mobileNav',
-          'expenditures'
-        ])),
-        transactions,
-        pendingTransactions,
-        periods
-      }
-    }
+// Translations only: the data is loaded client-side (see useApi above) and
+// the middleware already guards the route.
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale as string, [
+      'common',
+      'sidebar',
+      'mobileNav',
+      'expenditures'
+    ]))
   }
-)
+})

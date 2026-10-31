@@ -61,3 +61,28 @@ test('adds an expense from the expenditures page', async ({ page }) => {
     )
   await expectNoHorizontalScroll(page)
 })
+
+test('saving an expense refreshes the list without reloading the page', async ({
+  page
+}) => {
+  await login(page)
+  await page.goto('/expenditures')
+  // A full page load would reset this marker.
+  await page.evaluate(() => {
+    ;(window as unknown as { marker: string }).marker = 'same-page'
+  })
+
+  await page.getByRole('button', { name: 'Nuevo gasto' }).click()
+  await page.getByLabel('Monto').fill('7.25')
+  const refetch = page.waitForRequest(
+    request =>
+      request.url().includes('/api/proxy/read/periods/transactions') &&
+      request.method() === 'GET'
+  )
+  await page.getByRole('button', { name: 'Guardar gasto' }).click()
+  await refetch
+
+  expect(
+    await page.evaluate(() => (window as unknown as { marker?: string }).marker)
+  ).toBe('same-page')
+})

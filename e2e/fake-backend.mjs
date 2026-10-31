@@ -33,7 +33,19 @@ const routes = {
   'POST /api/auth/refresh': () => [201, tokens()],
   'POST /api/auth/logout': () => [200, {}],
   'GET /api/auth/profile': () => [200, { msg: 'Profile', user }],
-  'POST /api/transactions': body => [201, { id: requests.length, ...body }]
+  'POST /api/transactions': body => [201, { id: requests.length, ...body }],
+  // Screens load these with SWR. Empty lists; no current period (no payroll
+  // yet) is a 404, which the dashboard shows as its empty state.
+  'GET /api/periods': () => [200, []],
+  'GET /api/periods/transactions': () => [200, []],
+  'GET /api/periods/salary': () => [200, []],
+  'GET /api/transactions': () => [200, []],
+  'GET /api/salary': () => [200, []],
+  'GET /api/fixed-expenses': () => [200, []],
+  'GET /api/review-queue/summary': () => [
+    200,
+    { pendingTransactions: 0, pendingSalaries: 0 }
+  ]
 }
 
 const readBody = req =>
