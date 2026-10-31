@@ -89,16 +89,35 @@ jobs:
 
       - name: Deploy and wait until healthy
         id: deploy
-        # No `down` first: compose recreates the container in place. --wait
-        # blocks on docker-compose.yml's healthcheck (GET /api/health).
-        run: docker compose up -d --wait --wait-timeout 120
+        # No `down` first: compose recreates the container in place, then waits
+        # for docker-compose.yml's healthcheck (GET /api/health).
+        run: |
+          docker compose up -d
+          # Polls the container's healthcheck instead of `compose up --wait`,
+          # which needs Compose v2.17+ on the server.
+          for i in $(seq 1 24); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' prospero-frontend 2>/dev/null || echo missing)
+            if [ "$status" = healthy ]; then exit 0; fi
+            sleep 5
+          done
+          echo "::error::prospero-frontend never became healthy (last status: $status)"
+          exit 1
 
       - name: Roll back to the previous image
         if: failure() && steps.deploy.outcome == 'failure'
         run: |
           echo "::error::New image failed its health check, rolling back"
           docker logs --tail 100 prospero-frontend || true
-          IMAGE_TAG=rollback docker compose up -d --wait --wait-timeout 120
+          IMAGE_TAG=rollback docker compose up -d
+          # Polls the container's healthcheck instead of `compose up --wait`,
+          # which needs Compose v2.17+ on the server.
+          for i in $(seq 1 24); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' prospero-frontend 2>/dev/null || echo missing)
+            if [ "$status" = healthy ]; then exit 0; fi
+            sleep 5
+          done
+          echo "::error::prospero-frontend never became healthy (last status: $status)"
+          exit 1
 
       - name: Clean up old images
         # Keep the image just deployed and :rollback; drop older commit tags.
