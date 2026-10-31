@@ -71,6 +71,13 @@ already-authenticated session; it's unrelated to the login gate.
   provider in `_app`) and `if (!(await confirm({ title, destructive: true }))) return`.
 - **Building blocks:** `BottomSheet` (bottom on phones, right on desktop), `Amount` (tabular
   figures, signed/colored by kind), `EmptyState`.
+- **Quick add:** the tab bar's "+" opens `components/quick-add/QuickAddSheet` (provider in
+  `AppShell`, `useOpenQuickAdd()`): expense or income, amount parsed by `parseAmount` (accepts
+  `12,50`), category / income type as one-tap choices, date and description under "Más
+  opciones"; posts to the existing create proxies and revalidates with `useRevalidateApi`.
+- **Dashboard:** `components/dashboard/BalanceHero` (what's left this period, per day,
+  income vs. spent) and `BudgetSplitCard` (split as bars) replace the three rings and the
+  summary cards.
 
 #### Deploy
 

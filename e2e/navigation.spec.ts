@@ -27,7 +27,7 @@ test('the tab bar offers the five destinations', async ({ page }) => {
   for (const name of ['Inicio', 'Movimientos', 'Fijos', 'Más'])
     await expect(bar.getByRole('link', { name })).toBeVisible()
   await expect(
-    bar.getByRole('link', { name: 'Agregar movimiento' })
+    bar.getByRole('button', { name: 'Agregar movimiento' })
   ).toBeVisible()
   await expect(bar.getByRole('link', { name: 'Inicio' })).toHaveAttribute(
     'aria-current',
@@ -70,13 +70,4 @@ test('"Más" gathers profile, connections and preferences', async ({ page }) => 
   await expect(
     page.getByRole('button', { name: 'Cerrar sesión' })
   ).toBeVisible()
-})
-
-test('"+" opens the new expense form', async ({ page }) => {
-  await tabBar(page).getByRole('link', { name: 'Agregar movimiento' }).click()
-
-  await expect(page.getByRole('dialog', { name: 'Nuevo gasto' })).toBeVisible()
-  await expect(page.getByLabel('Monto')).toBeFocused()
-  // The ?new=1 flag is dropped so going back doesn't reopen the form.
-  await expect(page).toHaveURL(/\/expenditures$/)
 })

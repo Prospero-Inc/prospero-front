@@ -56,6 +56,7 @@ const routes = {
   'POST /api/auth/logout': () => [200, {}],
   'GET /api/auth/profile': () => [200, { msg: 'Profile', user }],
   'POST /api/transactions': body => [201, { id: requests.length, ...body }],
+  'POST /api/salary': body => [201, { id: requests.length, ...body }],
   // Screens load these with SWR: a new user with no data yet.
   'GET /api/periods/current': () => [200, emptyCurrentPeriod],
   'GET /api/periods': () => [200, []],

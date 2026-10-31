@@ -1,3 +1,4 @@
+import { QuickAddProvider } from '@/components/quick-add'
 import { MobileNav } from '@/components/ui/MobileNav'
 import { SidebarContent } from '@/components/ui/SidebarContent'
 import { Box } from '@chakra-ui/react'
@@ -32,16 +33,18 @@ const TAB_BAR_SPACE = 'calc(72px + env(safe-area-inset-bottom))'
  * instead of remounting on every screen.
  */
 export const AppShell = ({ children }: { children: ReactNode }) => (
-  <Box minH="100dvh" bg="bg.canvas">
-    <SidebarContent display={{ base: 'none', md: 'block' }} />
-    <MobileNav />
-    <Box
-      ml={{ base: 0, md: 60 }}
-      p={{ base: 0, md: 4 }}
-      pb={{ base: TAB_BAR_SPACE, md: 4 }}
-    >
-      {children}
+  <QuickAddProvider>
+    <Box minH="100dvh" bg="bg.canvas">
+      <SidebarContent display={{ base: 'none', md: 'block' }} />
+      <MobileNav />
+      <Box
+        ml={{ base: 0, md: 60 }}
+        p={{ base: 0, md: 4 }}
+        pb={{ base: TAB_BAR_SPACE, md: 4 }}
+      >
+        {children}
+      </Box>
+      <BottomTabBar display={{ base: 'flex', md: 'none' }} />
     </Box>
-    <BottomTabBar display={{ base: 'flex', md: 'none' }} />
-  </Box>
+  </QuickAddProvider>
 )

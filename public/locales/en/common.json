@@ -117,7 +117,7 @@
     }
   },
   "dashboard": {
-    "pageTitle": "Dashboard",
+    "pageTitle": "Home",
     "pageDescription": "Prospero home page",
     "daysElapsed": "{{count}} days elapsed",
     "daysRemaining": "{{count}} estimated days remaining",
@@ -174,6 +174,17 @@
       "payrolls_zero": "No payroll payments",
       "payrolls_one": "{{count}} payroll payment",
       "payrolls_other": "{{count}} payroll payments"
+    },
+    "hero": {
+      "left": "Left to spend this period",
+      "over": "Over budget this period by",
+      "perDay": "About {{amount}} a day",
+      "income": "Income",
+      "spent": "Spent"
+    },
+    "split": {
+      "title": "Your split",
+      "of": "of"
     }
   },
   "categoryBudget": {
@@ -323,5 +334,34 @@
     "language": "Language",
     "darkMode": "Dark mode",
     "signOut": "Sign out"
+  },
+  "quickAdd": {
+    "title": "New movement",
+    "kind": "Movement type",
+    "expense": "Expense",
+    "income": "Income",
+    "amount": "Amount",
+    "invalidAmount": "Enter an amount above 0, with up to 2 decimals.",
+    "category": "Category",
+    "categories": {
+      "Necesidad": "Need",
+      "Deseo": "Want",
+      "Ahorro": "Savings"
+    },
+    "incomeType": "Income type",
+    "incomeTypes": {
+      "Payroll": "Payroll",
+      "Extra": "Extra"
+    },
+    "moreOptions": "More options",
+    "fewerOptions": "Fewer options",
+    "date": "Date",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "E.g. groceries, Uber, pharmacy",
+    "saveExpense": "Save expense",
+    "saveIncome": "Save income",
+    "savedExpense": "Expense saved",
+    "savedIncome": "Income saved",
+    "error": "We couldn't save the movement"
   }
 }
