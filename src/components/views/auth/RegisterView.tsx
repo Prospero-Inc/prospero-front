@@ -100,23 +100,24 @@ export const RegisterView = () => {
             }
           },
           loading: {
-            title: 'Creando cuenta',
-            description: 'Estamos creando tu cuenta, por favor espera',
+            title: t('registerToast.loading.title'),
+            description: t('registerToast.loading.description'),
             colorScheme: 'primary'
           },
           error: error => {
             setIsLoading(false)
             return {
-              title: 'Error',
-              description: error?.message ?? 'Error al crear la cuenta'
+              title: t('registerToast.error.title'),
+              description:
+                error?.message ?? t('registerToast.error.description')
             }
           }
         }
       )
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Error al crear la cuenta',
+        title: t('registerToast.error.title'),
+        description: t('registerToast.error.description'),
         status: 'error',
         isClosable: true
       })
@@ -151,7 +152,12 @@ export const RegisterView = () => {
               control={control}
               name="name"
               render={({ field }) => (
-                <Input type="text" {...field} placeholder="John" />
+                <Input
+                  type="text"
+                  autoComplete="given-name"
+                  {...field}
+                  placeholder="John"
+                />
               )}
             />
             {errors.name && <Text color="red">{errors.name.message}</Text>}
@@ -162,7 +168,12 @@ export const RegisterView = () => {
               control={control}
               name="lastName"
               render={({ field }) => (
-                <Input type="text" {...field} placeholder="Doe" />
+                <Input
+                  type="text"
+                  autoComplete="family-name"
+                  {...field}
+                  placeholder="Doe"
+                />
               )}
             />
 
@@ -176,11 +187,17 @@ export const RegisterView = () => {
               control={control}
               name="userName"
               render={({ field }) => (
-                <Input type="text" {...field} placeholder="johnDoe" />
+                <Input
+                  type="text"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  {...field}
+                  placeholder="johnDoe"
+                />
               )}
             />
-            {errors.lastName && (
-              <Text color="red">{errors.lastName.message}</Text>
+            {errors.userName && (
+              <Text color="red">{errors.userName.message}</Text>
             )}
           </FormControl>
           <FormControl id="email">
@@ -189,7 +206,14 @@ export const RegisterView = () => {
               control={control}
               name="email"
               render={({ field }) => (
-                <Input colorScheme="primary.500" type="email" {...field} />
+                <Input
+                  colorScheme="primary.500"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  {...field}
+                />
               )}
             />
             {errors.email && <Text color="red">{errors.email.message}</Text>}
@@ -200,7 +224,11 @@ export const RegisterView = () => {
               control={control}
               name="password"
               render={({ field }) => (
-                <PasswordInput size={['sm', 'md', 'lg']} {...field} />
+                <PasswordInput
+                  size={['md', 'md', 'lg']}
+                  autoComplete="new-password"
+                  {...field}
+                />
               )}
             />
             {errors.password && (

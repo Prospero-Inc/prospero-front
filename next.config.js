@@ -14,13 +14,18 @@ const defaultRuntimeCaching = require('next-pwa/cache')
 const NETWORK_ONLY_CACHES = new Set(['next-data', 'apis', 'others'])
 const runtimeCaching = defaultRuntimeCaching.map(entry =>
   NETWORK_ONLY_CACHES.has(entry.options.cacheName)
-    ? { urlPattern: entry.urlPattern, handler: 'NetworkOnly' }
+    ? // `options` must exist: with an offline fallback page, next-pwa adds
+      // a plugin there so a failed network request shows /_offline.
+      { urlPattern: entry.urlPattern, handler: 'NetworkOnly', options: {} }
     : entry
 )
 
 const withPWA = require('next-pwa')({
   dest: 'public',
   runtimeCaching,
+  // Never precache public/assets (illustrations used only on desktop pages):
+  // every phone downloaded them on install.
+  publicExcludes: ['!noprecache/**/*', '!assets/**/*'],
   register: true,
   skipWaiting: true,
   // Precaching a stale build during `next dev` causes more confusion

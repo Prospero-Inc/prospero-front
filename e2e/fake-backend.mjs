@@ -1,0 +1,67 @@
+// Minimal stand-in for prospero-backend used by the Playwright smoke tests:
+// just enough auth for NextAuth plus transaction creation. Every other
+// endpoint answers 404, which the pages already tolerate as "no data".
+// GET /__requests returns what the front sent, so tests can assert on it.
+import { createServer } from 'node:http'
+
+const PORT = Number(process.env.FAKE_BACKEND_PORT ?? 4555)
+const requests = []
+
+const user = {
+  id: 1,
+  email: 'ana@example.com',
+  username: 'ana',
+  firstName: 'Ana',
+  lastName: 'Martínez',
+  enable2FA: false
+}
+
+const tokens = () => ({
+  accessToken: 'fake-access-token',
+  accessTokenExpiresIn: 900,
+  refreshToken: `fake-refresh-${Date.now()}`,
+  user: {
+    id: user.id,
+    name: 'Ana Martínez',
+    email: user.email,
+    username: 'ana'
+  }
+})
+
+const routes = {
+  'POST /api/auth/login': () => [201, tokens()],
+  'POST /api/auth/refresh': () => [201, tokens()],
+  'POST /api/auth/logout': () => [200, {}],
+  'GET /api/auth/profile': () => [200, { msg: 'Profile', user }],
+  'POST /api/transactions': body => [201, { id: requests.length, ...body }]
+}
+
+const readBody = req =>
+  new Promise(resolve => {
+    let raw = ''
+    req.on('data', chunk => (raw += chunk))
+    req.on('end', () => {
+      try {
+        resolve(raw ? JSON.parse(raw) : undefined)
+      } catch {
+        resolve(raw)
+      }
+    })
+  })
+
+createServer(async (req, res) => {
+  const path = req.url.split('?')[0]
+  res.setHeader('content-type', 'application/json')
+
+  if (path === '/__requests') return res.end(JSON.stringify(requests))
+
+  const body = await readBody(req)
+  requests.push({ method: req.method, path, body, headers: req.headers })
+
+  const handler = routes[`${req.method} ${path}`]
+  const [status, payload] = handler
+    ? handler(body)
+    : [404, { message: 'Not found (fake backend)' }]
+  res.statusCode = status
+  res.end(JSON.stringify(payload))
+}).listen(PORT, () => console.log(`fake backend on :${PORT}`))

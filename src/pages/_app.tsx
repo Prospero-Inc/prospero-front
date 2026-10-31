@@ -13,6 +13,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -68,6 +69,14 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         }
       }}
     >
+      <Head>
+        {/* viewport-fit=cover: draw under the notch/home bar on iPhone; the
+            safe-area insets in globals.css keep content clear of them. */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+      </Head>
       <SessionProvider session={session} refetchInterval={60}>
         <SessionWatcher />
         <RouteProgress isLoading={isLoading} />

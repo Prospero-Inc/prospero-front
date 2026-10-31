@@ -85,8 +85,11 @@ interface ExpendituresProps {
   periods: PeriodSummary[]
 }
 
-const emptyForm: TransactionData = {
-  amount: 0,
+// The amount starts empty, not 0: a prefilled 0 had to be deleted first.
+type TransactionForm = Omit<TransactionData, 'amount'> & { amount: number | '' }
+
+const emptyForm: TransactionForm = {
+  amount: '',
   date: getTodayLocalDate(),
   category: 'Necesidad',
   description: '',
@@ -178,7 +181,7 @@ export default function ExpendituresPage({
   const [dismissingDuplicateId, setDismissingDuplicateId] = useState<
     number | null
   >(null)
-  const { control, handleSubmit, reset } = useForm<TransactionData>({
+  const { control, handleSubmit, reset } = useForm<TransactionForm>({
     defaultValues: emptyForm
   })
 
@@ -307,7 +310,7 @@ export default function ExpendituresPage({
     setEditingId(null)
   }
 
-  const onSubmit = async (data: TransactionData) => {
+  const onSubmit = async (data: TransactionForm) => {
     setIsLoading(true)
     try {
       const payload = {
@@ -524,7 +527,7 @@ export default function ExpendituresPage({
           cancelLabel={t('form.cancel')}
           initialFocusRef={amountInputRef}
         >
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>{t('form.labelAmount')}</FormLabel>
             <Controller
               name="amount"

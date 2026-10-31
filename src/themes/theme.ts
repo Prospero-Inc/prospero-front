@@ -5,7 +5,7 @@ import { colors } from './colors'
 import { fonts } from './fonts'
 import { linkTheme } from './link'
 import { shadows } from './shadows'
-import { buttonTheme, inputTheme } from './sizes'
+import { buttonTheme, inputTheme, numberInputTheme, selectTheme } from './sizes'
 
 export const theme = extendTheme({
   colors,
@@ -22,12 +22,9 @@ export const theme = extendTheme({
       }
     },
     Button: buttonTheme,
-    Input: {
-      ...inputTheme,
-      sizes: {
-        ...inputTheme.sizes
-      }
-    },
+    Input: inputTheme,
+    Select: selectTheme,
+    NumberInput: numberInputTheme,
     Link: linkTheme
   },
   styles: {

@@ -243,5 +243,42 @@
       "text": "Hubo un problema de conexión o el servidor está ocupado. Tu enlace sigue siendo válido: inténtalo de nuevo.",
       "button": "Reintentar"
     }
+  },
+  "authPages": {
+    "login": {
+      "title": "Iniciar sesión · Prospero",
+      "description": "Entrá a tu presupuesto"
+    },
+    "verifyAccount": {
+      "title": "Verificar cuenta · Prospero",
+      "description": "Verificación de la cuenta"
+    },
+    "verify2fa": {
+      "title": "Verificación en dos pasos · Prospero",
+      "description": "Código de tu app de autenticación"
+    },
+    "forgotPassword": {
+      "title": "Recuperar contraseña · Prospero",
+      "description": "Recuperá el acceso a tu cuenta"
+    }
+  },
+  "passwordInput": {
+    "toggle": "Mostrar u ocultar la contraseña"
+  },
+  "registerToast": {
+    "loading": {
+      "title": "Creando cuenta",
+      "description": "Estamos creando tu cuenta, por favor esperá"
+    },
+    "error": {
+      "title": "Error",
+      "description": "No pudimos crear la cuenta"
+    }
+  },
+  "offline": {
+    "title": "Sin conexión · Prospero",
+    "heading": "Sin conexión",
+    "text": "No pudimos cargar esta pantalla. Revisá tu conexión e intentá de nuevo; tus datos siguen guardados en tu cuenta.",
+    "retry": "Reintentar"
   }
 }

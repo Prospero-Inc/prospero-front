@@ -1,3 +1,4 @@
+import { formatMoney } from '@/lib/formatMoney'
 import { PeriodCategoryBudget } from '@/services/periods'
 import {
   CircularProgress,
@@ -11,6 +12,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import { MdWarningAmber } from 'react-icons/md'
 
 interface CategoryBudgetBarsProps {
@@ -38,6 +40,7 @@ const CategoryGauge = ({
   colorScheme: string
 }) => {
   const { t } = useTranslation('common')
+  const { locale } = useRouter()
   const percent =
     budget.budgeted > 0 ? (budget.spent / budget.budgeted) * 100 : 0
   const isOverBudget = percent > 100
@@ -67,21 +70,22 @@ const CategoryGauge = ({
       </CircularProgress>
       <Text fontWeight="bold">{label}</Text>
       <Text fontSize="sm" color="GrayText">
-        ${budget.spent.toFixed(2)} / ${budget.budgeted.toFixed(2)}
+        {formatMoney(budget.spent, locale)} /{' '}
+        {formatMoney(budget.budgeted, locale)}
       </Text>
       {isOverBudget ? (
         <Flex align="center" gap={1} color={overBudgetTextColor}>
           <Icon as={MdWarningAmber} boxSize={4} aria-hidden="true" />
           <Text fontSize="sm" fontWeight="semibold">
             {t('categoryBudget.overBudget', {
-              amount: `$${remainingAmount.toFixed(2)}`
+              amount: formatMoney(remainingAmount, locale)
             })}
           </Text>
         </Flex>
       ) : (
         <Text fontSize="sm" color={normalTextColor}>
           {t('categoryBudget.remaining', {
-            amount: `$${remainingAmount.toFixed(2)}`
+            amount: formatMoney(remainingAmount, locale)
           })}
         </Text>
       )}

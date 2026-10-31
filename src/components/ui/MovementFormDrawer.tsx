@@ -74,7 +74,11 @@ export const MovementFormDrawer = ({
             {children}
           </Stack>
         </DrawerBody>
-        <DrawerFooter borderTopWidth="1px" gap={3}>
+        <DrawerFooter
+          borderTopWidth="1px"
+          gap={3}
+          pb="calc(var(--chakra-space-4) + env(safe-area-inset-bottom))"
+        >
           <Button variant="ghost" onClick={onClose} minH="44px">
             {cancelLabel}
           </Button>
