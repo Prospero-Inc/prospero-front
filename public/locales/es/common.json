@@ -363,5 +363,53 @@
     "savedExpense": "Gasto guardado",
     "savedIncome": "Ingreso guardado",
     "error": "No pudimos guardar el movimiento"
+  },
+  "review": {
+    "title": "Por revisar",
+    "count_one": "{{count}} movimiento detectado en tu Gmail",
+    "count_other": "{{count}} movimientos detectados en tu Gmail",
+    "expenseQuestion": "¿Qué tipo de gasto es?",
+    "incomeQuestion": "¿Qué tipo de ingreso es?",
+    "incomeCategories": {
+      "Payroll": "Nómina",
+      "Extra": "Extra",
+      "Transfer": "Transferencia",
+      "Reimbursement": "Reembolso",
+      "Deposit": "Depósito",
+      "Other": "Otro"
+    },
+    "untitledExpense": "Gasto sin concepto",
+    "untitledIncome": "Ingreso sin concepto",
+    "confirmed": "Confirmado como {{label}}",
+    "undo": "Deshacer",
+    "error": "No pudimos confirmar el movimiento",
+    "empty": {
+      "title": "Todo al día",
+      "description": "No hay movimientos de Gmail esperando tu revisión.",
+      "action": "Ver movimientos"
+    }
+  },
+  "movements": {
+    "title": "Movimientos",
+    "manual": "Manual",
+    "pending_one": "{{count}} por revisar de Gmail",
+    "pending_other": "{{count}} por revisar de Gmail",
+    "pendingHint": "Un toque para confirmar cada uno",
+    "review": "Revisar",
+    "filterLabel": "Mostrar",
+    "filters": {
+      "all": "Todos",
+      "expense": "Gastos",
+      "income": "Ingresos"
+    },
+    "columns": {
+      "concept": "Concepto",
+      "type": "Tipo",
+      "amount": "Monto"
+    },
+    "empty": {
+      "title": "Sin movimientos en este período",
+      "description": "Lo que registres con el botón + va a aparecer acá."
+    }
   }
 }

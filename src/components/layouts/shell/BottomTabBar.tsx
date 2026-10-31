@@ -34,9 +34,9 @@ const TABS: [Tab, Tab, Tab, Tab] = [
   { key: 'home', href: '/dashboard', icon: MdHome, matches: ['/dashboard'] },
   {
     key: 'movements',
-    href: '/expenditures',
+    href: '/movements',
     icon: MdSwapVert,
-    matches: ['/expenditures', '/entries']
+    matches: ['/movements', '/review', '/expenditures', '/entries']
   },
   {
     key: 'fixed',

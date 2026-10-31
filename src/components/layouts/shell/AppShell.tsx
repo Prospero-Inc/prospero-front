@@ -16,7 +16,9 @@ const APP_SHELL_ROUTES = [
   '/budget-calculator',
   '/settings',
   '/profile',
-  '/more'
+  '/more',
+  '/movements',
+  '/review'
 ]
 
 export const usesAppShell = (pathname: string): boolean =>

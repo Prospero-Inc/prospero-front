@@ -75,6 +75,12 @@ already-authenticated session; it's unrelated to the login gate.
   `AppShell`, `useOpenQuickAdd()`): expense or income, amount parsed by `parseAmount` (accepts
   `12,50`), category / income type as one-tap choices, date and description under "Más
   opciones"; posts to the existing create proxies and revalidates with `useRevalidateApi`.
+- **Movimientos / Por revisar:** the "Movimientos" tab is `pages/movements.tsx` (expenses and
+  income of a period in one day-grouped list, Todos · Gastos · Ingresos via shallow `?kind=`;
+  rows link to `/expenditures?edit=<id>` / `/entries?edit=<id>`, which open that row's form).
+  `pages/review.tsx` is the Gmail queue: one tap on a category confirms; the card hides at once
+  and `hooks/useUndoableCommit` only sends the PATCH after the 5 s "Deshacer" window (flushed on
+  leaving the screen / app going to background), so undo never needs a reverse API call.
 - **Dashboard:** `components/dashboard/BalanceHero` (what's left this period, per day,
   income vs. spent) and `BudgetSplitCard` (split as bars) replace the three rings and the
   summary cards.

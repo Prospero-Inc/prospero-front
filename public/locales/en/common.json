@@ -363,5 +363,53 @@
     "savedExpense": "Expense saved",
     "savedIncome": "Income saved",
     "error": "We couldn't save the movement"
+  },
+  "review": {
+    "title": "To review",
+    "count_one": "{{count}} movement detected in your Gmail",
+    "count_other": "{{count}} movements detected in your Gmail",
+    "expenseQuestion": "What kind of expense is it?",
+    "incomeQuestion": "What kind of income is it?",
+    "incomeCategories": {
+      "Payroll": "Payroll",
+      "Extra": "Extra",
+      "Transfer": "Transfer",
+      "Reimbursement": "Refund",
+      "Deposit": "Deposit",
+      "Other": "Other"
+    },
+    "untitledExpense": "Expense without description",
+    "untitledIncome": "Income without description",
+    "confirmed": "Confirmed as {{label}}",
+    "undo": "Undo",
+    "error": "We couldn't confirm the movement",
+    "empty": {
+      "title": "All caught up",
+      "description": "No Gmail movements are waiting for your review.",
+      "action": "See movements"
+    }
+  },
+  "movements": {
+    "title": "Activity",
+    "manual": "Manual",
+    "pending_one": "{{count}} from Gmail to review",
+    "pending_other": "{{count}} from Gmail to review",
+    "pendingHint": "One tap to confirm each",
+    "review": "Review",
+    "filterLabel": "Show",
+    "filters": {
+      "all": "All",
+      "expense": "Expenses",
+      "income": "Income"
+    },
+    "columns": {
+      "concept": "Description",
+      "type": "Type",
+      "amount": "Amount"
+    },
+    "empty": {
+      "title": "No movements in this period",
+      "description": "What you log with the + button shows up here."
+    }
   }
 }

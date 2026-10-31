@@ -55,7 +55,7 @@ interface MovementFiltersBarProps {
 
 /** Etiqueta legible de un período: "10 oct – 23 oct", "Actual · desde 10
  * oct"… `timeZone: 'UTC'` por el mismo motivo que en `MovementSummary`. */
-const usePeriodLabel = () => {
+export const usePeriodLabel = () => {
   const { t } = useTranslation('common', { keyPrefix: 'movementFilters' })
   const { locale } = useRouter()
   const formatter = new Intl.DateTimeFormat(locale ?? 'es', {
