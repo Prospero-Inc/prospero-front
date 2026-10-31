@@ -39,14 +39,25 @@ for a hardcoded `allowedOrigins` list — update that list if a new client origi
 Login is two-step when the account has 2FA enabled: `LoginView` first calls
 `POST /proxy/login`; a plain success returns `{ accessToken, accessTokenExpiresIn, refreshToken,
 user }` and is handed straight to `signIn('credentials', { accessToken, refreshToken,
-accessTokenExpiresIn, user: JSON.stringify(user), ... })` (the `CredentialsProvider.authorize` in
-`authConfig.ts` short-circuits to that set of fields instead of calling the backend again when it
-sees them). A `{ requires2FA, preAuthToken }` response instead stashes `preAuthToken` in
+accessTokenExpiresIn, ... })`. `CredentialsProvider.authorize` in `authConfig.ts` never trusts
+that posted token (the NextAuth callback is public): it resolves the user from `GET /auth/profile`
+with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthToken }` response instead stashes `preAuthToken` in
 `sessionStorage` (`PRE_AUTH_TOKEN_STORAGE_KEY` in `src/interfaces/auth.interface.ts`) and routes to
 `/auth/verify-2fa` (`VerifyTwoFactorView`), which exchanges the OTP + preAuthToken via
 `POST /proxy/login-verify-2fa` for the real token set before calling `signIn` the same way. Don't
 confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
 already-authenticated session; it's unrelated to the login gate.
+
+#### Server-side calls to the backend
+
+Server code reaches the backend over the internal Docker network (`API_INTERNAL_URL`, set in
+`docker-compose.yml`) and forwards the browser's IP as `X-Forwarded-For` so the backend's rate
+limits are per user: wrap any new entry point that calls the backend — API routes go through
+`createHandler`, `getServerSideProps` through `withClientIp`, anything else through
+`runWithClientIp` (all in `src/lib/server/clientIp.ts`, server-only, not exported from `@/lib`).
+Gmail's OAuth redirect lands on `pages/api/gmail/callback.ts`, which completes the flow with that
+browser's session (`POST /gmail/oauth/complete`) so a consent link can't be completed by another
+user.
 
 #### Access + refresh token rotation
 
