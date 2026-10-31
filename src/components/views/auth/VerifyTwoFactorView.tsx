@@ -61,7 +61,6 @@ export const VerifyTwoFactorView = () => {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         accessTokenExpiresIn: String(response.accessTokenExpiresIn),
-        user: JSON.stringify(response.user),
         redirect: false,
         callbackUrl: '/dashboard'
       })
