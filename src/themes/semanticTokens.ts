@@ -5,17 +5,29 @@
 // lightened (dark mode) so they pass WCAG AA (4.5:1) on their background.
 export const semanticTokens = {
   colors: {
-    'bg.canvas': { default: '#F5F5FA', _dark: 'gray.900' },
-    'bg.surface': { default: 'white', _dark: 'gray.800' },
-    'bg.subtle': { default: 'gray.50', _dark: 'whiteAlpha.100' },
-    'border.subtle': { default: 'gray.200', _dark: 'whiteAlpha.200' },
+    // Values below are the design's own (docs/diseno-mobile.html :root and
+    // .screen.dark), so screens match the mockups in both themes.
+    'bg.canvas': { default: '#F5F5FA', _dark: '#121220' },
+    'bg.surface': { default: '#FFFFFF', _dark: '#1D1D2E' },
+    'bg.subtle': { default: '#F5F5FA', _dark: '#24243A' },
+    'border.subtle': { default: '#E6E6EF', _dark: '#2C2C40' },
 
-    'text.primary': { default: '#1B1B2F', _dark: 'whiteAlpha.900' },
+    'text.primary': { default: '#1B1B2F', _dark: '#F2F2F8' },
     // 6.1:1 on white; the old gray.500 (#718096) was 4.0:1.
-    'text.secondary': { default: '#5F6175', _dark: 'gray.400' },
+    'text.secondary': { default: '#5F6175', _dark: '#A3A5BA' },
 
-    'brand.solid': { default: '#5352ED', _dark: '#7F7FF7' },
-    'brand.text': { default: '#4A4ADB', _dark: '#A4A4FA' },
+    'brand.solid': { default: '#5352ED', _dark: '#5352ED' },
+    'brand.text': { default: '#5352ED', _dark: '#A9A8FF' },
+    'brand.subtle': { default: '#EBEBFE', _dark: '#2A2A55' },
+    'hero.bg': { default: '#5352ED', _dark: '#3E3DC4' },
+    'track.bg': { default: '#EEEEF5', _dark: '#2C2C40' },
+    'tab.inactive': { default: '#6E7085', _dark: '#9C9EB4' },
+    'tab.active': { default: '#5352ED', _dark: '#A9A8FF' },
+    'tabbar.bg': {
+      default: 'rgba(255,255,255,0.96)',
+      _dark: 'rgba(24,24,38,0.96)'
+    },
+    'alert.iconBg': { default: '#FFFFFF', _dark: '#241A14' },
 
     // Fills (bars, dots, icons) and their AA text variants.
     'money.income': { default: '#12B886', _dark: '#38D9A9' },
@@ -23,10 +35,14 @@ export const semanticTokens = {
     'money.expense': { default: '#E03A3D', _dark: '#FF6B6E' },
     'money.expenseText': { default: '#C92A2D', _dark: '#FFA8AA' },
     'status.pending': { default: '#C2410C', _dark: '#FDBA74' },
-    'status.pendingBg': { default: '#FFF4EC', _dark: 'rgba(194,65,12,0.18)' },
+    'status.pendingBg': { default: '#FFF1E6', _dark: '#3A2418' },
+    // Filled pending (buttons, badges): same orange in both themes, white
+    // text on it is 5.2:1.
+    'status.pendingSolid': { default: '#C2410C', _dark: '#C2410C' },
 
-    'category.Necesidad': { default: '#5352ED', _dark: '#7F7FF7' },
-    'category.Deseo': { default: '#F59F00', _dark: '#FFC94D' },
-    'category.Ahorro': { default: '#12B886', _dark: '#38D9A9' }
+    // Same in both themes, as in the design.
+    'category.Necesidad': { default: '#5352ED', _dark: '#5352ED' },
+    'category.Deseo': { default: '#F59F00', _dark: '#F59F00' },
+    'category.Ahorro': { default: '#12B886', _dark: '#12B886' }
   }
 }

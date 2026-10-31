@@ -175,16 +175,31 @@
       "payrolls_one": "{{count}} pago de nómina",
       "payrolls_other": "{{count}} pagos de nómina"
     },
-    "hero": {
-      "left": "Te quedan para este período",
-      "over": "Te pasaste del presupuesto por",
-      "perDay": "Unos {{amount}} por día",
-      "income": "Ingresos",
-      "spent": "Gastado"
-    },
     "split": {
       "title": "Tu reparto",
       "of": "de"
+    },
+    "home": {
+      "left": "Te quedan para este período",
+      "over": "Te pasaste del presupuesto por",
+      "daysLeft_one": "falta {{count}} día",
+      "daysLeft_other": "faltan {{count}} días",
+      "payday": "hoy es día de pago",
+      "paymentDue": "tu pago estimado ya pasó",
+      "perDay": "unos {{amount}} por día",
+      "income": "Ingresos",
+      "spent": "Gastado",
+      "toReview_one": "{{count}} movimiento por revisar",
+      "toReview_other": "{{count}} movimientos por revisar",
+      "fromGmail": "Detectados en tu Gmail",
+      "review": "Revisar",
+      "recent": "Recientes",
+      "seeAll": "Ver todo",
+      "today": "hoy",
+      "yesterday": "ayer",
+      "toClassify": "Por clasificar",
+      "noRecent": "Todavía no registraste gastos en este período.",
+      "greeting": "Hola, {{name}}"
     }
   },
   "categoryBudget": {

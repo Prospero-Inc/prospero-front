@@ -175,16 +175,31 @@
       "payrolls_one": "{{count}} payroll payment",
       "payrolls_other": "{{count}} payroll payments"
     },
-    "hero": {
-      "left": "Left to spend this period",
-      "over": "Over budget this period by",
-      "perDay": "About {{amount}} a day",
-      "income": "Income",
-      "spent": "Spent"
-    },
     "split": {
       "title": "Your split",
       "of": "of"
+    },
+    "home": {
+      "left": "Left to spend this period",
+      "over": "Over budget this period by",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "payday": "payday is today",
+      "paymentDue": "your estimated payday has passed",
+      "perDay": "about {{amount}} a day",
+      "income": "Income",
+      "spent": "Spent",
+      "toReview_one": "{{count}} movement to review",
+      "toReview_other": "{{count}} movements to review",
+      "fromGmail": "Detected in your Gmail",
+      "review": "Review",
+      "recent": "Recent",
+      "seeAll": "See all",
+      "today": "today",
+      "yesterday": "yesterday",
+      "toClassify": "To classify",
+      "noRecent": "No expenses logged this period yet.",
+      "greeting": "Hi, {{name}}"
     }
   },
   "categoryBudget": {

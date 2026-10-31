@@ -8,17 +8,20 @@ interface Props {
   title: string
   pageDescription: string
   imageFullUrl?: string
+  /** Shown above the title in the phone top bar (e.g. "Hola, Ana"). */
+  greeting?: string
 }
 
 export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   children,
   title,
   pageDescription,
-  imageFullUrl
+  imageFullUrl,
+  greeting
 }) => {
   // The shell (menus, tab bar) lives in _app so it persists across pages;
   // here only the title and the page container.
-  useSetAppShellTitle(title)
+  useSetAppShellTitle(title, greeting)
 
   return (
     <>
@@ -37,7 +40,7 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
         px={{ base: 4, md: 6, lg: 8 }}
         py={{ base: 0, md: 6, lg: 8 }}
         maxW="container.2xl"
-        my={5}
+        my={{ base: 2, md: 5 }}
       >
         {children}
       </Container>

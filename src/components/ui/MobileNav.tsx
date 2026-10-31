@@ -38,7 +38,7 @@ export const MobileNav = (props: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
-  const title = useAppShellTitle()
+  const { title, greeting } = useAppShellTitle()
   if (status === 'loading') return null
 
   const handleChangeColorMode = () => {
@@ -62,22 +62,29 @@ export const MobileNav = (props: MobileProps) => {
       top={0}
       zIndex="sticky"
       alignItems="center"
-      bg={useColorModeValue('white', 'gray.900')}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+      bg={{ base: 'bg.canvas', md: 'bg.surface' }}
+      borderBottomWidth={{ base: 0, md: '1px' }}
+      borderBottomColor="border.subtle"
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
       {...props}
     >
-      <Text
-        display={{ base: 'block', md: 'none' }}
-        as="h1"
-        fontSize="xl"
-        fontWeight="bold"
-        color="text.primary"
-        noOfLines={1}
-      >
-        {title}
-      </Text>
+      <Box display={{ base: 'block', md: 'none' }} minW={0}>
+        {greeting && (
+          <Text fontSize="13px" fontWeight="medium" color="text.secondary">
+            {greeting}
+          </Text>
+        )}
+        <Text
+          as="h1"
+          fontSize="20px"
+          fontWeight="bold"
+          lineHeight="short"
+          color="text.primary"
+          noOfLines={1}
+        >
+          {title}
+        </Text>
+      </Box>
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton
           display={{ base: 'none', md: 'flex' }}
@@ -102,7 +109,16 @@ export const MobileNav = (props: MobileProps) => {
               _focusVisible={{ boxShadow: 'outline' }}
             >
               <HStack>
-                <Avatar size={'sm'} name={session?.user?.name ?? undefined} />
+                {/* Initials in the brand's colors, as in the design (Chakra's
+                    default picks a random color per name). */}
+                <Avatar
+                  name={session?.user?.name ?? undefined}
+                  boxSize="36px"
+                  bg="brand.subtle"
+                  color="brand.text"
+                  fontWeight="bold"
+                  sx={{ '& > div': { fontSize: '14px' } }}
+                />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
                   alignItems="flex-start"
