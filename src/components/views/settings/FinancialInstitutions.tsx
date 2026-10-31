@@ -1,3 +1,4 @@
+import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
 import { localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
@@ -48,6 +49,8 @@ export const FinancialInstitutions = ({
   })
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
+  const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const authHeader = { Authorization: `Bearer ${session?.accessToken}` }
 
@@ -165,7 +168,14 @@ export const FinancialInstitutions = ({
   }
 
   const onDeleteInstitution = async (id: number) => {
-    if (!window.confirm(t('list.confirmDelete'))) return
+    if (
+      !(await confirm({
+        title: t('list.confirmDelete'),
+        confirmLabel: tCommon('confirmSheet.delete'),
+        destructive: true
+      }))
+    )
+      return
 
     setDeletingInstitutionId(id)
     try {

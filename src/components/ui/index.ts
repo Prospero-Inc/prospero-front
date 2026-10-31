@@ -1,4 +1,3 @@
-export * from './SideBar'
 export * from './MotionDiv'
 export * from './AuthNav'
 export * from './Brand'

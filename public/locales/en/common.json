@@ -284,5 +284,44 @@
   "swUpdate": {
     "text": "A new version of Prospero is available.",
     "action": "Update"
+  },
+  "confirmSheet": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "disconnect": "Disconnect",
+    "dismiss": "Dismiss"
+  },
+  "tabBar": {
+    "label": "Main navigation",
+    "home": "Home",
+    "movements": "Activity",
+    "add": "Add a movement",
+    "fixed": "Fixed",
+    "more": "More",
+    "pending_one": "{{count}} item to review",
+    "pending_other": "{{count}} items to review"
+  },
+  "more": {
+    "title": "More",
+    "payFrequency": {
+      "Biweekly": "Paid every two weeks",
+      "Monthly": "Paid monthly"
+    },
+    "sections": {
+      "connections": "Connections",
+      "account": "Account",
+      "preferences": "Preferences"
+    },
+    "gmail": "Gmail and banks",
+    "notifications": "Notifications",
+    "budget": "Split and pay frequency",
+    "security": "Security and 2FA",
+    "twoFaOn": "On",
+    "twoFaOff": "Off",
+    "calculator": "Budget calculator",
+    "language": "Language",
+    "darkMode": "Dark mode",
+    "signOut": "Sign out"
   }
 }

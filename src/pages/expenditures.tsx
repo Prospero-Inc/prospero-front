@@ -1,4 +1,5 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { MovementDayList } from '@/components/ui/MovementDayList'
 import {
   FilterResults,
@@ -154,6 +155,8 @@ export default function ExpendituresPage() {
   const { t } = useTranslation('expenditures')
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
+  const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -316,6 +319,22 @@ export default function ExpendituresPage() {
     formDrawer.onOpen()
   }
 
+  // The tab bar's "+" links here with ?new=1: open the form right away and
+  // drop the flag, so going back or reloading doesn't reopen it.
+  const wantsNewExpense = router.query.new === '1'
+  useEffect(() => {
+    if (!wantsNewExpense) return
+    openCreate()
+    const query = Object.fromEntries(
+      Object.entries(router.query).filter(([key]) => key !== 'new')
+    )
+    router.replace({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+      scroll: false
+    })
+    // Runs once per "+" tap (keyed on the flag only).
+  }, [wantsNewExpense])
+
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
     reset({
@@ -379,7 +398,14 @@ export default function ExpendituresPage() {
   }
 
   const onDelete = async (id: number) => {
-    if (!window.confirm(t('list.confirmDelete'))) return
+    if (
+      !(await confirm({
+        title: t('list.confirmDelete'),
+        confirmLabel: tCommon('confirmSheet.delete'),
+        destructive: true
+      }))
+    )
+      return
 
     // Gone from the list at once; the refresh below restores it if the
     // delete fails.
@@ -413,7 +439,8 @@ export default function ExpendituresPage() {
   }
 
   const onNotSameMovement = async (processedEmailId: number) => {
-    if (!window.confirm(t('possibleDuplicate.confirmDialog'))) return
+    if (!(await confirm({ title: t('possibleDuplicate.confirmDialog') })))
+      return
 
     setResolvingDuplicateId(processedEmailId)
     try {
@@ -460,7 +487,14 @@ export default function ExpendituresPage() {
   }
 
   const onDismissDuplicate = async (processedEmailId: number) => {
-    if (!window.confirm(t('possibleDuplicate.dismissConfirmDialog'))) return
+    if (
+      !(await confirm({
+        title: t('possibleDuplicate.dismissConfirmDialog'),
+        confirmLabel: tCommon('confirmSheet.dismiss'),
+        destructive: true
+      }))
+    )
+      return
 
     setDismissingDuplicateId(processedEmailId)
     try {

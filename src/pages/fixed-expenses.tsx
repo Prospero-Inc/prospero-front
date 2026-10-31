@@ -1,4 +1,5 @@
 import { ProsperoLayout } from '@/components/layouts'
+import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
 import {
   CategoryBadge,
@@ -118,6 +119,8 @@ export default function FixedExpensesPage() {
   const refreshFixedExpenses = () =>
     revalidateApi('fixed-expenses', 'periods', 'transactions')
   const toast = useToast()
+  const confirm = useConfirm()
+  const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const { formatAmount } = useMovementFormatters()
   const today = useToday()
@@ -229,7 +232,13 @@ export default function FixedExpensesPage() {
   }
 
   const onDelete = async (fixedExpense: FixedExpense) => {
-    if (!window.confirm(t('list.confirmDelete', { name: fixedExpense.name })))
+    if (
+      !(await confirm({
+        title: t('list.confirmDelete', { name: fixedExpense.name }),
+        confirmLabel: tCommon('confirmSheet.delete'),
+        destructive: true
+      }))
+    )
       return
 
     // Gone from the list at once; the refresh restores it if the delete fails.

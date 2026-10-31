@@ -56,6 +56,22 @@ with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthTo
 confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
 already-authenticated session; it's unrelated to the login gate.
 
+#### App shell and UI conventions (mobile wave 4)
+
+- **Shell:** `components/layouts/shell/AppShell.tsx` is mounted **once in `_app`** for the routes
+  in `APP_SHELL_ROUTES` (desktop side menu; phone 56 px top bar + `BottomTabBar` with Inicio ·
+  Movimientos · "+" · Fijos · Más). It persists across navigation; `ProsperoLayout` only sets
+  the `<title>`, announces it to the top bar (`useSetAppShellTitle`) and renders the page
+  container. A new app page must be added to `APP_SHELL_ROUTES`.
+- **Colors:** use the semantic tokens in `themes/semanticTokens.ts` (`text.primary`,
+  `text.secondary`, `money.incomeText`, `money.expenseText`, `status.pending`,
+  `category.<Necesidad|Deseo|Ahorro>`, `bg.*`, `border.subtle`) instead of raw palette values or
+  new `useColorModeValue` pairs; text tones are AA-checked in both modes.
+- **Confirmations:** never `window.confirm` — `const confirm = useConfirm()` (`ConfirmSheet`,
+  provider in `_app`) and `if (!(await confirm({ title, destructive: true }))) return`.
+- **Building blocks:** `BottomSheet` (bottom on phones, right on desktop), `Amount` (tabular
+  figures, signed/colored by kind), `EmptyState`.
+
 #### Deploy
 
 The image only gets non-secret build args (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`);
