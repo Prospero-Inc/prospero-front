@@ -110,7 +110,7 @@ const BudgetEmptyState = () => {
       </Text>
       <Button
         as={NextLink}
-        href="/entries"
+        href="/welcome"
         colorScheme="primary"
         size="sm"
         mt={2}

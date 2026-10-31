@@ -81,6 +81,11 @@ already-authenticated session; it's unrelated to the login gate.
   `pages/review.tsx` is the Gmail queue: one tap on a category confirms; the card hides at once
   and `hooks/useUndoableCommit` only sends the PATCH after the 5 s "Deshacer" window (flushed on
   leaving the screen / app going to background), so undo never needs a reverse API call.
+- **First steps:** `pages/welcome.tsx` (outside the shell): pay frequency → split (presets or
+  ± steppers; `components/welcome/split.ts` `adjustSplit` keeps it at exactly 100 %, which the
+  backend requires) → last payment (Payroll). Entered from the dashboard's empty state ("Configurar
+  mi presupuesto"). iOS launch screens: `public/splash/*` + `apple-touch-startup-image` links in
+  `_document` (regenerate them if the icon or brand color changes).
 - **Dashboard:** `components/dashboard/BalanceHero` (what's left this period, per day,
   income vs. spent) and `BudgetSplitCard` (split as bars) replace the three rings and the
   summary cards.
