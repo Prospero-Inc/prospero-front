@@ -3,6 +3,7 @@ import { ProsperoLayout } from '@/components/layouts'
 import { SessionWatcher } from '@/components/ui'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
+import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
 import {
   PendingRouteContext,
   RouteLoadingContext,
@@ -77,8 +78,10 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
       </Head>
-      <SessionProvider session={session} refetchInterval={60}>
+      {/* 5 min: the access token lasts 15, and each poll is a request. */}
+      <SessionProvider session={session} refetchInterval={300}>
         <SessionWatcher />
+        <ServiceWorkerUpdater />
         <RouteProgress isLoading={isLoading} />
         <RouteLoadingContext.Provider value={routeLoading}>
           <PendingRouteContext.Provider

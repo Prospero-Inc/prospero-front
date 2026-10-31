@@ -280,5 +280,9 @@
     "heading": "You're offline",
     "text": "We couldn't load this screen. Check your connection and try again; your data is safe in your account.",
     "retry": "Try again"
+  },
+  "swUpdate": {
+    "text": "A new version of Prospero is available.",
+    "action": "Update"
   }
 }
