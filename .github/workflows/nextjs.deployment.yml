@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.16.0
+          node-version: 22.23.4
 
       - name: Install dependencies
         run: |
@@ -52,14 +52,20 @@ jobs:
             NODE_ENV=production
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            AUTH_SECRET=${{ secrets.AUTH_SECRET }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     needs: build
     runs-on: self-hosted
+
+    env:
+      # Deploy exactly the image built from this commit, never `latest`;
+      # docker-compose.yml reads it as ${IMAGE_TAG}.
+      IMAGE_TAG: ${{ github.sha }}
+      # Passed to the container at runtime by docker-compose.yml, so it is
+      # never baked into the image.
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
     steps:
       - uses: actions/checkout@v4
@@ -71,14 +77,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull latest image
+      - name: Keep the running image for rollback
+        # Tag whatever is running now as :rollback before anything changes.
+        # No-op on the very first deploy (no container yet).
+        run: |
+          RUNNING=$(docker inspect --format '{{.Image}}' prospero-frontend 2>/dev/null || true)
+          if [ -n "$RUNNING" ]; then docker tag "$RUNNING" ${{ env.IMAGE }}:rollback; fi
+
+      - name: Pull this commit's image
         run: docker compose pull
 
-      - name: Stop existing container
-        run: docker compose down
+      - name: Deploy and wait until healthy
+        id: deploy
+        # No `down` first: compose recreates the container in place. --wait
+        # blocks on docker-compose.yml's healthcheck (GET /api/health).
+        run: docker compose up -d --wait --wait-timeout 120
 
-      - name: Deploy Docker container
-        run: docker compose up -d
+      - name: Roll back to the previous image
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          echo "::error::New image failed its health check, rolling back"
+          docker logs --tail 100 prospero-frontend || true
+          IMAGE_TAG=rollback docker compose up -d --wait --wait-timeout 120
 
       - name: Clean up old images
-        run: docker image prune -a -f
+        # Keep the image just deployed and :rollback; drop older commit tags.
+        run: |
+          docker images ${{ env.IMAGE }} --format '{{.Tag}} {{.ID}}' \
+            | awk -v keep="${{ env.IMAGE_TAG }}" '$1 != keep && $1 != "rollback" && $1 != "latest" {print $2}' \
+            | sort -u | xargs -r docker rmi || true
+          docker image prune -f

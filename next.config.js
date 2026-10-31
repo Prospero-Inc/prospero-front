@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 
-const { i18n } = require('./next-i18next.config.js')
+// Only the routing keys: next-i18next's config also carries i18next options
+// (`interpolation`) that Next rejects as unknown.
+const {
+  i18n: { defaultLocale, locales, localeDetection }
+} = require('./next-i18next.config.js')
+const i18n = { defaultLocale, locales, localeDetection }
 const defaultRuntimeCaching = require('next-pwa/cache')
 
 // next-pwa's defaults cache *user data* in the service worker:
