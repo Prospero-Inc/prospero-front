@@ -93,7 +93,12 @@ createServer(async (req, res) => {
   const body = await readBody(req)
   requests.push({ method: req.method, path, body, headers: req.headers })
 
-  const handler = routes[`${req.method} ${path}`]
+  // Review queue confirmations: PATCH /api/transactions/:id, /api/salary/:id
+  const isPatchById =
+    req.method === 'PATCH' && /^\/api\/(transactions|salary)\/\d+$/.test(path)
+  const handler = isPatchById
+    ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
+    : routes[`${req.method} ${path}`]
   const [status, payload] = handler
     ? handler(body)
     : [404, { message: 'Not found (fake backend)' }]

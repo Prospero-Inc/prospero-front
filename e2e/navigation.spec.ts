@@ -45,7 +45,7 @@ test('the shell stays mounted while moving between screens', async ({
   await tabBar(page).getByRole('link', { name: 'Fijos' }).click()
   await page.waitForURL('**/fixed-expenses')
   await tabBar(page).getByRole('link', { name: 'Movimientos' }).click()
-  await page.waitForURL('**/expenditures')
+  await page.waitForURL('**/movements')
 
   expect(
     await tabBar(page).evaluate(

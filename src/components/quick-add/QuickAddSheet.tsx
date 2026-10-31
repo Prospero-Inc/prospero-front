@@ -1,4 +1,5 @@
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { ChoiceButton as Choice } from '@/components/ui/ChoiceButton'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, localApiService } from '@/lib'
 import { useRevalidateApi } from '@/lib/useApi'
@@ -27,49 +28,6 @@ type Kind = 'expense' | 'income'
 
 const CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 const INCOME_TYPES: IncomeType[] = ['Payroll', 'Extra']
-
-/**
- * Segmented choice: big, one tap. Selected = 2 px border and dot in the
- * option's color with dark text — readable on every color (white text on
- * the Deseo yellow wouldn't pass AA).
- */
-const Choice = ({
-  label,
-  isSelected,
-  color,
-  onClick
-}: {
-  label: string
-  isSelected: boolean
-  color: string
-  onClick: () => void
-}) => (
-  <Button
-    onClick={onClick}
-    aria-pressed={isSelected}
-    minH="48px"
-    variant="outline"
-    borderWidth="2px"
-    borderColor={isSelected ? color : 'border.subtle'}
-    bg={isSelected ? 'bg.subtle' : 'transparent'}
-    color="text.primary"
-    fontWeight={isSelected ? 'bold' : 'semibold'}
-    leftIcon={
-      <Box
-        aria-hidden
-        w={2.5}
-        h={2.5}
-        borderRadius="full"
-        bg={color}
-        opacity={isSelected ? 1 : 0.5}
-      />
-    }
-    _hover={{ borderColor: color }}
-    _active={{ bg: 'bg.subtle' }}
-  >
-    {label}
-  </Button>
-)
 
 /**
  * "+" from the tab bar (docs/diseno-mobile.html): log a movement in three

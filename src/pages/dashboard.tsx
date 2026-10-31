@@ -65,12 +65,7 @@ const PendingReviewAlert = ({ summary }: { summary: ReviewQueueSummary }) => {
       </Box>
       <ButtonGroup size="sm" flexShrink={0} flexWrap="wrap" gap={2} spacing={0}>
         {summary.pendingTransactions > 0 && (
-          <Button
-            as={NextLink}
-            href="/expenditures"
-            colorScheme="orange"
-            minH="44px"
-          >
+          <Button as={NextLink} href="/review" colorScheme="orange" minH="44px">
             {t('dashboard.pendingReview.expenses', {
               count: summary.pendingTransactions
             })}
@@ -79,7 +74,7 @@ const PendingReviewAlert = ({ summary }: { summary: ReviewQueueSummary }) => {
         {summary.pendingSalaries > 0 && (
           <Button
             as={NextLink}
-            href="/entries"
+            href="/review"
             colorScheme="orange"
             variant="outline"
             minH="44px"
@@ -197,7 +192,7 @@ const Dashboard = () => {
   )
 
   const recentActivityCaption = (
-    <Link as={NextLink} href="/expenditures" color="primary.500" fontSize="sm">
+    <Link as={NextLink} href="/movements" color="primary.500" fontSize="sm">
       {t('dashboard.recentActivity.viewAll')} →
     </Link>
   )
