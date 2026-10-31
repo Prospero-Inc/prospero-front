@@ -1,0 +1,44 @@
+name: CI
+
+# Runs on every pull request (any base branch): lint, type check and a
+# production build. There is no test runner in this repo yet.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      # Build-time placeholders only; nothing is deployed from this job.
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      NEXTAUTH_URL: http://localhost:4000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.0
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm@9
+          pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Build
+        run: pnpm build
