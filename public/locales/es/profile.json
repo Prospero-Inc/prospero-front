@@ -30,7 +30,10 @@
       "enable": "Activar 2FA",
       "disable": "Desactivar 2FA"
     },
-    "disableConfirm": "¿Desactivar la autenticación de dos factores? Tu cuenta va a quedar protegida solo con tu contraseña.",
+    "disableTitle": "Desactivar 2FA",
+    "disableConfirm": "Tu cuenta va a quedar protegida solo con tu contraseña. Para confirmar, ingresá el código de 6 dígitos de tu app de autenticación.",
+    "cancel": "Cancelar",
+    "confirm": "Desactivar",
     "toast": {
       "disabling": "Desactivando 2FA…",
       "disabled": "2FA desactivado",

@@ -30,7 +30,10 @@
       "enable": "Enable 2FA",
       "disable": "Disable 2FA"
     },
-    "disableConfirm": "Turn off two-factor authentication? Your account will be protected by your password only.",
+    "disableTitle": "Turn off 2FA",
+    "disableConfirm": "Your account will be protected by your password only. To confirm, enter the 6-digit code from your authenticator app.",
+    "cancel": "Cancel",
+    "confirm": "Turn off",
     "toast": {
       "disabling": "Turning off 2FA…",
       "disabled": "2FA turned off",
