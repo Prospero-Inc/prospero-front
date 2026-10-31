@@ -162,7 +162,7 @@ export default function SettingsPage({
 
         <Divider />
 
-        <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+        <Box as="form" method="post" onSubmit={handleSubmit(onSubmit)}>
           <Heading size="md" mb={3}>
             {t('budget.title')}
           </Heading>

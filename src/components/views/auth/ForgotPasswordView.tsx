@@ -83,6 +83,7 @@ export const ForgotPasswordView = () => {
     <Stack
       maxW={'2xl'}
       as={'form'}
+      method="post"
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}
       justifyContent={'center'}

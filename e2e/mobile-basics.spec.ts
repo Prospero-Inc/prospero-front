@@ -109,3 +109,26 @@ test('the installed app opens on the dashboard', async ({ request }) => {
     lang: 'es'
   })
 })
+
+test.describe('before JavaScript takes over', () => {
+  // A slow phone can show the server-rendered form before React hydrates;
+  // submitting then is a plain HTML form submit. It must never be a GET,
+  // which would put the password in the URL, history and server logs.
+  test.use({ javaScriptEnabled: false })
+
+  test('submitting the login form does not put the password in the URL', async ({
+    page
+  }) => {
+    await page.goto('/auth/login')
+    await page.getByLabel('Correo electrónico').fill('ana@example.com')
+    await page.getByLabel('Contraseña', { exact: true }).fill('Sup3r-secret!')
+    await page
+      .locator('form')
+      .getByRole('button', { name: 'Iniciar sesión' })
+      .click()
+    await page.waitForLoadState()
+
+    expect(page.url()).not.toContain('Sup3r-secret')
+    expect(page.url()).not.toContain('password')
+  })
+})

@@ -125,6 +125,7 @@ export const LoginView = () => {
     // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
       as={'form'}
+      method="post"
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}
       justifyContent={'center'}

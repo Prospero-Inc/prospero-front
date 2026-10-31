@@ -70,7 +70,14 @@ export const MovementFormDrawer = ({
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px">{title}</DrawerHeader>
         <DrawerBody>
-          <Stack as="form" id={formId} onSubmit={onSubmit} spacing={4} py={2}>
+          <Stack
+            as="form"
+            method="post"
+            id={formId}
+            onSubmit={onSubmit}
+            spacing={4}
+            py={2}
+          >
             {children}
           </Stack>
         </DrawerBody>

@@ -91,6 +91,7 @@ export const VerifyTwoFactorView = () => {
     >
       <Stack
         as="form"
+        method="post"
         onSubmit={handleSubmit(onSubmit)}
         spacing={4}
         w={'full'}

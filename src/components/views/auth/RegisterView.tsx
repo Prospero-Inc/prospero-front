@@ -144,7 +144,7 @@ export const RegisterView = () => {
           {t('register.text.three')}{' '}
         </Text>
       </Stack>
-      <Box as="form" onSubmit={handleSubmit(onSubmit)} mt={4}>
+      <Box as="form" method="post" onSubmit={handleSubmit(onSubmit)} mt={4}>
         <Stack spacing={4}>
           <FormControl>
             <FormLabel>{t('register.form.labelFirstName')}</FormLabel>

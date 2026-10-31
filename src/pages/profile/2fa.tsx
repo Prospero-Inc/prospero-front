@@ -223,6 +223,7 @@ const TwoFactorSetup = ({ data: { qr, secret } }: Props) => {
           {/* Paso 2: confirmar con el primer código */}
           <Box
             as="form"
+            method="post"
             onSubmit={onSubmit}
             bg={stepBg}
             borderRadius="md"
