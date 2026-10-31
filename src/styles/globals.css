@@ -105,3 +105,11 @@ a {
     color-scheme: dark;
   }
 }
+
+/* Installed app on iPhone (viewport-fit=cover in _app): keep content out of
+   the home indicator and rounded corners. Zero everywhere else. */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}

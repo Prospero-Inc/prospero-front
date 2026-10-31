@@ -1,3 +1,4 @@
+import { formatMoney } from '@/lib/formatMoney'
 import {
   Card,
   CardBody,
@@ -20,11 +21,9 @@ interface DashboardSummaryCardProps {
   accent: DashboardSummaryAccent
 }
 
-/** `-$120.00`, nunca `$-120.00` — el signo va antes del símbolo de moneda. */
-export const formatSignedCurrency = (value: number): string => {
-  const sign = value < 0 ? '-' : ''
-  return `${sign}$${Math.abs(value).toFixed(2)}`
-}
+/** `-$1,120.00`, nunca `$-1120.00` — ver `formatMoney`. */
+export const formatSignedCurrency = (value: number, locale?: string): string =>
+  formatMoney(value, locale)
 
 export const DashboardSummaryCard = ({
   label,

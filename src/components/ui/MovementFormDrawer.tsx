@@ -70,11 +70,22 @@ export const MovementFormDrawer = ({
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px">{title}</DrawerHeader>
         <DrawerBody>
-          <Stack as="form" id={formId} onSubmit={onSubmit} spacing={4} py={2}>
+          <Stack
+            as="form"
+            method="post"
+            id={formId}
+            onSubmit={onSubmit}
+            spacing={4}
+            py={2}
+          >
             {children}
           </Stack>
         </DrawerBody>
-        <DrawerFooter borderTopWidth="1px" gap={3}>
+        <DrawerFooter
+          borderTopWidth="1px"
+          gap={3}
+          pb="calc(var(--chakra-space-4) + env(safe-area-inset-bottom))"
+        >
           <Button variant="ghost" onClick={onClose} minH="44px">
             {cancelLabel}
           </Button>

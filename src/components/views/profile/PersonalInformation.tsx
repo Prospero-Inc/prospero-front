@@ -89,6 +89,7 @@ export const PersonalInformation = ({
     return (
       <Stack
         as="form"
+        method="post"
         onSubmit={handleSubmit(onSubmit)}
         border="1px solid"
         borderColor="gray.200"

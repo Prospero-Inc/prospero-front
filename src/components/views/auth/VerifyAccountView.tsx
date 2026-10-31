@@ -247,6 +247,7 @@ export const VerifyAccountView = () => {
         {showResendForm && (
           <Stack
             as="form"
+            method="post"
             onSubmit={handleSubmit(onResend)}
             spacing={3}
             textAlign={'left'}

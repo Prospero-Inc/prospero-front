@@ -18,7 +18,7 @@ export const SwitchLanguage = () => {
   }
   return (
     <Menu isLazy>
-      <MenuButton mx={3}>
+      <MenuButton mx={3} minH="44px" minW="44px">
         <Icon as={HiMiniLanguage} size={'lg'} />
         {t('switchLanguage.text')}
       </MenuButton>

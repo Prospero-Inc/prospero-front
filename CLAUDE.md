@@ -16,10 +16,18 @@ pnpm lint           # eslint on src/.vscode/test
 pnpm lint:fix       # eslint --fix + prettier write
 pnpm format         # prettier --check src/**/*.{ts,tsx}
 pnpm format:fix     # prettier --write
+pnpm build && pnpm test:e2e   # Playwright mobile smoke tests (iPhone + Pixel viewports)
 ```
 
-No test runner is configured in this repo. Husky + lint-staged + commitlint run on
-commit/commit-msg (`.husky/`, `.commitlintrc`) — commits must follow Conventional Commits.
+The only tests are Playwright's (`e2e/`, `playwright.config.ts`): they run the production build
+(`next start`) against `e2e/fake-backend.mjs`, a tiny stand-in API (login, profile, create
+transaction; everything else 404, which pages already treat as "no data"). `smoke.spec.ts` is
+the safety net for upgrades (login, add an expense); `mobile-basics.spec.ts` pins the mobile
+rules (16 px gutter, ≥16 px fields, ≥44 px buttons, autofill/keyboard attributes, `lang`,
+manifest). CI runs them on every PR. Locally Chromium needs system libraries; if they're
+missing, run them in `mcr.microsoft.com/playwright:<version>-noble` with `--network host`.
+Husky + lint-staged + commitlint run on commit/commit-msg (`.husky/`, `.commitlintrc`) —
+commits must follow Conventional Commits.
 
 ## Architecture
 

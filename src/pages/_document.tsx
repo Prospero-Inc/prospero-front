@@ -1,6 +1,6 @@
 import { theme } from '@/themes'
 import { ColorModeScript } from '@chakra-ui/react'
-import { Html, Head, Main, NextScript } from 'next/document'
+import { type DocumentProps, Head, Html, Main, NextScript } from 'next/document'
 
 const SPLASH_CSS = `
 /* Splash de arranque: HTML estático fuera de #__next, visible desde el
@@ -37,9 +37,10 @@ const SPLASH_CSS = `
 }
 `
 
-export default function Document() {
+export default function Document({ locale }: DocumentProps) {
   return (
-    <Html lang="en">
+    // Screen readers and the browser's translation offer rely on this.
+    <Html lang={locale ?? 'es'}>
       <Head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#5352ED" />

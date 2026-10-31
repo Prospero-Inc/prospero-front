@@ -91,6 +91,7 @@ export const VerifyTwoFactorView = () => {
     >
       <Stack
         as="form"
+        method="post"
         onSubmit={handleSubmit(onSubmit)}
         spacing={4}
         w={'full'}
@@ -121,9 +122,12 @@ export const VerifyTwoFactorView = () => {
                 render={({ field }) => (
                   <PinInput
                     {...field}
+                    otp
+                    type="number"
+                    autoFocus
                     onComplete={ping => setValue('ping', ping)}
                   >
-                    <PinInputField />
+                    <PinInputField autoComplete="one-time-code" />
                     <PinInputField />
                     <PinInputField />
                     <PinInputField />

@@ -250,7 +250,14 @@ export const FinancialInstitutions = ({
         {t('title')}
       </Heading>
 
-      <Stack as="form" onSubmit={onCreateBank} spacing={3} mb={4} maxW="lg">
+      <Stack
+        as="form"
+        method="post"
+        onSubmit={onCreateBank}
+        spacing={3}
+        mb={4}
+        maxW="lg"
+      >
         <FormControl>
           <FormLabel>{t('form.labelBank')}</FormLabel>
           <Select
@@ -395,6 +402,7 @@ export const FinancialInstitutions = ({
 
                   <Stack
                     as="form"
+                    method="post"
                     direction="row"
                     spacing={2}
                     pl={2}

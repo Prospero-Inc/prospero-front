@@ -3,12 +3,17 @@ import { MotionDiv } from '@/components/ui'
 import { ForgotPasswordView } from '@/components/views/auth/ForgotPasswordView'
 import { Grid, GridItem, Image, Show } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import React from 'react'
 
 const forgotPassword = () => {
+  const { t } = useTranslation('common')
   return (
-    <AuthLayout title="Forgot Password" pageDescription="Forgot password page">
+    <AuthLayout
+      title={t('authPages.forgotPassword.title')}
+      pageDescription={t('authPages.forgotPassword.description')}
+    >
       <Grid templateColumns="repeat(12, 1fr)" gap={2}>
         <GridItem
           mx={'auto'}

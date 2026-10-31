@@ -125,6 +125,7 @@ export const LoginView = () => {
     // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
       as={'form'}
+      method="post"
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}
       justifyContent={'center'}
@@ -138,6 +139,10 @@ export const LoginView = () => {
             <Input
               size={['md', 'md', 'lg']}
               {...field}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
               placeholder="john@doe.com"
             />
           )}
@@ -150,7 +155,11 @@ export const LoginView = () => {
           name="password"
           control={control}
           render={({ field }) => (
-            <PasswordInput size={['md', 'md', 'lg']} {...field} />
+            <PasswordInput
+              size={['md', 'md', 'lg']}
+              autoComplete="current-password"
+              {...field}
+            />
           )}
         />
         {errors.password && <Text color="red">{errors.password.message}</Text>}

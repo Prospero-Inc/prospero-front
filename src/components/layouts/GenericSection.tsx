@@ -22,7 +22,6 @@ export const GenericSection = ({
   caption,
   my = 10
 }: SectionProps) => {
-  const padding = useBreakpointValue({ base: '4', sm: '6', md: '8', lg: '10' })
   const headingSize = useBreakpointValue({
     base: 'lg',
     sm: 'xl',
@@ -31,7 +30,13 @@ export const GenericSection = ({
   })
 
   return (
-    <Container p={padding} maxW="container.2xl" my={my}>
+    // No side padding on phones: the page container already has the gutter.
+    <Container
+      px={{ base: 0, sm: 6, md: 8, lg: 10 }}
+      py={{ base: 4, sm: 6, md: 8, lg: 10 }}
+      maxW="container.2xl"
+      my={my}
+    >
       {showHeader && (
         <Flex
           justify="space-between"

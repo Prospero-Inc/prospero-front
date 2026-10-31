@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint \"{src,.vscode,test}/**/*.{ts,tsx,json}\"",
     "lint:fix": "pnpm lint --fix && pnpm format:fix",
+    "test:e2e": "playwright test",
     "format": "prettier --check \"src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --write \"src/**/*.{ts,tsx}\" ",
     "generate-icons": "node scripts/generate-icons.js",
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@commitlint/cli": "17.4.2",
     "@commitlint/config-conventional": "17.4.2",
+    "@playwright/test": "^1.48",
     "@types/js-cookie": "^3.0.6",
     "@types/qrcode": "^1.5.5",
     "@typescript-eslint/eslint-plugin": "5.0.0",
