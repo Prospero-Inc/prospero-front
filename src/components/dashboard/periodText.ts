@@ -62,3 +62,39 @@ export const formatRelativeDay = (
     .format(date)
     .replace('.', '')
 }
+
+/** Compact range for chips: "16–31 oct" / "16 oct – 2 nov". */
+export const formatShortRange = (
+  period: PeriodSummary,
+  locale: string
+): string | null => {
+  const end = periodEnd(period)
+  if (!period.startDate || !end) return null
+  const start = new Date(period.startDate)
+  const month = (date: Date) =>
+    new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' })
+      .format(date)
+      .replace('.', '')
+  return start.getUTCMonth() === end.getUTCMonth()
+    ? `${start.getUTCDate()}–${end.getUTCDate()} ${month(end)}`
+    : `${start.getUTCDate()} ${month(start)} – ${end.getUTCDate()} ${month(
+        end
+      )}`
+}
+
+/** Day group title: "Hoy", "Ayer", or "Miércoles 29" (weekday + day). */
+export const formatDayTitle = (
+  isoDay: string,
+  locale: string,
+  labels: { today: string; yesterday: string }
+): string => {
+  const relative = formatRelativeDay(isoDay, locale, labels)
+  if (relative === labels.today || relative === labels.yesterday)
+    return relative
+  const date = new Date(`${isoDay.slice(0, 10)}T00:00:00.000Z`)
+  const weekday = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    timeZone: 'UTC'
+  }).format(date)
+  return `${weekday} ${date.getUTCDate()}`
+}

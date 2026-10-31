@@ -316,7 +316,8 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "disconnect": "Disconnect",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "close": "Close"
   },
   "tabBar": {
     "label": "Main navigation",
@@ -377,7 +378,8 @@
     "saveIncome": "Save income",
     "savedExpense": "Expense saved",
     "savedIncome": "Income saved",
-    "error": "We couldn't save the movement"
+    "error": "We couldn't save the movement",
+    "note": "Note"
   },
   "review": {
     "title": "To review",
@@ -425,6 +427,19 @@
     "empty": {
       "title": "No movements in this period",
       "description": "What you log with the + button shows up here."
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "filtersChip": "Filters",
+    "filtersCount_one": "Filters · {{count}}",
+    "filtersCount_other": "Filters · {{count}}",
+    "search": "Search",
+    "allCategories": "All",
+    "showResults_one": "Show {{count}} movement",
+    "showResults_other": "Show {{count}} movements",
+    "incomeTypes": {
+      "Payroll": "Payroll",
+      "Extra": "Extra income"
     }
   },
   "welcome": {

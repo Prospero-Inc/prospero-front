@@ -28,6 +28,16 @@ export const semanticTokens = {
       _dark: 'rgba(24,24,38,0.96)'
     },
     'alert.iconBg': { default: '#FFFFFF', _dark: '#241A14' },
+    // Segmented control, chips, input-like rows (design .seg/.chip/.field).
+    'seg.bg': { default: '#E9E9F2', _dark: '#24243A' },
+    'seg.on': { default: '#FFFFFF', _dark: '#33334D' },
+    'field.bg': { default: '#F4F4F9', _dark: '#24243A' },
+    'button.soft': { default: '#F0F0F6', _dark: '#2C2C40' },
+    // Tinted backgrounds behind category icons (design .cat).
+    'tint.Necesidad': { default: '#EBEBFE', _dark: '#2A2A55' },
+    'tint.Deseo': { default: '#FFF4DE', _dark: '#3A2E14' },
+    'tint.Ahorro': { default: '#E6F8F1', _dark: '#14302A' },
+    'tint.income': { default: '#E6F8F1', _dark: '#14302A' },
 
     // Fills (bars, dots, icons) and their AA text variants.
     'money.income': { default: '#12B886', _dark: '#38D9A9' },

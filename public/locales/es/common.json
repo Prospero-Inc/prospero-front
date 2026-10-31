@@ -316,7 +316,8 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "disconnect": "Desconectar",
-    "dismiss": "Descartar"
+    "dismiss": "Descartar",
+    "close": "Cerrar"
   },
   "tabBar": {
     "label": "Navegación principal",
@@ -377,7 +378,8 @@
     "saveIncome": "Guardar ingreso",
     "savedExpense": "Gasto guardado",
     "savedIncome": "Ingreso guardado",
-    "error": "No pudimos guardar el movimiento"
+    "error": "No pudimos guardar el movimiento",
+    "note": "Nota"
   },
   "review": {
     "title": "Por revisar",
@@ -425,6 +427,19 @@
     "empty": {
       "title": "Sin movimientos en este período",
       "description": "Lo que registres con el botón + va a aparecer acá."
+    },
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "filtersChip": "Filtros",
+    "filtersCount_one": "Filtros · {{count}}",
+    "filtersCount_other": "Filtros · {{count}}",
+    "search": "Buscar",
+    "allCategories": "Todas",
+    "showResults_one": "Ver {{count}} movimiento",
+    "showResults_other": "Ver {{count}} movimientos",
+    "incomeTypes": {
+      "Payroll": "Nómina",
+      "Extra": "Ingreso extra"
     }
   },
   "welcome": {
