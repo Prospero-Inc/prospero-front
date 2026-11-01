@@ -37,6 +37,21 @@ const SPLASH_CSS = `
 }
 `
 
+// Launch screens for the installed app on iPhone (iOS ignores the manifest
+// splash): brand color + icon, one per screen size, in public/splash.
+const IOS_SPLASH: [width: number, height: number, ratio: number][] = [
+  [440, 956, 3],
+  [402, 874, 3],
+  [430, 932, 3],
+  [393, 852, 3],
+  [428, 926, 3],
+  [390, 844, 3],
+  [414, 896, 3],
+  [375, 812, 3],
+  [414, 896, 2],
+  [375, 667, 2]
+]
+
 export default function Document({ locale }: DocumentProps) {
   return (
     // Screen readers and the browser's translation offer rely on this.
@@ -48,6 +63,14 @@ export default function Document({ locale }: DocumentProps) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Prospero" />
+        {IOS_SPLASH.map(([width, height, ratio]) => (
+          <link
+            key={`${width}x${height}@${ratio}`}
+            rel="apple-touch-startup-image"
+            media={`(device-width: ${width}px) and (device-height: ${height}px) and (-webkit-device-pixel-ratio: ${ratio}) and (orientation: portrait)`}
+            href={`/splash/splash-${width * ratio}x${height * ratio}.png`}
+          />
+        ))}
         <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
       </Head>
       <body>

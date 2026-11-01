@@ -33,7 +33,11 @@
         "minLength": "Password must be at least 8 characters long",
         "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
       }
-    }
+    },
+    "welcome": "Welcome back",
+    "tagline": "Your budget, anchored to your paydays.",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account"
   },
   "register": {
     "heading": "Create an Account",
@@ -117,7 +121,7 @@
     }
   },
   "dashboard": {
-    "pageTitle": "Dashboard",
+    "pageTitle": "Home",
     "pageDescription": "Prospero home page",
     "daysElapsed": "{{count}} days elapsed",
     "daysRemaining": "{{count}} estimated days remaining",
@@ -147,7 +151,7 @@
     "budgetEmpty": {
       "heading": "You haven't logged an income for this period yet",
       "description": "Prospero calculates your budget from your last payment. Log one to see the breakdown.",
-      "cta": "Log income"
+      "cta": "Set up my budget"
     },
     "error": {
       "heading": "We couldn't load your current period",
@@ -174,6 +178,32 @@
       "payrolls_zero": "No payroll payments",
       "payrolls_one": "{{count}} payroll payment",
       "payrolls_other": "{{count}} payroll payments"
+    },
+    "split": {
+      "title": "Your split",
+      "of": "of"
+    },
+    "home": {
+      "left": "Left to spend this period",
+      "over": "Over budget this period by",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "payday": "payday is today",
+      "paymentDue": "your estimated payday has passed",
+      "perDay": "about {{amount}} a day",
+      "income": "Income",
+      "spent": "Spent",
+      "toReview_one": "{{count}} movement to review",
+      "toReview_other": "{{count}} movements to review",
+      "fromGmail": "Detected in your Gmail",
+      "review": "Review",
+      "recent": "Recent",
+      "seeAll": "See all",
+      "today": "today",
+      "yesterday": "yesterday",
+      "toClassify": "To classify",
+      "noRecent": "No expenses logged this period yet.",
+      "greeting": "Hi, {{name}}"
     }
   },
   "categoryBudget": {
@@ -284,5 +314,188 @@
   "swUpdate": {
     "text": "A new version of Prospero is available.",
     "action": "Update"
+  },
+  "confirmSheet": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "disconnect": "Disconnect",
+    "dismiss": "Dismiss",
+    "close": "Close"
+  },
+  "tabBar": {
+    "label": "Main navigation",
+    "home": "Home",
+    "movements": "Activity",
+    "add": "Add a movement",
+    "fixed": "Fixed",
+    "more": "More",
+    "pending_one": "{{count}} item to review",
+    "pending_other": "{{count}} items to review"
+  },
+  "more": {
+    "title": "More",
+    "payFrequency": {
+      "Biweekly": "Paid every two weeks",
+      "Monthly": "Paid monthly"
+    },
+    "sections": {
+      "connections": "Connections",
+      "account": "Account",
+      "preferences": "Preferences"
+    },
+    "gmail": "Gmail and banks",
+    "notifications": "Notifications",
+    "budget": "Split and pay frequency",
+    "security": "Security and 2FA",
+    "twoFaOn": "On",
+    "twoFaOff": "Off",
+    "calculator": "Budget calculator",
+    "language": "Language",
+    "darkMode": "Dark mode",
+    "signOut": "Sign out",
+    "gmailConnected": "Connected",
+    "gmailDisconnected": "Not connected",
+    "push": "Push",
+    "languageName": {
+      "es": "Español",
+      "en": "English"
+    }
+  },
+  "quickAdd": {
+    "title": "New movement",
+    "kind": "Movement type",
+    "expense": "Expense",
+    "income": "Income",
+    "amount": "Amount",
+    "invalidAmount": "Enter an amount above 0, with up to 2 decimals.",
+    "category": "Category",
+    "categories": {
+      "Necesidad": "Need",
+      "Deseo": "Want",
+      "Ahorro": "Savings"
+    },
+    "incomeType": "Income type",
+    "incomeTypes": {
+      "Payroll": "Payroll",
+      "Extra": "Extra"
+    },
+    "moreOptions": "More options",
+    "fewerOptions": "Fewer options",
+    "date": "Date",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "E.g. groceries, Uber, pharmacy",
+    "saveExpense": "Save expense",
+    "saveIncome": "Save income",
+    "savedExpense": "Expense saved",
+    "savedIncome": "Income saved",
+    "error": "We couldn't save the movement",
+    "note": "Note"
+  },
+  "review": {
+    "title": "To review",
+    "count_one": "{{count}} movement detected in your Gmail",
+    "count_other": "{{count}} movements detected in your Gmail",
+    "expenseQuestion": "What kind of expense is it?",
+    "incomeQuestion": "What kind of income is it?",
+    "incomeCategories": {
+      "Payroll": "Payroll",
+      "Extra": "Extra",
+      "Transfer": "Transfer",
+      "Reimbursement": "Refund",
+      "Deposit": "Deposit",
+      "Other": "Other"
+    },
+    "untitledExpense": "Expense without description",
+    "untitledIncome": "Income without description",
+    "confirmed": "Confirmed as {{label}}",
+    "undo": "Undo",
+    "error": "We couldn't confirm the movement",
+    "empty": {
+      "title": "All caught up",
+      "description": "No Gmail movements are waiting for your review.",
+      "action": "See movements"
+    },
+    "progress": "{{done}} of {{total}} reviewed",
+    "confirmedItem": "{{name}} confirmed",
+    "discardedItem": "{{name}} discarded",
+    "purchase": "Purchase",
+    "possibleIncome": "Possible income",
+    "discard": "Discard",
+    "editFirst": "Edit before saving",
+    "today": "today",
+    "yesterday": "yesterday"
+  },
+  "movements": {
+    "title": "Activity",
+    "manual": "Manual",
+    "pending_one": "{{count}} from Gmail to review",
+    "pending_other": "{{count}} from Gmail to review",
+    "pendingHint": "One tap to confirm each",
+    "review": "Review",
+    "filterLabel": "Show",
+    "filters": {
+      "all": "All",
+      "expense": "Expenses",
+      "income": "Income"
+    },
+    "columns": {
+      "concept": "Description",
+      "type": "Type",
+      "amount": "Amount"
+    },
+    "empty": {
+      "title": "No movements in this period",
+      "description": "What you log with the + button shows up here."
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "filtersChip": "Filters",
+    "filtersCount_one": "Filters · {{count}}",
+    "filtersCount_other": "Filters · {{count}}",
+    "search": "Search",
+    "allCategories": "All",
+    "showResults_one": "Show {{count}} movement",
+    "showResults_other": "Show {{count}} movements",
+    "incomeTypes": {
+      "Payroll": "Payroll",
+      "Extra": "Extra income"
+    }
+  },
+  "welcome": {
+    "pageTitle": "First steps · Prospero",
+    "step": "Step {{step}} of {{total}}",
+    "continue": "Continue",
+    "back": "Back",
+    "error": "We couldn't save. Please try again.",
+    "frequency": {
+      "title": "How often are you paid?",
+      "hint": "Prospero builds your budget from each payday, not from the calendar month.",
+      "Biweekly": "Every two weeks",
+      "Monthly": "Once a month",
+      "BiweeklyHint": "Two payments a month, even if the dates vary",
+      "MonthlyHint": "A single payment every month"
+    },
+    "split": {
+      "title": "How do you want to split each payment?",
+      "hint": "You can change it anytime in More → Profile.",
+      "recommended": "Recommended: 50 / 30 / 20",
+      "custom": "Custom",
+      "needs": "Needs",
+      "wants": "Wants",
+      "savings": "Savings",
+      "increase": "Raise {{name}}",
+      "decrease": "Lower {{name}}",
+      "recommendedHint": "Needs, wants and savings",
+      "customHint": "Choose your own percentages"
+    },
+    "income": {
+      "title": "Log your last payment",
+      "hint": "That's all it takes to see what's left this period.",
+      "amount": "Amount",
+      "date": "Payment date",
+      "save": "Save and start",
+      "later": "I'll do it later"
+    }
   }
 }

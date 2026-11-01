@@ -18,7 +18,6 @@ import { EntryIcon } from '../icons'
 import { BagIcon } from '../icons/BagIcon'
 import { EgressIcon } from '../icons/EgressIcon'
 import { FixedExpenseIcon } from '../icons/FixedExpenseIcon'
-import { GoalsIcon } from '../icons/GoalsIcon'
 import { SettingsIcon } from '../icons/SettingsIcon'
 import { Brand } from './Brand'
 import { NavItem } from './NavItem'
@@ -54,12 +53,13 @@ const LinkItems: Array<LinkItemProps> = [
     badgeAriaKey: 'pendingBadgeExpenditures'
   },
   { name: 'fixedExpenses', icon: FixedExpenseIcon, route: '/fixed-expenses' },
-  { name: 'goals', icon: GoalsIcon, route: '/goals' },
+  // Metas is out of the menu until the feature exists (plan, ola 4).
   { name: 'budgetCalculator', icon: BagIcon, route: '/budget-calculator' },
   { name: 'settings', icon: SettingsIcon, route: '/settings' }
 ]
 interface SidebarProps extends BoxProps {
-  onClose: () => void
+  /** Only when shown inside a drawer: renders its close button. */
+  onClose?: () => void
 }
 
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
@@ -100,7 +100,12 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <Text fontFamily="monospace" pr={3} fontWeight="bold">
           <Icon as={Brand} />
         </Text>
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+        {onClose && (
+          <CloseButton
+            display={{ base: 'flex', md: 'none' }}
+            onClick={onClose}
+          />
+        )}
       </Flex>
       {LinkItems.map(link => {
         const badgeCount = link.badgeKey ? summary[link.badgeKey] : undefined

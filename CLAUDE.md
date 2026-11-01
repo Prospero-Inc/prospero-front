@@ -56,6 +56,47 @@ with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthTo
 confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
 already-authenticated session; it's unrelated to the login gate.
 
+#### App shell and UI conventions (mobile wave 4)
+
+- **Shell:** `components/layouts/shell/AppShell.tsx` is mounted **once in `_app`** for the routes
+  in `APP_SHELL_ROUTES` (desktop side menu; phone 56 px top bar + `BottomTabBar` with Inicio ·
+  Movimientos · "+" · Fijos · Más). It persists across navigation; `ProsperoLayout` only sets
+  the `<title>`, announces it to the top bar (`useSetAppShellTitle`) and renders the page
+  container. A new app page must be added to `APP_SHELL_ROUTES`.
+- **Colors:** use the semantic tokens in `themes/semanticTokens.ts` (`text.primary`,
+  `text.secondary`, `money.incomeText`, `money.expenseText`, `status.pending`,
+  `category.<Necesidad|Deseo|Ahorro>`, `bg.*`, `border.subtle`) instead of raw palette values or
+  new `useColorModeValue` pairs; text tones are AA-checked in both modes.
+- **Confirmations:** never `window.confirm` — `const confirm = useConfirm()` (`ConfirmSheet`,
+  provider in `_app`) and `if (!(await confirm({ title, destructive: true }))) return`.
+- **Building blocks:** `BottomSheet` (bottom on phones, right on desktop), `Amount` (tabular
+  figures, signed/colored by kind), `EmptyState`.
+- **Quick add:** the tab bar's "+" opens `components/quick-add/QuickAddSheet` (provider in
+  `AppShell`, `useOpenQuickAdd()`): expense or income, amount parsed by `parseAmount` (accepts
+  `12,50`), category / income type as one-tap choices, date and description under "Más
+  opciones"; posts to the existing create proxies and revalidates with `useRevalidateApi`.
+- **Movimientos / Por revisar:** the "Movimientos" tab is `pages/movements.tsx` (expenses and
+  income of a period in one day-grouped list, Todos · Gastos · Ingresos via shallow `?kind=`;
+  rows link to `/expenditures?edit=<id>` / `/entries?edit=<id>`, which open that row's form).
+  `pages/review.tsx` is the Gmail queue: one tap on a category confirms; the card hides at once
+  and `hooks/useUndoableCommit` only sends the PATCH after the 5 s "Deshacer" window (flushed on
+  leaving the screen / app going to background), so undo never needs a reverse API call.
+- **First steps:** `pages/welcome.tsx` (outside the shell): pay frequency → split (presets or
+  ± steppers; `components/welcome/split.ts` `adjustSplit` keeps it at exactly 100 %, which the
+  backend requires) → last payment (Payroll). Entered from the dashboard's empty state ("Configurar
+  mi presupuesto"). iOS launch screens: `public/splash/*` + `apple-touch-startup-image` links in
+  `_document` (regenerate them if the icon or brand color changes).
+- **Dashboard:** `components/dashboard/HomeCards` (`HomeHero`: what's left this period,
+  range · days left · per day, income/spent pills; `ReviewAlertCard`; `SplitCard`; `RecentCard`
+  with the latest movement) — one card each, in the design's order.
+- **Pixel fidelity to `docs/diseno-mobile.html`:** icons come from `components/icons/app.tsx`
+  (generated from the design's `<symbol>`s — don't use react-icons on redesigned screens);
+  shared pieces in `components/design` (SegmentedControl, Chip, CategoryIconBox, MovementRow,
+  DayHeader, ListCard); colors are the design's values as semantic tokens. The top bar's right
+  side is set per page with `ProsperoLayout`'s `topBarTrailing` (`'avatar'` default, `'none'`
+  on Más, `{ closeHref }` for sub-screens like Por revisar, which also hides the tab bar via
+  `NO_TAB_BAR_ROUTES` in `AppShell`).
+
 #### Deploy
 
 The image only gets non-secret build args (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`);
@@ -211,8 +252,9 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
   (e.g. `HttpMethod`) and hooks (e.g. `usePushSubscription`).
 - `src/sw.ts` — service worker source, built into `public/sw.js` by Serwist (see Web Push
   above). `public/sw.js` is build output (gitignored).
-- `src/themes/fonts/` — Montserrat 400/600/700 (OFL), loaded with `next/font/local` in
-  `themes/fonts.tsx` (not `next/font/google`: the build must not depend on reaching Google).
+- `src/themes/fonts/` — Montserrat variable (OFL, the same latin file the design embeds, so
+  550/650 weights render as designed), loaded with `next/font/local` in `themes/fonts.tsx`
+  (not `next/font/google`: the build must not depend on reaching Google).
 
 ### Related repo
 

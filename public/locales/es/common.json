@@ -33,7 +33,11 @@
         "minLength": "Contraseña debe tener almenos 8 caracteres",
         "matches": "Contraseña debe contener al menos una minuscula,una mayuscula,un digito,un caracter especial, y un punto"
       }
-    }
+    },
+    "welcome": "Hola de nuevo",
+    "tagline": "Tu presupuesto, anclado a tus fechas de pago.",
+    "noAccount": "¿No tenés cuenta?",
+    "createAccount": "Crear cuenta"
   },
   "register": {
     "heading": "Crear una Cuenta",
@@ -117,7 +121,7 @@
     }
   },
   "dashboard": {
-    "pageTitle": "Dashboard",
+    "pageTitle": "Inicio",
     "pageDescription": "Página de inicio de Prospero",
     "daysElapsed": "{{count}} días transcurridos",
     "daysRemaining": "{{count}} días estimados restantes",
@@ -147,7 +151,7 @@
     "budgetEmpty": {
       "heading": "Aún no registraste un ingreso para este período",
       "description": "Prospero calcula tu presupuesto a partir de tu último pago. Registrá uno para ver el desglose.",
-      "cta": "Registrar ingreso"
+      "cta": "Configurar mi presupuesto"
     },
     "error": {
       "heading": "No pudimos cargar tu período actual",
@@ -174,6 +178,32 @@
       "payrolls_zero": "Sin pagos de nómina",
       "payrolls_one": "{{count}} pago de nómina",
       "payrolls_other": "{{count}} pagos de nómina"
+    },
+    "split": {
+      "title": "Tu reparto",
+      "of": "de"
+    },
+    "home": {
+      "left": "Te quedan para este período",
+      "over": "Te pasaste del presupuesto por",
+      "daysLeft_one": "falta {{count}} día",
+      "daysLeft_other": "faltan {{count}} días",
+      "payday": "hoy es día de pago",
+      "paymentDue": "tu pago estimado ya pasó",
+      "perDay": "unos {{amount}} por día",
+      "income": "Ingresos",
+      "spent": "Gastado",
+      "toReview_one": "{{count}} movimiento por revisar",
+      "toReview_other": "{{count}} movimientos por revisar",
+      "fromGmail": "Detectados en tu Gmail",
+      "review": "Revisar",
+      "recent": "Recientes",
+      "seeAll": "Ver todo",
+      "today": "hoy",
+      "yesterday": "ayer",
+      "toClassify": "Por clasificar",
+      "noRecent": "Todavía no registraste gastos en este período.",
+      "greeting": "Hola, {{name}}"
     }
   },
   "categoryBudget": {
@@ -284,5 +314,188 @@
   "swUpdate": {
     "text": "Hay una nueva versión de Prospero.",
     "action": "Actualizar"
+  },
+  "confirmSheet": {
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "disconnect": "Desconectar",
+    "dismiss": "Descartar",
+    "close": "Cerrar"
+  },
+  "tabBar": {
+    "label": "Navegación principal",
+    "home": "Inicio",
+    "movements": "Movimientos",
+    "add": "Agregar movimiento",
+    "fixed": "Fijos",
+    "more": "Más",
+    "pending_one": "{{count}} movimiento por revisar",
+    "pending_other": "{{count}} movimientos por revisar"
+  },
+  "more": {
+    "title": "Más",
+    "payFrequency": {
+      "Biweekly": "Pago quincenal",
+      "Monthly": "Pago mensual"
+    },
+    "sections": {
+      "connections": "Conexiones",
+      "account": "Cuenta",
+      "preferences": "Preferencias"
+    },
+    "gmail": "Gmail y bancos",
+    "notifications": "Notificaciones",
+    "budget": "Reparto y frecuencia de pago",
+    "security": "Seguridad y 2FA",
+    "twoFaOn": "Activado",
+    "twoFaOff": "Desactivado",
+    "calculator": "Calculadora de presupuesto",
+    "language": "Idioma",
+    "darkMode": "Modo oscuro",
+    "signOut": "Cerrar sesión",
+    "gmailConnected": "Conectado",
+    "gmailDisconnected": "Sin conectar",
+    "push": "Push",
+    "languageName": {
+      "es": "Español",
+      "en": "English"
+    }
+  },
+  "quickAdd": {
+    "title": "Nuevo movimiento",
+    "kind": "Tipo de movimiento",
+    "expense": "Gasto",
+    "income": "Ingreso",
+    "amount": "Monto",
+    "invalidAmount": "Ingresá un monto mayor a 0, con hasta 2 decimales.",
+    "category": "Categoría",
+    "categories": {
+      "Necesidad": "Necesidad",
+      "Deseo": "Deseo",
+      "Ahorro": "Ahorro"
+    },
+    "incomeType": "Tipo de ingreso",
+    "incomeTypes": {
+      "Payroll": "Nómina",
+      "Extra": "Extra"
+    },
+    "moreOptions": "Más opciones",
+    "fewerOptions": "Menos opciones",
+    "date": "Fecha",
+    "description": "Concepto (opcional)",
+    "descriptionPlaceholder": "Ej. Supermercado, Uber, farmacia",
+    "saveExpense": "Guardar gasto",
+    "saveIncome": "Guardar ingreso",
+    "savedExpense": "Gasto guardado",
+    "savedIncome": "Ingreso guardado",
+    "error": "No pudimos guardar el movimiento",
+    "note": "Nota"
+  },
+  "review": {
+    "title": "Por revisar",
+    "count_one": "{{count}} movimiento detectado en tu Gmail",
+    "count_other": "{{count}} movimientos detectados en tu Gmail",
+    "expenseQuestion": "¿Qué tipo de gasto es?",
+    "incomeQuestion": "¿Qué tipo de ingreso es?",
+    "incomeCategories": {
+      "Payroll": "Nómina",
+      "Extra": "Extra",
+      "Transfer": "Transferencia",
+      "Reimbursement": "Reembolso",
+      "Deposit": "Depósito",
+      "Other": "Otro"
+    },
+    "untitledExpense": "Gasto sin concepto",
+    "untitledIncome": "Ingreso sin concepto",
+    "confirmed": "Confirmado como {{label}}",
+    "undo": "Deshacer",
+    "error": "No pudimos confirmar el movimiento",
+    "empty": {
+      "title": "Todo al día",
+      "description": "No hay movimientos de Gmail esperando tu revisión.",
+      "action": "Ver movimientos"
+    },
+    "progress": "{{done}} de {{total}} revisados",
+    "confirmedItem": "{{name}} confirmado",
+    "discardedItem": "{{name}} descartado",
+    "purchase": "Compra",
+    "possibleIncome": "Posible ingreso",
+    "discard": "Descartar",
+    "editFirst": "Editar antes de guardar",
+    "today": "hoy",
+    "yesterday": "ayer"
+  },
+  "movements": {
+    "title": "Movimientos",
+    "manual": "Manual",
+    "pending_one": "{{count}} por revisar de Gmail",
+    "pending_other": "{{count}} por revisar de Gmail",
+    "pendingHint": "Un toque para confirmar cada uno",
+    "review": "Revisar",
+    "filterLabel": "Mostrar",
+    "filters": {
+      "all": "Todos",
+      "expense": "Gastos",
+      "income": "Ingresos"
+    },
+    "columns": {
+      "concept": "Concepto",
+      "type": "Tipo",
+      "amount": "Monto"
+    },
+    "empty": {
+      "title": "Sin movimientos en este período",
+      "description": "Lo que registres con el botón + va a aparecer acá."
+    },
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "filtersChip": "Filtros",
+    "filtersCount_one": "Filtros · {{count}}",
+    "filtersCount_other": "Filtros · {{count}}",
+    "search": "Buscar",
+    "allCategories": "Todas",
+    "showResults_one": "Ver {{count}} movimiento",
+    "showResults_other": "Ver {{count}} movimientos",
+    "incomeTypes": {
+      "Payroll": "Nómina",
+      "Extra": "Ingreso extra"
+    }
+  },
+  "welcome": {
+    "pageTitle": "Primeros pasos · Prospero",
+    "step": "Paso {{step}} de {{total}}",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "error": "No pudimos guardar. Intentá de nuevo.",
+    "frequency": {
+      "title": "¿Cada cuánto te pagan?",
+      "hint": "Prospero arma tu presupuesto desde la fecha de cada pago, no desde el mes del calendario.",
+      "Biweekly": "Cada quincena",
+      "Monthly": "Una vez al mes",
+      "BiweeklyHint": "Dos pagos al mes, aunque las fechas varíen",
+      "MonthlyHint": "Un solo pago cada mes"
+    },
+    "split": {
+      "title": "¿Cómo querés repartir cada pago?",
+      "hint": "Podés cambiarlo cuando quieras en Más → Perfil.",
+      "recommended": "Recomendado: 50 / 30 / 20",
+      "custom": "Personalizado",
+      "needs": "Necesidades",
+      "wants": "Deseos",
+      "savings": "Ahorro",
+      "increase": "Subir {{name}}",
+      "decrease": "Bajar {{name}}",
+      "recommendedHint": "Necesidades, deseos y ahorro",
+      "customHint": "Elegí tus propios porcentajes"
+    },
+    "income": {
+      "title": "Registrá tu último pago",
+      "hint": "Con eso ya ves cuánto te queda para este período.",
+      "amount": "Monto",
+      "date": "Fecha del pago",
+      "save": "Guardar y empezar",
+      "later": "Lo hago después"
+    }
   }
 }

@@ -237,6 +237,27 @@ export default function EntriesPage() {
     formDrawer.onOpen()
   }
 
+  // "Movimientos" links here with ?edit=<id>: open that row's form once
+  // it's loaded, then drop the flag so back/reload don't reopen it.
+  const editId =
+    typeof router.query.edit === 'string' ? Number(router.query.edit) : null
+  const rowToEdit =
+    editId === null
+      ? undefined
+      : [...salary, ...pendingSalary].find(row => row.id === editId)
+  useEffect(() => {
+    if (!rowToEdit) return
+    startEdit(rowToEdit)
+    const query = Object.fromEntries(
+      Object.entries(router.query).filter(([key]) => key !== 'edit')
+    )
+    router.replace({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+      scroll: false
+    })
+    // Once per ?edit= (keyed on the row found).
+  }, [rowToEdit?.id])
+
   const closeForm = () => {
     formDrawer.onClose()
     setEditingId(null)
