@@ -82,5 +82,6 @@
     "paid": "Paid ({{paid}} of {{total}})",
     "pending": "Left to pay",
     "thisPeriod": "Fixed this period"
-  }
+  },
+  "loadErrorWhat": "your fixed expenses"
 }

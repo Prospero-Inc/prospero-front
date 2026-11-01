@@ -82,5 +82,6 @@
     "paid": "Pagado ({{paid}} de {{total}})",
     "pending": "Falta pagar",
     "thisPeriod": "Fijos de este período"
-  }
+  },
+  "loadErrorWhat": "tus gastos fijos"
 }

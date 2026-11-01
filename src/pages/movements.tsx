@@ -14,6 +14,7 @@ import { FilterIcon, MailIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { SwipeRow } from '@/components/movements/SwipeRow'
 import { type EditableMovement, useEditMovement } from '@/components/quick-add'
+import { LoadError } from '@/components/states/LoadError'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { usePeriodLabel } from '@/components/ui/MovementFiltersBar'
@@ -326,7 +327,18 @@ export default function MovementsPage() {
           </Flex>
         )}
 
-        {rows.length === 0 ? (
+        {(expenses.error && !expenses.data) ||
+        (incomes.error && !incomes.data) ? (
+          // A failed load is not "no movements" (design 15).
+          <LoadError
+            what={t('states.what.movements')}
+            onRetry={() => {
+              expenses.mutate()
+              incomes.mutate()
+            }}
+            isRetrying={expenses.isValidating || incomes.isValidating}
+          />
+        ) : rows.length === 0 ? (
           <EmptyState
             icon={MdSwapVert}
             title={t('movements.empty.title')}

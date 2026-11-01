@@ -79,16 +79,6 @@
         "cta": "Add your first expense"
       }
     },
-    "budgetEmpty": {
-      "heading": "You haven't logged an income for this period yet",
-      "description": "Prospero calculates your budget from your last payment. Log one to see the breakdown.",
-      "cta": "Set up my budget"
-    },
-    "error": {
-      "heading": "We couldn't load your current period",
-      "description": "Try reloading the page. If the problem continues, contact us.",
-      "retry": "Retry"
-    },
     "paymentToday": "payment expected today",
     "paymentOverdue": "your next payment was expected on {{date}}.",
     "registerPayment": "Register it",
@@ -176,12 +166,6 @@
   },
   "passwordInput": {
     "toggle": "Show or hide the password"
-  },
-  "offline": {
-    "title": "Offline · Prospero",
-    "heading": "You're offline",
-    "text": "We couldn't load this screen. Check your connection and try again; your data is safe in your account.",
-    "retry": "Try again"
   },
   "swUpdate": {
     "text": "A new version of Prospero is available.",
@@ -510,5 +494,49 @@
         "button": "Get another link"
       }
     }
+  },
+  "states": {
+    "retry": "Try again",
+    "offline": {
+      "pageTitle": "Offline · Prospero",
+      "title": "You're offline",
+      "text": "Prospero needs internet to show your data. For security, we don't keep your movements on the phone.",
+      "banner": "Offline · changes can't be saved"
+    },
+    "serverError": {
+      "pageTitle": "Something went wrong · Prospero",
+      "title": "Something went wrong on our side",
+      "text": "Your data is safe. Try again in a moment."
+    },
+    "loadError": {
+      "title": "We couldn't load {{what}}",
+      "text": "It may be your connection or a problem on our side. Your data is safe.",
+      "home": "Go home"
+    },
+    "what": {
+      "period": "your current period",
+      "movements": "your movements",
+      "review": "the movements to review"
+    }
+  },
+  "firstSteps": {
+    "eyebrow": "Your first period",
+    "title": "Log your payment to see what's left",
+    "text": "With your payday we build the period and split the money into needs, wants and savings.",
+    "split": "Choose how to split",
+    "splitHint": "{{split}}, {{frequency}}",
+    "splitHintEmpty": "Needs, wants and savings",
+    "frequency": {
+      "Biweekly": "biweekly",
+      "Monthly": "monthly"
+    },
+    "payment": "Log your last payment",
+    "paymentHint": "Amount and the date it arrived",
+    "add": "Add",
+    "addLabel": "Add your last payment",
+    "gmail": "Connect Gmail",
+    "gmailHint": "Optional · detects spending by itself",
+    "noMovements": "No movements yet",
+    "noMovementsHint": "Use the + button to log your first expense."
   }
 }

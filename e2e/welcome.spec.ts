@@ -27,7 +27,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('the empty dashboard leads to the first steps', async ({ page }) => {
-  await page.getByRole('link', { name: 'Configurar mi presupuesto' }).click()
+  await page.getByRole('link', { name: /Elegir cómo repartir/ }).click()
   await page.waitForURL('**/welcome')
   await expect(page.getByText('Paso 1 de 3')).toBeVisible()
 })

@@ -14,6 +14,7 @@ import {
   SPLIT_STEP
 } from '@/components/welcome/split'
 import { HttpMethod } from '@/enums'
+import { useIsOnline } from '@/hooks/useIsOnline'
 import type { PayFrequency, Profile } from '@/interfaces'
 import { localApiService } from '@/lib'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
@@ -47,6 +48,7 @@ export default function BudgetSettingsPage() {
   const toast = useToast()
   const { data: session } = useSession()
   const revalidateApi = useRevalidateApi()
+  const isOnline = useIsOnline()
   const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const profile = data?.user
 
@@ -109,7 +111,7 @@ export default function BudgetSettingsPage() {
           variant="brand"
           size="cta"
           w="full"
-          isDisabled={difference !== 0}
+          isDisabled={difference !== 0 || !isOnline}
           isLoading={isSaving}
         >
           {t('budget.submit')}
