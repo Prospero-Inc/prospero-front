@@ -153,65 +153,265 @@ const MovementsSkeleton: FC = () => (
   </SkeletonPage>
 )
 
-const FixedExpensesSkeleton: FC = () => (
+/*
+ * Redesigned screens (docs/diseno-mobile.html): the same cards, radii and
+ * heights as the real page, on the same surfaces, so the content fills in
+ * place. Bones use the design's track/line colors, not Chakra's grays.
+ */
+
+/** A placeholder bar on a design surface. */
+const Bone = ({
+  h,
+  w = 'full',
+  radius = '6px',
+  onBrand = false,
+  ...rest
+}: {
+  h: string
+  w?: string | Record<string, string>
+  radius?: string
+  /** On the brand-colored hero: translucent white instead of gray. */
+  onBrand?: boolean
+  flexShrink?: number
+  mt?: string
+}) => (
+  <Skeleton
+    h={h}
+    w={w}
+    borderRadius={radius}
+    startColor={onBrand ? 'whiteAlpha.300' : 'track.bg'}
+    endColor={onBrand ? 'whiteAlpha.100' : 'border.subtle'}
+    {...rest}
+  />
+)
+
+/** White rounded card, as `.card` / `.list` / `.rev` / `.fx`. */
+const Card = ({
+  children,
+  radius = '20px',
+  p = '16px'
+}: {
+  children: ReactNode
+  radius?: string
+  p?: string
+}) => (
+  <Box bg="bg.surface" borderRadius={radius} p={p}>
+    {children}
+  </Box>
+)
+
+/** Title + subtitle lines, as in every list row. */
+const TwoLines = ({ w = '60%' }: { w?: string }) => (
+  <Stack spacing="7px" flex={1} minW={0}>
+    <Bone h="14px" w={w} />
+    <Bone h="11px" w="40%" />
+  </Stack>
+)
+
+/** `.mrow`: 40 px icon box, two lines, amount. */
+const MovementRowBone = ({ w }: { w?: string }) => (
+  <Flex align="center" gap="12px" py="12px">
+    <Bone h="40px" w="40px" radius="13px" flexShrink={0} />
+    <TwoLines w={w} />
+    <Bone h="14px" w="64px" flexShrink={0} />
+  </Flex>
+)
+
+/** `.day`: 12 px uppercase group label. */
+const GroupLabel = ({ w = '90px' }: { w?: string }) => (
+  <Box px="2px" pt="4px">
+    <Bone h="11px" w={w} />
+  </Box>
+)
+
+const ScreenStack = ({ children }: { children: ReactNode }) => (
   <SkeletonPage>
-    <Stack spacing={6}>
-      <PrimaryButton />
-      <Box>
-        <SectionTitle w="180px" />
-        <Panel>
-          <Stats count={3} />
-        </Panel>
-        <Box mt={4}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <ListRow key={index} />
-          ))}
-        </Box>
-      </Box>
+    <Stack spacing="12px" maxW="lg" pb={4}>
+      {children}
     </Stack>
   </SkeletonPage>
 )
 
+/** Inicio: hero, Gmail alert, split bars, latest movement. */
 const DashboardSkeleton: FC = () => (
-  <SkeletonPage>
-    <Stack spacing={12}>
-      <Box>
-        <SectionTitle w="60%" />
-        <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6} mt={6}>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Stack key={index} align="center" spacing={3}>
-              <SkeletonCircle size="28" />
-              <Skeleton h="16px" w="90px" />
-              <Skeleton h="14px" w="120px" />
-            </Stack>
-          ))}
-        </SimpleGrid>
-      </Box>
-      <Box>
-        <SectionTitle w="40%" />
-        <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} h="120px" borderRadius="md" />
-          ))}
-        </SimpleGrid>
-      </Box>
-      {/* "Este mes": mismas tarjetas que el resumen del período. */}
-      <Box>
-        <SectionTitle w="30%" />
-        <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={6}>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} h="120px" borderRadius="md" />
-          ))}
-        </SimpleGrid>
-      </Box>
-      <Box>
-        <SectionTitle w="35%" />
-        {Array.from({ length: 5 }).map((_, index) => (
-          <ListRow key={index} />
+  <ScreenStack>
+    <Box bg="hero.bg" borderRadius="24px" p="18px">
+      <Bone onBrand h="13px" w="150px" />
+      <Bone onBrand h="40px" w="190px" radius="10px" mt="10px" />
+      <Bone onBrand h="13px" w="85%" mt="12px" />
+      <Flex gap="8px" mt="16px">
+        <Bone onBrand h="52px" radius="14px" />
+        <Bone onBrand h="52px" radius="14px" />
+      </Flex>
+    </Box>
+    <Box bg="status.pendingBg" borderRadius="16px" p="14px">
+      <Flex align="center" gap="12px">
+        <Bone h="36px" w="36px" radius="10px" flexShrink={0} />
+        <TwoLines w="70%" />
+        <Bone h="40px" w="84px" radius="12px" flexShrink={0} />
+      </Flex>
+    </Box>
+    <Card>
+      <Flex justify="space-between" mb="16px">
+        <Bone h="15px" w="90px" />
+        <Bone h="13px" w="70px" />
+      </Flex>
+      <Stack spacing="16px">
+        {[0, 1, 2].map(index => (
+          <Box key={index}>
+            <Flex justify="space-between" mb="8px">
+              <Bone h="13px" w="100px" />
+              <Bone h="13px" w="110px" />
+            </Flex>
+            <Bone h="10px" radius="5px" />
+          </Box>
         ))}
-      </Box>
+      </Stack>
+    </Card>
+    <Card p="16px 16px 4px">
+      <Flex justify="space-between" mb="4px">
+        <Bone h="15px" w="80px" />
+        <Bone h="13px" w="60px" />
+      </Flex>
+      <MovementRowBone />
+    </Card>
+  </ScreenStack>
+)
+
+/** Movimientos: segmented control, chips and lists grouped by day. */
+const MovementsListSkeleton: FC = () => (
+  <ScreenStack>
+    <Bone h="46px" radius="14px" />
+    <Flex gap="8px">
+      <Bone h="36px" w="110px" radius="18px" />
+      <Bone h="36px" w="96px" radius="18px" />
+      <Bone h="36px" w="86px" radius="18px" />
+    </Flex>
+    {[2, 3, 1].map((rows, group) => (
+      <Stack key={group} spacing="12px">
+        <GroupLabel w={group === 0 ? '50px' : '90px'} />
+        <Card radius="20px" p="4px 14px">
+          {Array.from({ length: rows }).map((_, index) => (
+            <MovementRowBone key={index} w={index % 2 ? '45%' : '65%'} />
+          ))}
+        </Card>
+      </Stack>
+    ))}
+  </ScreenStack>
+)
+
+/** Por revisar: progress and the `.rev` cards. */
+const ReviewSkeleton: FC = () => (
+  <ScreenStack>
+    <Flex align="center" gap="10px">
+      <Bone h="13px" w="110px" flexShrink={0} />
+      <Bone h="6px" radius="3px" />
+    </Flex>
+    {[0, 1].map(index => (
+      <Card key={index} p="14px">
+        <Flex align="center" gap="12px">
+          <Bone h="40px" w="40px" radius="12px" flexShrink={0} />
+          <TwoLines w={index ? '70%' : '45%'} />
+          <Bone h="16px" w="64px" flexShrink={0} />
+        </Flex>
+        <Bone h="11px" w="45%" mt="14px" />
+        <Flex gap="8px" mt="10px">
+          <Bone h="44px" radius="12px" />
+          <Bone h="44px" radius="12px" />
+          <Bone h="44px" radius="12px" />
+        </Flex>
+        <Flex justify="space-between" mt="14px" mb="4px">
+          <Bone h="13px" w="70px" />
+          <Bone h="13px" w="150px" />
+        </Flex>
+      </Card>
+    ))}
+  </ScreenStack>
+)
+
+/** `.fx`: date block, two lines, amount, "Pagar". */
+const FixedRowBone = ({ w }: { w: string }) => (
+  <Card radius="18px" p="12px 14px">
+    <Flex align="center" gap="12px">
+      <Stack spacing="5px" w="46px" align="center" flexShrink={0}>
+        <Bone h="20px" w="26px" />
+        <Bone h="10px" w="28px" />
+      </Stack>
+      <TwoLines w={w} />
+      <Bone h="14px" w="58px" flexShrink={0} />
+      <Bone h="40px" w="72px" radius="12px" flexShrink={0} />
+    </Flex>
+  </Card>
+)
+
+/** Fijos: summary with the paid bar, then "Por pagar" and "Pagados". */
+const FixedExpensesSkeleton: FC = () => (
+  <ScreenStack>
+    <Card>
+      <Flex justify="space-between" align="flex-end">
+        <Stack spacing="8px">
+          <Bone h="12px" w="130px" />
+          <Bone h="24px" w="110px" />
+        </Stack>
+        <Stack spacing="8px" align="flex-end">
+          <Bone h="12px" w="50px" />
+          <Bone h="24px" w="100px" />
+        </Stack>
+      </Flex>
+    </Card>
+    <Box mt="-4px">
+      <Bone h="8px" radius="5px" />
+    </Box>
+    <Box mt="6px">
+      <GroupLabel w="80px" />
+    </Box>
+    <FixedRowBone w="55%" />
+    <FixedRowBone w="45%" />
+    <Box mt="6px">
+      <GroupLabel w="70px" />
+    </Box>
+    <FixedRowBone w="50%" />
+  </ScreenStack>
+)
+
+/** `.list` with `.li` rows: 32 px icon box and a label. */
+const ListRowsBone = ({ widths }: { widths: string[] }) => (
+  <Card radius="18px" p="0 14px">
+    <Stack
+      spacing={0}
+      divider={<Box borderTopWidth="1px" borderColor="border.subtle" />}
+    >
+      {widths.map((w, index) => (
+        <Flex key={index} align="center" gap="12px" h="56px">
+          <Bone h="32px" w="32px" radius="10px" flexShrink={0} />
+          <Bone h="14px" w={w} />
+        </Flex>
+      ))}
     </Stack>
-  </SkeletonPage>
+  </Card>
+)
+
+/** Más: profile card and the grouped lists. */
+const MoreSkeleton: FC = () => (
+  <ScreenStack>
+    <Card radius="18px" p="14px">
+      <Flex align="center" gap="12px">
+        <SkeletonCircle
+          size="48px"
+          startColor="track.bg"
+          endColor="border.subtle"
+        />
+        <TwoLines w="45%" />
+      </Flex>
+    </Card>
+    <GroupLabel w="100px" />
+    <ListRowsBone widths={['45%', '40%']} />
+    <GroupLabel w="70px" />
+    <ListRowsBone widths={['40%', '65%']} />
+    <GroupLabel w="110px" />
+    <ListRowsBone widths={['25%', '35%']} />
+    <ListRowsBone widths={['35%']} />
+  </ScreenStack>
 )
 
 const Field = () => (
@@ -346,6 +546,9 @@ const GenericSkeleton: FC = () => (
 
 const PAGE_SKELETONS: Record<string, FC> = {
   '/dashboard': DashboardSkeleton,
+  '/movements': MovementsListSkeleton,
+  '/review': ReviewSkeleton,
+  '/more': MoreSkeleton,
   '/expenditures': MovementsSkeleton,
   '/entries': MovementsSkeleton,
   '/fixed-expenses': FixedExpensesSkeleton,

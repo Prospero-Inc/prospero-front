@@ -11,6 +11,7 @@ import {
 } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { CookiesEnum } from '@/enums'
 import { usePushSubscription } from '@/hooks/usePushSubscription'
 import { Profile } from '@/interfaces'
@@ -181,7 +182,7 @@ export default function MorePage() {
   const router = useRouter()
   const { colorMode, toggleColorMode } = useColorMode()
   const { data: session } = useSession()
-  const { data } = useApi<{ user: Profile }>('auth/profile')
+  const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const { data: gmail } = useApi<GmailConnectionStatus>('gmail/connection')
   const { isSubscribed } = usePushSubscription(session?.accessToken)
   const language = useDisclosure()
@@ -206,6 +207,19 @@ export default function MorePage() {
   }
 
   const chevron = <ChevronRightIcon boxSize="16px" color="icon.subtle" />
+
+  // First load: the screen's skeleton instead of empty rows.
+  const PageSkeleton = getPageSkeleton(router.pathname)
+  if (data === undefined && !error && PageSkeleton)
+    return (
+      <ProsperoLayout
+        title={t('more.title')}
+        pageDescription={t('more.title')}
+        topBarTrailing="none"
+      >
+        <PageSkeleton />
+      </ProsperoLayout>
+    )
 
   return (
     <ProsperoLayout
