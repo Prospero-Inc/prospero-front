@@ -3,19 +3,26 @@
   "form": {
     "labelAmount": "Monto",
     "labelName": "Nombre",
-    "labelBudgetCategory": "Distribución",
-    "labelDueDate": "Día de cobro",
+    "labelBudgetCategory": "Categoría",
+    "labelDueDate": "Vence",
     "labelReminder": "Recordarme",
-    "labelDescription": "Nota (opcional)",
+    "labelDescription": "Nota",
     "submit": "Guardar gasto fijo",
-    "submitEdit": "Actualizar gasto fijo",
+    "submitEdit": "Guardar cambios",
     "cancel": "Cancelar",
     "namePlaceholder": "Ej. Internet, alquiler, Spotify",
     "dueDayOption": "Día {{day}}",
     "dueDayHelper": "Se cobra ese día cada mes. Si el mes es más corto, cuenta el último día.",
     "openCreate": "Nuevo gasto fijo",
     "createTitle": "Nuevo gasto fijo",
-    "editTitle": "Editar gasto fijo"
+    "editTitle": "Editar gasto fijo",
+    "delete": "Eliminar gasto fijo",
+    "dueDayValue": "Día {{day}} de cada mes",
+    "invalidAmount": "Ingresá un monto mayor a 0, con hasta 2 decimales.",
+    "reminderHint": "Los avisos de vencimiento llegan pronto; tu elección ya queda guardada.",
+    "moreOptions": "Más opciones",
+    "fewerOptions": "Menos opciones",
+    "descriptionPlaceholder": "Ej. plan de 50 Mbps"
   },
   "categories": {
     "Necesidad": "Necesidad",
@@ -36,9 +43,10 @@
     "dueDay": "Día {{day}} de cada mes",
     "columnStatus": "Estado",
     "columnActions": "Acciones",
-    "confirmDelete": "¿Eliminar \"{{name}}\"? Los pagos que ya registraste se mantienen.",
     "toPay": "Por pagar",
-    "paidSection": "Pagados"
+    "paidSection": "Pagados",
+    "confirmDeleteTitle": "¿Eliminar \"{{name}}\"?",
+    "confirmDeleteDescription": "Deja de aparecer en tus gastos fijos. Los pagos que ya registraste se mantienen en Movimientos."
   },
   "toast": {
     "success": {

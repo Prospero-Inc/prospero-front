@@ -3,19 +3,26 @@
   "form": {
     "labelAmount": "Amount",
     "labelName": "Name",
-    "labelBudgetCategory": "Distribution",
-    "labelDueDate": "Due day",
+    "labelBudgetCategory": "Category",
+    "labelDueDate": "Due",
     "labelReminder": "Remind me",
-    "labelDescription": "Note (optional)",
+    "labelDescription": "Note",
     "submit": "Save fixed expense",
-    "submitEdit": "Update fixed expense",
+    "submitEdit": "Save changes",
     "cancel": "Cancel",
     "namePlaceholder": "E.g. Internet, rent, Spotify",
     "dueDayOption": "Day {{day}}",
     "dueDayHelper": "Charged that day every month. In shorter months, the last day counts.",
     "openCreate": "New fixed expense",
     "createTitle": "New fixed expense",
-    "editTitle": "Edit fixed expense"
+    "editTitle": "Edit fixed expense",
+    "delete": "Delete fixed expense",
+    "dueDayValue": "Day {{day}} of each month",
+    "invalidAmount": "Enter an amount above 0, with up to 2 decimals.",
+    "reminderHint": "Due-date reminders are coming soon; your choice is already saved.",
+    "moreOptions": "More options",
+    "fewerOptions": "Fewer options",
+    "descriptionPlaceholder": "E.g. 50 Mbps plan"
   },
   "categories": {
     "Necesidad": "Needs",
@@ -36,9 +43,10 @@
     "dueDay": "Day {{day}} of every month",
     "columnStatus": "Status",
     "columnActions": "Actions",
-    "confirmDelete": "Delete \"{{name}}\"? Payments you already registered are kept.",
     "toPay": "To pay",
-    "paidSection": "Paid"
+    "paidSection": "Paid",
+    "confirmDeleteTitle": "Delete \"{{name}}\"?",
+    "confirmDeleteDescription": "It stops showing in your fixed expenses. Payments you already logged stay in Movements."
   },
   "toast": {
     "success": {

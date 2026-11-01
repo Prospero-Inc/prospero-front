@@ -1,32 +1,21 @@
 import { DayHeader } from '@/components/design'
+import { FixedExpenseSheet } from '@/components/fixed-expenses/FixedExpenseSheet'
 import { CheckIcon, PlusIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
 import { useMovementFormatters } from '@/components/ui/MovementSummary'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
-import {
-  DueStatus,
-  dueDateFromDay,
-  dueDayOf,
-  resolveDueStatus
-} from '@/lib/fixedExpenseDue'
+import { DueStatus, dueDayOf, resolveDueStatus } from '@/lib/fixedExpenseDue'
 import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
 import { FixedExpenseData } from '@/services/fixedExpenses'
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
-  Select,
   Stack,
   Text,
   useDisclosure,
@@ -37,32 +26,13 @@ import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
 import { MdEventRepeat } from 'react-icons/md'
 
 interface FixedExpense extends FixedExpenseData {
   id: number
   paidThisCycle: boolean
 }
-
-/** El formulario pide el día del mes, no una fecha: ver `fixedExpenseDue`. */
-// The amount starts empty, not 0: a prefilled 0 had to be deleted first.
-type FixedExpenseForm = Omit<FixedExpenseData, 'dueDate' | 'amount'> & {
-  dueDay: string
-  amount: number | ''
-}
-
-const emptyForm: FixedExpenseForm = {
-  amount: '',
-  name: '',
-  budgetCategory: 'Necesidad',
-  dueDay: '1',
-  reminder: false,
-  description: ''
-}
-
-const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, index) => index + 1)
 
 const STATUS_ORDER: Record<DueStatus['kind'], number> = {
   overdue: 0,
@@ -99,7 +69,6 @@ export default function FixedExpensesPage() {
     revalidateApi('fixed-expenses', 'periods', 'transactions')
   const toast = useToast()
   const confirm = useConfirm()
-  const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const { formatAmount } = useMovementFormatters()
   const today = useToday()
@@ -109,10 +78,6 @@ export default function FixedExpensesPage() {
   const formDrawer = useDisclosure()
   const editingFixedExpense =
     fixedExpenses.find(item => item.id === editingId) ?? null
-  const nameInputRef = useRef<HTMLInputElement | null>(null)
-  const { control, handleSubmit, reset } = useForm<FixedExpenseForm>({
-    defaultValues: emptyForm
-  })
 
   const statusOf = (fixedExpense: FixedExpense): DueStatus | null =>
     today
@@ -143,20 +108,11 @@ export default function FixedExpensesPage() {
 
   const openCreate = () => {
     setEditingId(null)
-    reset(emptyForm)
     formDrawer.onOpen()
   }
 
   const startEdit = (fixedExpense: FixedExpense) => {
     setEditingId(fixedExpense.id)
-    reset({
-      amount: fixedExpense.amount,
-      name: fixedExpense.name,
-      budgetCategory: fixedExpense.budgetCategory,
-      dueDay: String(dueDayOf(fixedExpense.dueDate)),
-      reminder: fixedExpense.reminder,
-      description: fixedExpense.description ?? ''
-    })
     formDrawer.onOpen()
   }
 
@@ -165,14 +121,9 @@ export default function FixedExpensesPage() {
     setEditingId(null)
   }
 
-  const onSubmit = async ({ dueDay, ...data }: FixedExpenseForm) => {
+  const onSubmit = async (payload: FixedExpenseData) => {
     setIsLoading(true)
     try {
-      const payload: FixedExpenseData = {
-        ...data,
-        amount: Number(data.amount),
-        dueDate: dueDateFromDay(Number(dueDay))
-      }
       const headers = { Authorization: `Bearer ${session?.accessToken}` }
       if (editingId)
         await localApiService.request({
@@ -213,8 +164,9 @@ export default function FixedExpensesPage() {
   const onDelete = async (fixedExpense: FixedExpense) => {
     if (
       !(await confirm({
-        title: t('list.confirmDelete', { name: fixedExpense.name }),
-        confirmLabel: tCommon('confirmSheet.delete'),
+        title: t('list.confirmDeleteTitle', { name: fixedExpense.name }),
+        description: t('list.confirmDeleteDescription'),
+        confirmLabel: t('form.delete'),
         destructive: true
       }))
     )
@@ -456,119 +408,17 @@ export default function FixedExpensesPage() {
 
   return layout(
     <Stack spacing="12px" maxW="lg" pb={4}>
-      <MovementFormDrawer
+      <FixedExpenseSheet
         isOpen={formDrawer.isOpen}
         onClose={closeForm}
-        title={editingId ? t('form.editTitle') : t('form.createTitle')}
-        formId="fixed-expense-form"
-        onSubmit={handleSubmit(onSubmit)}
-        isSubmitting={isLoading}
-        submitLabel={editingId ? t('form.submitEdit') : t('form.submit')}
-        cancelLabel={t('form.cancel')}
-        initialFocusRef={nameInputRef}
-      >
-        <FormControl>
-          <FormLabel>{t('form.labelName')}</FormLabel>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field: { ref, ...field } }) => (
-              <Input
-                {...field}
-                ref={element => {
-                  ref(element)
-                  nameInputRef.current = element
-                }}
-                placeholder={t('form.namePlaceholder')}
-              />
-            )}
-          />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>{t('form.labelAmount')}</FormLabel>
-          <Controller
-            name="amount"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min={0}
-              />
-            )}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>{t('form.labelBudgetCategory')}</FormLabel>
-          <Controller
-            name="budgetCategory"
-            control={control}
-            render={({ field }) => (
-              <Select {...field}>
-                <option value="Necesidad">{t('categories.Necesidad')}</option>
-                <option value="Deseo">{t('categories.Deseo')}</option>
-                <option value="Ahorro">{t('categories.Ahorro')}</option>
-              </Select>
-            )}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>{t('form.labelDueDate')}</FormLabel>
-          <Controller
-            name="dueDay"
-            control={control}
-            render={({ field }) => (
-              <Select {...field}>
-                {DAYS_OF_MONTH.map(day => (
-                  <option key={day} value={day}>
-                    {t('form.dueDayOption', { day })}
-                  </option>
-                ))}
-              </Select>
-            )}
-          />
-          <FormHelperText>{t('form.dueDayHelper')}</FormHelperText>
-        </FormControl>
-        <FormControl>
-          <FormLabel>{t('form.labelDescription')}</FormLabel>
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => <Input {...field} />}
-          />
-        </FormControl>
-        <FormControl display="flex" alignItems="center">
-          <Controller
-            name="reminder"
-            control={control}
-            render={({ field: { value, onChange, ...field } }) => (
-              <Checkbox
-                {...field}
-                isChecked={value}
-                onChange={e => onChange(e.target.checked)}
-              >
-                {t('form.labelReminder')}
-              </Checkbox>
-            )}
-          />
-        </FormControl>
-        {editingFixedExpense && (
-          <Button
-            variant="ghost"
-            colorScheme="red"
-            alignSelf="flex-start"
-            minH="44px"
-            onClick={() => {
-              closeForm()
-              onDelete(editingFixedExpense)
-            }}
-          >
-            {t('list.actions.delete')}
-          </Button>
-        )}
-      </MovementFormDrawer>
+        fixedExpense={editingFixedExpense}
+        isSaving={isLoading}
+        onSave={onSubmit}
+        onDelete={fixedExpense => {
+          closeForm()
+          onDelete(fixedExpense as FixedExpense)
+        }}
+      />
 
       {fixedExpenses.length === 0 ? (
         <EmptyState
@@ -576,7 +426,7 @@ export default function FixedExpensesPage() {
           title={t('list.empty')}
           description={t('list.emptyHint')}
           action={
-            <Button colorScheme="primary" minH="44px" onClick={openCreate}>
+            <Button variant="brand" size="ctaSm" onClick={openCreate}>
               {t('form.openCreate')}
             </Button>
           }

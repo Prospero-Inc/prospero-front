@@ -71,6 +71,7 @@ const routes = {
   'GET /api/transactions': () => [200, []],
   'GET /api/salary': () => [200, []],
   'GET /api/fixed-expenses': () => [200, []],
+  'POST /api/fixed-expenses': body => [201, { id: requests.length, ...body }],
   'GET /api/review-queue/summary': () => [
     200,
     { pendingTransactions: 0, pendingSalaries: 0 }
@@ -180,12 +181,16 @@ createServer(async (req, res) => {
   // Bank sheet: PATCH /api/financial-institutions/:id
   const isPatchInstitution =
     req.method === 'PATCH' && /^\/api\/financial-institutions\/\d+$/.test(path)
-  // Edit sheet: DELETE /api/transactions/:id, /api/salary/:id
+  // Edit sheets: DELETE /api/transactions/:id, /api/salary/:id,
+  // /api/fixed-expenses/:id
   const isDeleteById =
-    req.method === 'DELETE' && /^\/api\/(transactions|salary)\/\d+$/.test(path)
+    req.method === 'DELETE' &&
+    /^\/api\/(transactions|salary|fixed-expenses)\/\d+$/.test(path)
+  const isPatchFixedExpense =
+    req.method === 'PATCH' && /^\/api\/fixed-expenses\/\d+$/.test(path)
   const handler = isDeleteById
     ? () => [200, { id: Number(path.split('/').pop()) }]
-    : isPatchById || isPatchInstitution
+    : isPatchById || isPatchInstitution || isPatchFixedExpense
     ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
     : isPay
     ? () => [201, { id: requests.length }]
