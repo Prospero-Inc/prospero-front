@@ -1,5 +1,5 @@
-import { categoryIcon, Chip, SegmentedControl } from '@/components/design'
-import { ArrowDownIcon, ChevronRightIcon } from '@/components/icons/app'
+import { Chip, SegmentedControl } from '@/components/design'
+import { ArrowDownIcon } from '@/components/icons/app'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
@@ -23,8 +23,16 @@ import {
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import {
+  AmountField,
+  CategoryTiles,
+  OptionTile,
+  PICKER_OVERLAY,
+  PickerField,
+  TextField
+} from './fields'
 import { parseAmount } from './parseAmount'
 
 type Kind = 'expense' | 'income'
@@ -60,49 +68,7 @@ const destinationOf = (item: SalaryListItem): Destination =>
 const amountText = (amount: number) =>
   Number.isInteger(amount) ? String(amount) : amount.toFixed(2)
 
-const CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 const INCOME_TYPES: IncomeType[] = ['Payroll', 'Extra']
-
-/** Design .cats3 button: 64 px, icon over label; selected = 2 px colored
- * border on the category's tint. */
-const OptionTile = ({
-  icon,
-  label,
-  isSelected,
-  color,
-  tint,
-  onClick
-}: {
-  icon: ReactNode
-  label: string
-  isSelected: boolean
-  color: string
-  tint: string
-  onClick: () => void
-}) => (
-  <Flex
-    as="button"
-    type="button"
-    onClick={onClick}
-    aria-pressed={isSelected}
-    flex={1}
-    h="64px"
-    borderRadius="16px"
-    borderWidth={isSelected ? '2px' : '1.5px'}
-    borderColor={isSelected ? color : 'border.subtle'}
-    bg={isSelected ? tint : 'transparent'}
-    direction="column"
-    align="center"
-    justify="center"
-    gap="5px"
-    fontSize="13px"
-    fontWeight={650}
-    color="text.primary"
-  >
-    <Box color={color}>{icon}</Box>
-    {label}
-  </Flex>
-)
 
 /** A labeled row of chips (design .chip) for the less used options. */
 const OptionChips = <T extends string>({
@@ -499,83 +465,25 @@ export const QuickAddSheet = ({
           />
         )}
 
-        <Flex
-          as="label"
-          justify="center"
-          align="baseline"
-          pt="16px"
-          pb="10px"
-          fontSize="52px"
-          fontWeight="bold"
-          letterSpacing="-0.02em"
-          lineHeight="1.1"
-        >
-          <Text
-            as="span"
-            color="text.secondary"
-            fontWeight="semibold"
-            opacity={0.7}
-          >
-            $
-          </Text>
-          <Input
-            ref={amountRef}
-            aria-label={t('quickAdd.amount')}
-            value={amountInput}
-            onChange={event => setAmountInput(event.target.value)}
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="0.00"
-            variant="unstyled"
-            textAlign="left"
-            fontSize="52px"
-            fontWeight="bold"
-            h="auto"
-            w={`${Math.max(amountInput.length, 4) + 0.5}ch`}
-            maxW="70%"
-            color="text.primary"
-            sx={{
-              fontVariantNumeric: 'tabular-nums',
-              caretColor: 'var(--chakra-colors-brand-solid)'
-            }}
-          />
-        </Flex>
-        {showAmountError && (
-          <Text
-            color="money.expenseText"
-            fontSize="sm"
-            textAlign="center"
-            mb={2}
-          >
-            {t('quickAdd.invalidAmount')}
-          </Text>
-        )}
+        <AmountField
+          inputRef={amountRef}
+          label={t('quickAdd.amount')}
+          value={amountInput}
+          onChange={setAmountInput}
+          error={showAmountError ? t('quickAdd.invalidAmount') : null}
+        />
 
-        <Flex
-          gap="10px"
-          mt="14px"
-          mb="12px"
-          role="group"
-          aria-label={t(
-            kind === 'expense' ? 'quickAdd.category' : 'quickAdd.incomeType'
-          )}
-        >
-          {kind === 'expense'
-            ? CATEGORIES.map(option => {
-                const CategoryIcon = categoryIcon(option)
-                return (
-                  <OptionTile
-                    key={option}
-                    icon={<CategoryIcon boxSize="20px" />}
-                    label={t(`quickAdd.categories.${option}`)}
-                    isSelected={category === option}
-                    color={`category.${option}`}
-                    tint={`tint.${option}`}
-                    onClick={() => setCategory(option)}
-                  />
-                )
-              })
-            : INCOME_TYPES.map(option => (
+        <Box mt="14px" mb="12px">
+          {kind === 'expense' ? (
+            <CategoryTiles
+              label={t('quickAdd.category')}
+              value={category}
+              onChange={setCategory}
+              labelOf={option => t(`quickAdd.categories.${option}`)}
+            />
+          ) : (
+            <Flex gap="10px" role="group" aria-label={t('quickAdd.incomeType')}>
+              {INCOME_TYPES.map(option => (
                 <OptionTile
                   key={option}
                   icon={<ArrowDownIcon boxSize="20px" />}
@@ -586,42 +494,26 @@ export const QuickAddSheet = ({
                   onClick={() => setIncomeType(option)}
                 />
               ))}
-        </Flex>
+            </Flex>
+          )}
+        </Box>
 
         {/* Design .field: tapping the row opens the system date picker. */}
-        <Flex
-          as="label"
-          position="relative"
-          h="52px"
-          borderRadius="14px"
-          bg="field.bg"
-          align="center"
-          px="14px"
-          gap="10px"
-          fontSize="16px"
-          mb="10px"
-          cursor="pointer"
-        >
-          <Text as="span" color="text.secondary" fontSize="14px" w="84px">
-            {t('quickAdd.date')}
-          </Text>
-          <Text as="span" fontWeight="semibold" color="text.primary">
-            {date ? dateLabel(date) : '—'}
-          </Text>
-          <ChevronRightIcon boxSize="18px" ml="auto" color="text.secondary" />
-          <Input
-            ref={dateRef}
-            type="date"
-            value={date}
-            onChange={event => setDate(event.target.value)}
-            aria-label={t('quickAdd.date')}
-            position="absolute"
-            inset={0}
-            h="full"
-            opacity={0}
-            cursor="pointer"
-          />
-        </Flex>
+        <Box mb="10px">
+          <PickerField
+            label={t('quickAdd.date')}
+            value={date ? dateLabel(date) : '—'}
+          >
+            <Input
+              ref={dateRef}
+              type="date"
+              value={date}
+              onChange={event => setDate(event.target.value)}
+              aria-label={t('quickAdd.date')}
+              {...PICKER_OVERLAY}
+            />
+          </PickerField>
+        </Box>
 
         <Box textAlign="center">
           <Button
@@ -638,28 +530,18 @@ export const QuickAddSheet = ({
           </Button>
         </Box>
         <Collapse in={showMore} animateOpacity>
-          <Flex
-            as="label"
-            h="52px"
-            borderRadius="14px"
-            bg="field.bg"
-            align="center"
-            px="14px"
-            gap="10px"
-            mt="8px"
-          >
-            <Text as="span" color="text.secondary" fontSize="14px" w="84px">
-              {t('quickAdd.note')}
-            </Text>
-            <Input
-              value={description}
-              onChange={event => setDescription(event.target.value)}
-              placeholder={t('quickAdd.descriptionPlaceholder')}
-              variant="unstyled"
-              fontSize="16px"
-              fontWeight="semibold"
-            />
-          </Flex>
+          <Box mt="8px">
+            <TextField label={t('quickAdd.note')}>
+              <Input
+                value={description}
+                onChange={event => setDescription(event.target.value)}
+                placeholder={t('quickAdd.descriptionPlaceholder')}
+                variant="unstyled"
+                fontSize="16px"
+                fontWeight="semibold"
+              />
+            </TextField>
+          </Box>
           {kind === 'expense' ? (
             <OptionChips
               label={t('quickAdd.period.label')}
