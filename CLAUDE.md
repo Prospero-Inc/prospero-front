@@ -86,9 +86,16 @@ already-authenticated session; it's unrelated to the login gate.
   backend requires) → last payment (Payroll). Entered from the dashboard's empty state ("Configurar
   mi presupuesto"). iOS launch screens: `public/splash/*` + `apple-touch-startup-image` links in
   `_document` (regenerate them if the icon or brand color changes).
-- **Dashboard:** `components/dashboard/BalanceHero` (what's left this period, per day,
-  income vs. spent) and `BudgetSplitCard` (split as bars) replace the three rings and the
-  summary cards.
+- **Dashboard:** `components/dashboard/HomeCards` (`HomeHero`: what's left this period,
+  range · days left · per day, income/spent pills; `ReviewAlertCard`; `SplitCard`; `RecentCard`
+  with the latest movement) — one card each, in the design's order.
+- **Pixel fidelity to `docs/diseno-mobile.html`:** icons come from `components/icons/app.tsx`
+  (generated from the design's `<symbol>`s — don't use react-icons on redesigned screens);
+  shared pieces in `components/design` (SegmentedControl, Chip, CategoryIconBox, MovementRow,
+  DayHeader, ListCard); colors are the design's values as semantic tokens. The top bar's right
+  side is set per page with `ProsperoLayout`'s `topBarTrailing` (`'avatar'` default, `'none'`
+  on Más, `{ closeHref }` for sub-screens like Por revisar, which also hides the tab bar via
+  `NO_TAB_BAR_ROUTES` in `AppShell`).
 
 #### Deploy
 
@@ -245,8 +252,9 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
   (e.g. `HttpMethod`) and hooks (e.g. `usePushSubscription`).
 - `src/sw.ts` — service worker source, built into `public/sw.js` by Serwist (see Web Push
   above). `public/sw.js` is build output (gitignored).
-- `src/themes/fonts/` — Montserrat 400/600/700 (OFL), loaded with `next/font/local` in
-  `themes/fonts.tsx` (not `next/font/google`: the build must not depend on reaching Google).
+- `src/themes/fonts/` — Montserrat variable (OFL, the same latin file the design embeds, so
+  550/650 weights render as designed), loaded with `next/font/local` in `themes/fonts.tsx`
+  (not `next/font/google`: the build must not depend on reaching Google).
 
 ### Related repo
 

@@ -1,5 +1,4 @@
 import { parseAmount } from '@/components/quick-add/parseAmount'
-import { ChoiceButton } from '@/components/ui/ChoiceButton'
 import {
   adjustSplit,
   RECOMMENDED_SPLIT,
@@ -18,10 +17,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  IconButton,
   Input,
-  Progress,
-  SimpleGrid,
   Stack,
   Text,
   useToast
@@ -33,10 +29,136 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { MdAdd, MdRemove } from 'react-icons/md'
 
 const STEPS = 3
 const FREQUENCIES: PayFrequency[] = ['Biweekly', 'Monthly']
+const SPLIT_CATEGORY = {
+  needs: 'Necesidad',
+  wants: 'Deseo',
+  savings: 'Ahorro'
+} as const
+
+// docs/diseno-mobile.html .ob-h, .ob-p, .lfield and .btn.
+const TITLE_STYLE = {
+  fontSize: '26px',
+  fontWeight: 'bold',
+  lineHeight: '1.2',
+  letterSpacing: '-0.01em',
+  color: 'text.primary'
+} as const
+const HINT_STYLE = {
+  fontSize: '14.5px',
+  lineHeight: '1.5',
+  color: 'text.secondary'
+} as const
+const FIELD_LABEL_STYLE = {
+  fontSize: '13px',
+  fontWeight: 600,
+  mb: '6px',
+  color: 'field.label'
+} as const
+const FIELD_STYLE = {
+  h: '54px',
+  borderRadius: '14px',
+  borderWidth: '1.5px',
+  borderColor: 'field.border',
+  bg: 'bg.surface',
+  fontSize: '16px',
+  px: '14px',
+  _focusVisible: {
+    borderColor: 'brand.solid',
+    borderWidth: '2px',
+    boxShadow: 'none'
+  }
+} as const
+const PRIMARY_BUTTON_STYLE = {
+  h: '54px',
+  borderRadius: '16px',
+  bg: 'brand.solid',
+  color: 'white',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  _hover: { bg: 'brand.solid', opacity: 0.92 },
+  _active: { opacity: 0.85 },
+  _disabled: { opacity: 0.45, cursor: 'not-allowed' }
+} as const
+
+/** `.choice`: title, hint and a radio dot; 2 px brand border when chosen. */
+const ChoiceCard = ({
+  title,
+  hint,
+  isSelected,
+  onClick
+}: {
+  title: string
+  hint: string
+  isSelected: boolean
+  onClick: () => void
+}) => (
+  <Flex
+    as="button"
+    type="button"
+    aria-pressed={isSelected}
+    onClick={onClick}
+    align="center"
+    gap="14px"
+    p={isSelected ? '15.5px' : '16px'}
+    borderRadius="18px"
+    borderWidth={isSelected ? '2px' : '1.5px'}
+    borderColor={isSelected ? 'brand.solid' : 'choice.border'}
+    bg={isSelected ? 'choice.onBg' : 'bg.surface'}
+    textAlign="left"
+    _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
+  >
+    <Box flex={1} minW={0}>
+      <Text fontSize="15.5px" fontWeight={650} color="text.primary">
+        {title}
+      </Text>
+      <Text fontSize="12.5px" color="text.secondary" mt="3px">
+        {hint}
+      </Text>
+    </Box>
+    <Box
+      boxSize="22px"
+      flexShrink={0}
+      borderRadius="full"
+      borderWidth={isSelected ? '7px' : '2px'}
+      borderColor={isSelected ? 'brand.solid' : 'radio.off'}
+      aria-hidden
+    />
+  </Flex>
+)
+
+/** `.stepper .b`: 40 px soft square with − / +. */
+const StepperButton = ({
+  label,
+  isDisabled,
+  onClick,
+  children
+}: {
+  label: string
+  isDisabled: boolean
+  onClick: () => void
+  children: string
+}) => (
+  <Button
+    aria-label={label}
+    boxSize="40px"
+    minW="40px"
+    p={0}
+    borderRadius="12px"
+    bg="button.soft"
+    color="text.primary"
+    fontSize="20px"
+    fontWeight={600}
+    _hover={{ bg: 'button.soft' }}
+    _active={{ opacity: 0.8 }}
+    isDisabled={isDisabled}
+    onClick={onClick}
+  >
+    {children}
+  </Button>
+)
 
 /**
  * First steps (docs/diseno-mobile.html, 04): how often you're paid, how to
@@ -51,7 +173,10 @@ export default function WelcomePage() {
   const { data: profileData } = useApi<{ user: Profile }>('auth/profile')
   const revalidateApi = useRevalidateApi()
 
-  const [step, setStep] = useState(1)
+  // In the URL (?step=2) so the phone's back gesture goes back one step.
+  const step = Math.min(Math.max(Number(router.query.step) || 1, 1), STEPS)
+  const goToStep = (next: number) =>
+    router.push({ query: { step: next } }, undefined, { shallow: true })
   const [frequency, setFrequency] = useState<PayFrequency | null>(null)
   const [custom, setCustom] = useState(false)
   const [split, setSplit] = useState<Split>(RECOMMENDED_SPLIT)
@@ -94,7 +219,7 @@ export default function WelcomePage() {
         headers
       })
       await revalidateApi('auth/profile', 'periods')
-      setStep(3)
+      goToStep(3)
     } catch (error) {
       toast({
         title: t('welcome.error'),
@@ -128,210 +253,246 @@ export default function WelcomePage() {
     }
   }
 
+  const splitBar = (
+    <Flex h="16px" borderRadius="8px" overflow="hidden" gap="3px" aria-hidden>
+      {SPLIT_KEYS.map(key => (
+        <Box
+          key={key}
+          flex={split[key]}
+          bg={`category.${SPLIT_CATEGORY[key]}`}
+          transition="flex .2s"
+        />
+      ))}
+    </Flex>
+  )
+
   return (
-    <Flex minH="100dvh" bg="bg.canvas" justify="center" px={4} py={6}>
+    <Box minH="100dvh" bg="bg.surface">
       <Head>
         <title>{t('welcome.pageTitle')}</title>
       </Head>
-      <Stack spacing={6} w="full" maxW="md">
+      <Stack
+        spacing="14px"
+        w="full"
+        maxW="md"
+        mx="auto"
+        px="16px"
+        pt="calc(8px + env(safe-area-inset-top))"
+        // Room for the fixed button at the bottom.
+        pb="calc(104px + env(safe-area-inset-bottom))"
+        // One form for all steps; only step 3's button submits it.
+        as="form"
+        id="welcome-step"
+        method="post"
+        onSubmit={(event: React.FormEvent) => {
+          event.preventDefault()
+          if (step === 3) saveIncome()
+        }}
+      >
         <Box>
-          <Text fontSize="sm" color="text.secondary" mb={2}>
+          <Flex gap="6px" mt="8px" mb="4px" aria-hidden>
+            {Array.from({ length: STEPS }, (_, index) => (
+              <Box
+                key={index}
+                flex={1}
+                h="5px"
+                borderRadius="3px"
+                bg={index < step ? 'brand.solid' : 'steps.off'}
+              />
+            ))}
+          </Flex>
+          <Text
+            fontSize="12.5px"
+            fontWeight={600}
+            color="text.secondary"
+            mt="14px"
+          >
             {t('welcome.step', { step, total: STEPS })}
           </Text>
-          <Progress
-            value={(step / STEPS) * 100}
-            size="xs"
-            borderRadius="full"
-            colorScheme="primary"
-            aria-hidden
-          />
         </Box>
 
         {step === 1 && (
-          <Stack spacing={5}>
-            <Heading as="h1" size="lg" color="text.primary">
+          <>
+            <Heading as="h1" {...TITLE_STYLE}>
               {t('welcome.frequency.title')}
             </Heading>
-            <Text color="text.secondary">{t('welcome.frequency.hint')}</Text>
-            <SimpleGrid columns={1} spacing={3}>
-              {FREQUENCIES.map(option => (
-                <ChoiceButton
-                  key={option}
-                  label={t(`welcome.frequency.${option}`)}
-                  isSelected={frequency === option}
-                  color="brand.solid"
-                  onClick={() => setFrequency(option)}
-                />
-              ))}
-            </SimpleGrid>
-            <Button
-              colorScheme="primary"
-              minH="52px"
-              isDisabled={!frequency}
-              onClick={() => setStep(2)}
-            >
-              {t('welcome.continue')}
-            </Button>
-          </Stack>
+            <Text {...HINT_STYLE}>{t('welcome.frequency.hint')}</Text>
+            {FREQUENCIES.map(option => (
+              <ChoiceCard
+                key={option}
+                title={t(`welcome.frequency.${option}`)}
+                hint={t(`welcome.frequency.${option}Hint`)}
+                isSelected={frequency === option}
+                onClick={() => setFrequency(option)}
+              />
+            ))}
+          </>
         )}
 
         {step === 2 && (
-          <Stack spacing={5}>
-            <Heading as="h1" size="lg" color="text.primary">
+          <>
+            <Heading as="h1" {...TITLE_STYLE}>
               {t('welcome.split.title')}
             </Heading>
-            <Text color="text.secondary">{t('welcome.split.hint')}</Text>
-            <SimpleGrid columns={1} spacing={3}>
-              <ChoiceButton
-                label={t('welcome.split.recommended')}
-                isSelected={!custom}
-                color="brand.solid"
-                onClick={() => {
-                  setCustom(false)
-                  setSplit(RECOMMENDED_SPLIT)
-                }}
-              />
-              <ChoiceButton
-                label={t('welcome.split.custom')}
-                isSelected={custom}
-                color="brand.solid"
-                onClick={() => setCustom(true)}
-              />
-            </SimpleGrid>
+            <Text {...HINT_STYLE}>{t('welcome.split.hint')}</Text>
+            <ChoiceCard
+              title={t('welcome.split.recommended')}
+              hint={t('welcome.split.recommendedHint')}
+              isSelected={!custom}
+              onClick={() => {
+                setCustom(false)
+                setSplit(RECOMMENDED_SPLIT)
+              }}
+            />
+            <ChoiceCard
+              title={t('welcome.split.custom')}
+              hint={t('welcome.split.customHint')}
+              isSelected={custom}
+              onClick={() => setCustom(true)}
+            />
 
-            {custom && (
-              <Stack
-                spacing={1}
-                bg="bg.surface"
-                borderRadius="16px"
-                borderWidth="1px"
-                borderColor="border.subtle"
-                p={4}
-              >
+            <Box bg="bg.subtle" borderRadius="20px" p="16px">
+              <Box mb="14px">{splitBar}</Box>
+              <Stack spacing="10px">
                 {SPLIT_KEYS.map(key => (
-                  <Flex
-                    key={key}
-                    align="center"
-                    justify="space-between"
-                    minH="52px"
-                  >
-                    <Text color="text.primary" fontWeight="semibold">
+                  <Flex key={key} align="center" justify="space-between">
+                    <Flex
+                      align="center"
+                      gap="7px"
+                      fontSize="14px"
+                      fontWeight={600}
+                      color="text.primary"
+                    >
+                      <Box
+                        boxSize="9px"
+                        borderRadius="full"
+                        bg={`category.${SPLIT_CATEGORY[key]}`}
+                      />
                       {t(`welcome.split.${key}`)}
-                    </Text>
-                    <Flex align="center" gap={3}>
-                      <IconButton
-                        aria-label={t('welcome.split.decrease', {
+                    </Flex>
+                    <Flex align="center" gap="10px">
+                      <StepperButton
+                        label={t('welcome.split.decrease', {
                           name: t(`welcome.split.${key}`)
                         })}
-                        icon={<MdRemove />}
-                        variant="outline"
-                        isRound
                         isDisabled={split[key] < SPLIT_STEP}
-                        onClick={() =>
+                        onClick={() => {
+                          setCustom(true)
                           setSplit(current =>
                             adjustSplit(current, key, -SPLIT_STEP)
                           )
-                        }
-                      />
+                        }}
+                      >
+                        −
+                      </StepperButton>
                       <Text
-                        w="3.5rem"
+                        w="52px"
                         textAlign="center"
                         fontWeight="bold"
-                        fontSize="lg"
+                        fontSize="16px"
                         color="text.primary"
                         aria-live="polite"
+                        sx={{ fontVariantNumeric: 'tabular-nums' }}
                       >
                         {split[key]}%
                       </Text>
-                      <IconButton
-                        aria-label={t('welcome.split.increase', {
+                      <StepperButton
+                        label={t('welcome.split.increase', {
                           name: t(`welcome.split.${key}`)
                         })}
-                        icon={<MdAdd />}
-                        variant="outline"
-                        isRound
                         isDisabled={split[key] > 100 - SPLIT_STEP}
-                        onClick={() =>
+                        onClick={() => {
+                          setCustom(true)
                           setSplit(current =>
                             adjustSplit(current, key, SPLIT_STEP)
                           )
-                        }
-                      />
+                        }}
+                      >
+                        +
+                      </StepperButton>
                     </Flex>
                   </Flex>
                 ))}
               </Stack>
-            )}
-
-            <Flex gap={3}>
-              <Button variant="ghost" onClick={() => setStep(1)}>
-                {t('welcome.back')}
-              </Button>
-              <Button
-                flex={1}
-                colorScheme="primary"
-                minH="52px"
-                isLoading={isSaving}
-                onClick={saveBudget}
-              >
-                {t('welcome.continue')}
-              </Button>
-            </Flex>
-          </Stack>
+            </Box>
+          </>
         )}
 
         {step === 3 && (
-          <Stack
-            as="form"
-            method="post"
-            spacing={5}
-            onSubmit={event => {
-              event.preventDefault()
-              saveIncome()
-            }}
-          >
-            <Heading as="h1" size="lg" color="text.primary">
+          <>
+            <Heading as="h1" {...TITLE_STYLE}>
               {t('welcome.income.title')}
             </Heading>
-            <Text color="text.secondary">{t('welcome.income.hint')}</Text>
+            <Text {...HINT_STYLE}>{t('welcome.income.hint')}</Text>
             <FormControl>
-              <FormLabel>{t('welcome.income.amount')}</FormLabel>
+              <FormLabel {...FIELD_LABEL_STYLE}>
+                {t('welcome.income.amount')}
+              </FormLabel>
               <Input
+                {...FIELD_STYLE}
                 value={amountInput}
                 onChange={event => setAmountInput(event.target.value)}
                 inputMode="decimal"
                 autoComplete="off"
                 placeholder="0.00"
-                fontSize="2xl"
-                h="56px"
-                bg="bg.surface"
               />
             </FormControl>
             <FormControl>
-              <FormLabel>{t('welcome.income.date')}</FormLabel>
+              <FormLabel {...FIELD_LABEL_STYLE}>
+                {t('welcome.income.date')}
+              </FormLabel>
               <Input
+                {...FIELD_STYLE}
                 type="date"
                 value={date}
                 onChange={event => setDate(event.target.value)}
-                bg="bg.surface"
               />
             </FormControl>
             <Button
-              type="submit"
-              colorScheme="primary"
-              minH="52px"
-              isDisabled={amount === null || !date}
-              isLoading={isSaving}
+              variant="ghost"
+              color="brand.text"
+              alignSelf="center"
+              minH="44px"
+              onClick={() => router.push('/dashboard')}
             >
-              {t('welcome.income.save')}
-            </Button>
-            <Button variant="ghost" onClick={() => router.push('/dashboard')}>
               {t('welcome.income.later')}
             </Button>
-          </Stack>
+          </>
         )}
       </Stack>
-    </Flex>
+
+      {/* `.bottom-cta`: the step's main action, always under the thumb. */}
+      <Box
+        position="fixed"
+        left={0}
+        right={0}
+        bottom={0}
+        px="16px"
+        pt="8px"
+        pb="calc(16px + env(safe-area-inset-bottom))"
+        bg="bg.surface"
+      >
+        <Button
+          {...PRIMARY_BUTTON_STYLE}
+          w="full"
+          maxW="md"
+          mx="auto"
+          display="flex"
+          {...(step === 3
+            ? {
+                type: 'submit',
+                form: 'welcome-step',
+                isDisabled: amount === null || !date
+              }
+            : step === 1
+            ? { isDisabled: !frequency, onClick: () => goToStep(2) }
+            : { onClick: saveBudget })}
+          isLoading={isSaving}
+        >
+          {step === 3 ? t('welcome.income.save') : t('welcome.continue')}
+        </Button>
+      </Box>
+    </Box>
   )
 }
 

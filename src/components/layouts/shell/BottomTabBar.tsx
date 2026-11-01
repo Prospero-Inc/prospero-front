@@ -1,61 +1,53 @@
+import {
+  CalendarRepeatIcon,
+  HomeIcon,
+  ListIcon,
+  MoreIcon,
+  PlusIcon
+} from '@/components/icons/app'
 import { useOpenQuickAdd } from '@/components/quick-add'
 import { useApi } from '@/lib/useApi'
 import type { ReviewQueueSummary } from '@/services/reviewQueue'
-import {
-  Badge,
-  Box,
-  Flex,
-  Icon,
-  IconButton,
-  Text,
-  type FlexProps
-} from '@chakra-ui/react'
+import { Box, Flex, type FlexProps, IconProps, Text } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import type { IconType } from 'react-icons'
-import {
-  MdAdd,
-  MdEventRepeat,
-  MdHome,
-  MdMoreHoriz,
-  MdSwapVert
-} from 'react-icons/md'
+import type { ComponentType } from 'react'
 
 interface Tab {
   key: 'home' | 'movements' | 'fixed' | 'more'
   href: string
-  icon: IconType
+  icon: ComponentType<IconProps>
   /** Other routes that light this tab up. */
   matches: string[]
 }
 
 const TABS: [Tab, Tab, Tab, Tab] = [
-  { key: 'home', href: '/dashboard', icon: MdHome, matches: ['/dashboard'] },
+  { key: 'home', href: '/dashboard', icon: HomeIcon, matches: ['/dashboard'] },
   {
     key: 'movements',
     href: '/movements',
-    icon: MdSwapVert,
+    icon: ListIcon,
     matches: ['/movements', '/review', '/expenditures', '/entries']
   },
   {
     key: 'fixed',
     href: '/fixed-expenses',
-    icon: MdEventRepeat,
+    icon: CalendarRepeatIcon,
     matches: ['/fixed-expenses']
   },
   {
     key: 'more',
     href: '/more',
-    icon: MdMoreHoriz,
+    icon: MoreIcon,
     matches: ['/more', '/settings', '/profile', '/budget-calculator', '/goals']
   }
 ]
 
 /**
- * Phone navigation (docs/diseno-mobile.html): five destinations at thumb
- * height — Inicio · Movimientos (with the pending count) · "+" · Fijos ·
- * Más. Desktop keeps the side menu.
+ * Phone navigation, as drawn in docs/diseno-mobile.html: Inicio ·
+ * Movimientos (pending count) · "+" · Fijos · Más. Desktop keeps the side
+ * menu.
  */
 export const BottomTabBar = (props: FlexProps) => {
   const { t } = useTranslation('common')
@@ -73,6 +65,7 @@ export const BottomTabBar = (props: FlexProps) => {
 
   const renderTab = (tab: Tab) => {
     const active = isActive(tab)
+    const TabIcon = tab.icon
     return (
       <Flex
         key={tab.key}
@@ -81,32 +74,35 @@ export const BottomTabBar = (props: FlexProps) => {
         aria-current={active ? 'page' : undefined}
         direction="column"
         align="center"
-        justify="center"
-        flex={1}
-        minH="56px"
-        gap={0.5}
+        w="64px"
+        minH="48px"
+        gap={1}
         position="relative"
-        color={active ? 'brand.text' : 'text.secondary'}
+        color={active ? 'tab.active' : 'tab.inactive'}
         _hover={{ textDecoration: 'none' }}
       >
-        <Box position="relative">
-          <Icon as={tab.icon} boxSize={6} />
-          {tab.key === 'movements' && pending > 0 && (
-            <Badge
-              position="absolute"
-              top={-1}
-              right={-3}
-              borderRadius="full"
-              bg="status.pending"
-              color="white"
-              fontSize="2xs"
-              aria-label={t('tabBar.pending', { count: pending })}
-            >
-              {pending}
-            </Badge>
-          )}
-        </Box>
-        <Text fontSize="xs" fontWeight={active ? 'semibold' : 'normal'}>
+        <TabIcon boxSize="26px" />
+        {tab.key === 'movements' && pending > 0 && (
+          <Box
+            position="absolute"
+            top="-3px"
+            left="38px"
+            minW="18px"
+            h="18px"
+            px="5px"
+            borderRadius="9px"
+            bg="status.pendingSolid"
+            color="white"
+            fontSize="10.5px"
+            fontWeight="bold"
+            display="grid"
+            placeItems="center"
+            aria-label={t('tabBar.pending', { count: pending })}
+          >
+            {pending}
+          </Box>
+        )}
+        <Text fontSize="11px" fontWeight="semibold" lineHeight="short">
           {t(`tabBar.${tab.key}`)}
         </Text>
       </Flex>
@@ -122,31 +118,37 @@ export const BottomTabBar = (props: FlexProps) => {
       left={0}
       right={0}
       zIndex="sticky"
-      bg="bg.surface"
+      bg="tabbar.bg"
+      backdropFilter="saturate(180%) blur(12px)"
       borderTopWidth="1px"
       borderColor="border.subtle"
-      align="center"
-      px={2}
-      pb="env(safe-area-inset-bottom)"
+      justify="space-around"
+      align="flex-start"
+      pt={2}
+      px="6px"
+      pb="calc(8px + env(safe-area-inset-bottom))"
       {...props}
     >
       {renderTab(TABS[0])}
       {renderTab(TABS[1])}
-      <Flex flex={1} justify="center">
-        <IconButton
-          onClick={openQuickAdd}
-          aria-label={t('tabBar.add')}
-          icon={<Icon as={MdAdd} boxSize={7} />}
-          isRound
-          w="52px"
-          h="52px"
-          minW="52px"
-          bg="brand.solid"
-          color="white"
-          boxShadow="md"
-          _hover={{ bg: 'primary.600' }}
-        />
-      </Flex>
+      <Box
+        as="button"
+        type="button"
+        onClick={openQuickAdd}
+        aria-label={t('tabBar.add')}
+        w="56px"
+        h="56px"
+        mt="-2px"
+        borderRadius="18px"
+        bg="brand.solid"
+        color="white"
+        display="grid"
+        placeItems="center"
+        boxShadow="0 8px 18px -6px rgba(83,82,237,.7)"
+        _active={{ transform: 'scale(0.96)' }}
+      >
+        <PlusIcon boxSize="28px" />
+      </Box>
       {renderTab(TABS[2])}
       {renderTab(TABS[3])}
     </Flex>

@@ -1,3 +1,4 @@
+import { CloseIcon } from '@/components/icons/app'
 import { useAppShellTitle } from '@/components/layouts/shell/AppShellTitle'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
@@ -21,6 +22,7 @@ import {
 } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { FiChevronDown } from 'react-icons/fi'
 import { GoSun, GoMoon } from 'react-icons/go'
@@ -38,7 +40,8 @@ export const MobileNav = (props: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
-  const title = useAppShellTitle()
+  const { title, greeting, trailing = 'avatar' } = useAppShellTitle()
+  const closeHref = typeof trailing === 'object' ? trailing.closeHref : null
   if (status === 'loading') return null
 
   const handleChangeColorMode = () => {
@@ -62,22 +65,29 @@ export const MobileNav = (props: MobileProps) => {
       top={0}
       zIndex="sticky"
       alignItems="center"
-      bg={useColorModeValue('white', 'gray.900')}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+      bg={{ base: 'bg.canvas', md: 'bg.surface' }}
+      borderBottomWidth={{ base: 0, md: '1px' }}
+      borderBottomColor="border.subtle"
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
       {...props}
     >
-      <Text
-        display={{ base: 'block', md: 'none' }}
-        as="h1"
-        fontSize="xl"
-        fontWeight="bold"
-        color="text.primary"
-        noOfLines={1}
-      >
-        {title}
-      </Text>
+      <Box display={{ base: 'block', md: 'none' }} minW={0}>
+        {greeting && (
+          <Text fontSize="13px" fontWeight="medium" color="text.secondary">
+            {greeting}
+          </Text>
+        )}
+        <Text
+          as="h1"
+          fontSize="20px"
+          fontWeight="bold"
+          lineHeight="short"
+          color="text.primary"
+          noOfLines={1}
+        >
+          {title}
+        </Text>
+      </Box>
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton
           display={{ base: 'none', md: 'flex' }}
@@ -90,7 +100,29 @@ export const MobileNav = (props: MobileProps) => {
         <Box display={{ base: 'none', md: 'block' }}>
           <SwitchLanguage />
         </Box>
-        <Flex alignItems={'center'}>
+        {closeHref && (
+          <IconButton
+            as={NextLink}
+            href={closeHref}
+            display={{ base: 'flex', md: 'none' }}
+            aria-label={t('close')}
+            icon={<CloseIcon boxSize="16px" />}
+            boxSize="36px"
+            minW="36px"
+            borderRadius="full"
+            bg="button.soft"
+            color="text.primary"
+          />
+        )}
+        {/* Phone: only the screens that keep the avatar show it (Más and
+            sub-screens like Por revisar don't, per the design). */}
+        <Flex
+          alignItems={'center'}
+          display={{
+            base: trailing === 'avatar' ? 'flex' : 'none',
+            md: 'flex'
+          }}
+        >
           <Menu>
             <MenuButton
               aria-label={t('userMenu')}
@@ -102,7 +134,16 @@ export const MobileNav = (props: MobileProps) => {
               _focusVisible={{ boxShadow: 'outline' }}
             >
               <HStack>
-                <Avatar size={'sm'} name={session?.user?.name ?? undefined} />
+                {/* Initials in the brand's colors, as in the design (Chakra's
+                    default picks a random color per name). */}
+                <Avatar
+                  name={session?.user?.name ?? undefined}
+                  boxSize="36px"
+                  bg="brand.subtle"
+                  color="brand.text"
+                  fontWeight="bold"
+                  sx={{ '& > div': { fontSize: '14px' } }}
+                />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
                   alignItems="flex-start"

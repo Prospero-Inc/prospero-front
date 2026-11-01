@@ -29,13 +29,16 @@
     "actions": {
       "edit": "Editar",
       "delete": "Eliminar",
-      "pay": "Marcar como pagado"
+      "pay": "Marcar como pagado",
+      "payShort": "Pagar"
     },
     "emptyHint": "Agregá lo que pagás todos los meses (alquiler, internet, suscripciones) y marcalo como pagado con un clic.",
     "dueDay": "Día {{day}} de cada mes",
     "columnStatus": "Estado",
     "columnActions": "Acciones",
-    "confirmDelete": "¿Eliminar \"{{name}}\"? Los pagos que ya registraste se mantienen."
+    "confirmDelete": "¿Eliminar \"{{name}}\"? Los pagos que ya registraste se mantienen.",
+    "toPay": "Por pagar",
+    "paidSection": "Pagados"
   },
   "toast": {
     "success": {
@@ -69,6 +72,7 @@
   "summary": {
     "total": "Total mensual",
     "paid": "Pagado ({{paid}} de {{total}})",
-    "pending": "Falta pagar"
+    "pending": "Falta pagar",
+    "thisPeriod": "Fijos de este período"
   }
 }

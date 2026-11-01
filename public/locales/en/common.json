@@ -33,7 +33,11 @@
         "minLength": "Password must be at least 8 characters long",
         "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and one dot"
       }
-    }
+    },
+    "welcome": "Welcome back",
+    "tagline": "Your budget, anchored to your paydays.",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account"
   },
   "register": {
     "heading": "Create an Account",
@@ -175,16 +179,31 @@
       "payrolls_one": "{{count}} payroll payment",
       "payrolls_other": "{{count}} payroll payments"
     },
-    "hero": {
-      "left": "Left to spend this period",
-      "over": "Over budget this period by",
-      "perDay": "About {{amount}} a day",
-      "income": "Income",
-      "spent": "Spent"
-    },
     "split": {
       "title": "Your split",
       "of": "of"
+    },
+    "home": {
+      "left": "Left to spend this period",
+      "over": "Over budget this period by",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "payday": "payday is today",
+      "paymentDue": "your estimated payday has passed",
+      "perDay": "about {{amount}} a day",
+      "income": "Income",
+      "spent": "Spent",
+      "toReview_one": "{{count}} movement to review",
+      "toReview_other": "{{count}} movements to review",
+      "fromGmail": "Detected in your Gmail",
+      "review": "Review",
+      "recent": "Recent",
+      "seeAll": "See all",
+      "today": "today",
+      "yesterday": "yesterday",
+      "toClassify": "To classify",
+      "noRecent": "No expenses logged this period yet.",
+      "greeting": "Hi, {{name}}"
     }
   },
   "categoryBudget": {
@@ -301,7 +320,8 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "disconnect": "Disconnect",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "close": "Close"
   },
   "tabBar": {
     "label": "Main navigation",
@@ -333,7 +353,14 @@
     "calculator": "Budget calculator",
     "language": "Language",
     "darkMode": "Dark mode",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "gmailConnected": "Connected",
+    "gmailDisconnected": "Not connected",
+    "push": "Push",
+    "languageName": {
+      "es": "Español",
+      "en": "English"
+    }
   },
   "quickAdd": {
     "title": "New movement",
@@ -362,7 +389,8 @@
     "saveIncome": "Save income",
     "savedExpense": "Expense saved",
     "savedIncome": "Income saved",
-    "error": "We couldn't save the movement"
+    "error": "We couldn't save the movement",
+    "note": "Note"
   },
   "review": {
     "title": "To review",
@@ -387,7 +415,16 @@
       "title": "All caught up",
       "description": "No Gmail movements are waiting for your review.",
       "action": "See movements"
-    }
+    },
+    "progress": "{{done}} of {{total}} reviewed",
+    "confirmedItem": "{{name}} confirmed",
+    "discardedItem": "{{name}} discarded",
+    "purchase": "Purchase",
+    "possibleIncome": "Possible income",
+    "discard": "Discard",
+    "editFirst": "Edit before saving",
+    "today": "today",
+    "yesterday": "yesterday"
   },
   "movements": {
     "title": "Activity",
@@ -410,6 +447,19 @@
     "empty": {
       "title": "No movements in this period",
       "description": "What you log with the + button shows up here."
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "filtersChip": "Filters",
+    "filtersCount_one": "Filters · {{count}}",
+    "filtersCount_other": "Filters · {{count}}",
+    "search": "Search",
+    "allCategories": "All",
+    "showResults_one": "Show {{count}} movement",
+    "showResults_other": "Show {{count}} movements",
+    "incomeTypes": {
+      "Payroll": "Payroll",
+      "Extra": "Extra income"
     }
   },
   "welcome": {
@@ -422,18 +472,22 @@
       "title": "How often are you paid?",
       "hint": "Prospero builds your budget from each payday, not from the calendar month.",
       "Biweekly": "Every two weeks",
-      "Monthly": "Once a month"
+      "Monthly": "Once a month",
+      "BiweeklyHint": "Two payments a month, even if the dates vary",
+      "MonthlyHint": "A single payment every month"
     },
     "split": {
       "title": "How do you want to split each payment?",
-      "hint": "You can change it anytime in More → Split and pay frequency.",
+      "hint": "You can change it anytime in More → Profile.",
       "recommended": "Recommended: 50 / 30 / 20",
       "custom": "Custom",
       "needs": "Needs",
       "wants": "Wants",
       "savings": "Savings",
       "increase": "Raise {{name}}",
-      "decrease": "Lower {{name}}"
+      "decrease": "Lower {{name}}",
+      "recommendedHint": "Needs, wants and savings",
+      "customHint": "Choose your own percentages"
     },
     "income": {
       "title": "Log your last payment",

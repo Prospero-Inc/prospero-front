@@ -24,7 +24,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           {...props}
           ref={ref} // Pasa el ref al componente Input
         />
-        <InputRightElement h="full">
+        <InputRightElement h="full" w="48px">
           <IconButton
             aria-label={t('passwordInput.toggle')}
             variant="ghost"

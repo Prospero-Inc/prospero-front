@@ -29,13 +29,16 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
-      "pay": "Mark as paid"
+      "pay": "Mark as paid",
+      "payShort": "Pay"
     },
     "emptyHint": "Add what you pay every month (rent, internet, subscriptions) and mark it as paid in one click.",
     "dueDay": "Day {{day}} of every month",
     "columnStatus": "Status",
     "columnActions": "Actions",
-    "confirmDelete": "Delete \"{{name}}\"? Payments you already registered are kept."
+    "confirmDelete": "Delete \"{{name}}\"? Payments you already registered are kept.",
+    "toPay": "To pay",
+    "paidSection": "Paid"
   },
   "toast": {
     "success": {
@@ -69,6 +72,7 @@
   "summary": {
     "total": "Monthly total",
     "paid": "Paid ({{paid}} of {{total}})",
-    "pending": "Left to pay"
+    "pending": "Left to pay",
+    "thisPeriod": "Fixed this period"
   }
 }

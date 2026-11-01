@@ -20,10 +20,34 @@ import {
 } from '@chakra-ui/react'
 import { signIn, SignInResponse } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
+
+// docs/diseno-mobile.html .lfield: 13 px label, 54 px field, 2 px brand
+// border while focused.
+const FIELD_LABEL_STYLE = {
+  fontSize: '13px',
+  fontWeight: 600,
+  mb: '6px',
+  color: 'field.label'
+} as const
+const FIELD_STYLE = {
+  h: '54px',
+  borderRadius: '14px',
+  borderWidth: '1.5px',
+  borderColor: 'field.border',
+  bg: 'bg.surface',
+  fontSize: '16px',
+  px: '14px',
+  _focusVisible: {
+    borderColor: 'brand.solid',
+    borderWidth: '2px',
+    boxShadow: 'none'
+  }
+} as const
 
 interface LoginViewProps {
   email: string
@@ -122,54 +146,93 @@ export const LoginView = () => {
     }
   }
   return (
-    // <Form as={'form'} onSubmit={handleSubmit(onSubmit)}>
     <Stack
       as={'form'}
       method="post"
       onSubmit={handleSubmit(onSubmit)}
       w={'full'}
-      justifyContent={'center'}
+      spacing={0}
     >
-      <FormControl my={2}>
-        <FormLabel color={'gray'}>{t('login.labelEmail')}</FormLabel>
+      <FormControl mb="14px" isInvalid={Boolean(errors.email)}>
+        <FormLabel {...FIELD_LABEL_STYLE}>{t('login.labelEmail')}</FormLabel>
         <Controller
           control={control}
           name="email"
           render={({ field }) => (
             <Input
-              size={['md', 'md', 'lg']}
+              {...FIELD_STYLE}
               {...field}
               type="email"
               inputMode="email"
               autoComplete="email"
               autoCapitalize="none"
-              placeholder="john@doe.com"
+              placeholder="ana@ejemplo.com"
             />
           )}
         />
-        {errors.email && <Text color="red">{errors.email.message}</Text>}
+        {errors.email && (
+          <Text color="money.expenseText" fontSize="13px" mt="6px">
+            {errors.email.message}
+          </Text>
+        )}
       </FormControl>
-      <FormControl my={2}>
-        <FormLabel color={'gray'}>{t('login.labelPassword')}</FormLabel>
+      <FormControl mb="14px" isInvalid={Boolean(errors.password)}>
+        <FormLabel {...FIELD_LABEL_STYLE}>{t('login.labelPassword')}</FormLabel>
         <Controller
           name="password"
           control={control}
           render={({ field }) => (
             <PasswordInput
-              size={['md', 'md', 'lg']}
+              {...FIELD_STYLE}
+              pr="52px"
               autoComplete="current-password"
               {...field}
             />
           )}
         />
-        {errors.password && <Text color="red">{errors.password.message}</Text>}
+        {errors.password && (
+          <Text color="money.expenseText" fontSize="13px" mt="6px">
+            {errors.password.message}
+          </Text>
+        )}
       </FormControl>
-      <Link ml="auto" variant={'brandPrimary'} href="/auth/forgot-password">
+      <Link
+        as={NextLink}
+        href="/auth/forgot-password"
+        alignSelf="flex-end"
+        mt="-2px"
+        mb="20px"
+        fontSize="13.5px"
+        fontWeight={600}
+        color="brand.text"
+      >
         {t('login.forgotPasswordLink')}
       </Link>
-      <Button colorScheme="primary" my={2} type="submit" isLoading={isLoading}>
+      <Button
+        type="submit"
+        isLoading={isLoading}
+        h="54px"
+        borderRadius="16px"
+        bg="brand.solid"
+        color="white"
+        fontSize="16px"
+        fontWeight="bold"
+        _hover={{ bg: 'brand.solid', opacity: 0.92 }}
+        _active={{ opacity: 0.85 }}
+      >
         {t('login.sigIn')}
       </Button>
+      <Text textAlign="center" fontSize="14px" color="text.secondary" mt="18px">
+        {t('login.noAccount')}{' '}
+        <Link
+          as={NextLink}
+          href="/auth/register"
+          fontWeight="bold"
+          color="brand.text"
+        >
+          {t('login.createAccount')}
+        </Link>
+      </Text>
     </Stack>
   )
 }
