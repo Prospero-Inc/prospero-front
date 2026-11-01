@@ -32,7 +32,8 @@ const tabBar = (page: Page) =>
 /** Types a 6-digit code box by box (typing in one go races with the boxes
  * moving focus by themselves when the machine is slow). */
 const enterCode = async (scope: Page | Locator, code: string) => {
-  for (const [index, digit] of [...code].entries()) {
+  for (let index = 0; index < code.length; index++) {
+    const digit = code.charAt(index)
     const box = scope.getByLabel(`Dígito ${index + 1} del código`)
     await expect(box).toBeEnabled()
     await box.fill(digit)

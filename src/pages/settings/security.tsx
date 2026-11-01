@@ -140,11 +140,11 @@ export default function SecuritySettingsPage() {
     if (!profile) return
     if (
       !(await confirm({
-        title: t('security.passwordTitle'),
-        description: t('security.passwordDescription', {
+        title: t('security.resetLinkTitle'),
+        description: t('security.resetLinkDescription', {
           email: profile.email
         }),
-        confirmLabel: t('security.passwordConfirm')
+        confirmLabel: t('security.resetLinkConfirm')
       }))
     )
       return
@@ -153,8 +153,8 @@ export default function SecuritySettingsPage() {
         email: profile.email
       })
       toast({
-        title: t('security.passwordSent'),
-        description: t('security.passwordSentDescription', {
+        title: t('security.resetLinkSent'),
+        description: t('security.resetLinkSentDescription', {
           email: profile.email
         }),
         status: 'success',
@@ -250,7 +250,7 @@ export default function SecuritySettingsPage() {
 
       {profile && !profile.isGoogleAccount && (
         <>
-          <Group>{t('security.password')}</Group>
+          <Group>{t('security.accessGroup')}</Group>
           <ListCard>
             <ListRow
               onClick={onChangePassword}
