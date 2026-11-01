@@ -1,4 +1,5 @@
-import { Button, Text } from '@chakra-ui/react'
+import { TrashIcon } from '@/components/icons/app'
+import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import {
   createContext,
@@ -52,31 +53,60 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
+      {/* docs/diseno-mobile.html 13, "Confirmar borrado (hoja)": icon,
+          centered title and what happens, then the action and an equally
+          big "Cancelar". */}
       <BottomSheet
         isOpen={options !== null}
         onClose={() => settle(false)}
         title={options?.title ?? ''}
         initialFocusRef={cancelRef}
-        footer={
-          <>
-            <Button
-              ref={cancelRef}
-              variant="ghost"
-              onClick={() => settle(false)}
+        hero={
+          options?.destructive ? (
+            <Flex
+              boxSize="64px"
+              borderRadius="20px"
+              bg="tint.expense"
+              color="money.expenseText"
+              align="center"
+              justify="center"
+              aria-hidden
             >
-              {t('confirmSheet.cancel')}
-            </Button>
+              <TrashIcon boxSize="28px" />
+            </Flex>
+          ) : undefined
+        }
+        footer={
+          <Stack spacing="10px" w="full">
             <Button
-              colorScheme={options?.destructive ? 'red' : 'primary'}
+              variant={options?.destructive ? 'dangerSolid' : 'brand'}
+              size="cta"
+              w="full"
               onClick={() => settle(true)}
             >
               {options?.confirmLabel ?? t('confirmSheet.confirm')}
             </Button>
-          </>
+            <Button
+              ref={cancelRef}
+              variant="soft"
+              size="cta"
+              w="full"
+              onClick={() => settle(false)}
+            >
+              {t('confirmSheet.cancel')}
+            </Button>
+          </Stack>
         }
       >
         {options?.description && (
-          <Text color="text.secondary">{options.description}</Text>
+          <Text
+            textAlign="center"
+            fontSize="13.5px"
+            lineHeight="1.5"
+            color="text.secondary"
+          >
+            {options.description}
+          </Text>
         )}
       </BottomSheet>
     </ConfirmContext.Provider>

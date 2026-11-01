@@ -390,7 +390,35 @@
     "savedExpense": "Expense saved",
     "savedIncome": "Income saved",
     "error": "We couldn't save the movement",
-    "note": "Note"
+    "note": "Note",
+    "edit": {
+      "titleExpense": "Edit expense",
+      "titleIncome": "Edit income",
+      "save": "Save changes",
+      "saved": "Changes saved",
+      "deleteExpense": "Delete expense",
+      "deleteIncome": "Delete income",
+      "confirmDelete": "Delete \"{{name}}\"?",
+      "deleteExpenseHint": "It stops counting in your budget. This can't be undone.",
+      "deleteIncomeHint": "It stops counting in your budget; if it was your payroll, the period is recalculated. This can't be undone.",
+      "deletedExpense": "Expense deleted",
+      "deletedIncome": "Income deleted",
+      "deleteError": "We couldn't delete the movement"
+    },
+    "period": {
+      "label": "Count in",
+      "auto": "By its date",
+      "Previous": "Previous period",
+      "Current": "Current period"
+    },
+    "destination": {
+      "label": "Goes to",
+      "none": "Unassigned",
+      "split": "Split",
+      "Necesidad": "Needs",
+      "Deseo": "Wants",
+      "Ahorro": "Savings"
+    }
   },
   "review": {
     "title": "To review",
@@ -460,7 +488,9 @@
     "incomeTypes": {
       "Payroll": "Payroll",
       "Extra": "Extra income"
-    }
+    },
+    "edit": "Edit",
+    "editRow": "Edit {{name}}"
   },
   "welcome": {
     "pageTitle": "First steps · Prospero",

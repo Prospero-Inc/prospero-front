@@ -180,12 +180,16 @@ createServer(async (req, res) => {
   // Bank sheet: PATCH /api/financial-institutions/:id
   const isPatchInstitution =
     req.method === 'PATCH' && /^\/api\/financial-institutions\/\d+$/.test(path)
-  const handler =
-    isPatchById || isPatchInstitution
-      ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
-      : isPay
-      ? () => [201, { id: requests.length }]
-      : routes[`${req.method} ${path}`]
+  // Edit sheet: DELETE /api/transactions/:id, /api/salary/:id
+  const isDeleteById =
+    req.method === 'DELETE' && /^\/api\/(transactions|salary)\/\d+$/.test(path)
+  const handler = isDeleteById
+    ? () => [200, { id: Number(path.split('/').pop()) }]
+    : isPatchById || isPatchInstitution
+    ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
+    : isPay
+    ? () => [201, { id: requests.length }]
+    : routes[`${req.method} ${path}`]
   const [status, payload] = handler
     ? handler(body)
     : [404, { message: 'Not found (fake backend)' }]
