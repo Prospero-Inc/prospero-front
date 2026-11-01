@@ -10,6 +10,7 @@ import { LockIcon, ShieldIcon } from '@/components/icons/app'
 import { SettingsLayout } from '@/components/settings/SettingsLayout'
 import { settingsStaticProps } from '@/components/settings/settingsStaticProps'
 import { HttpMethod } from '@/enums'
+import { useIsOnline } from '@/hooks/useIsOnline'
 import type { Profile, UpdateProfileData } from '@/interfaces'
 import { localApiService } from '@/lib'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
@@ -47,6 +48,7 @@ export default function ProfileSettingsPage() {
   const toast = useToast()
   const { data: session } = useSession()
   const revalidateApi = useRevalidateApi()
+  const isOnline = useIsOnline()
   const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const profile = data?.user
 
@@ -106,7 +108,7 @@ export default function ProfileSettingsPage() {
           ? {
               label: t('save'),
               form: FORM_ID,
-              isDisabled: !isValid,
+              isDisabled: !isValid || !isOnline,
               isLoading: isSaving
             }
           : null

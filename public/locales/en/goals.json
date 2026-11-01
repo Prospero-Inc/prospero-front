@@ -1,7 +1,8 @@
 {
   "title": "Goals",
   "comingSoon": {
-    "heading": "Coming soon",
-    "description": "Detailed savings goals aren't available yet. We're working on this feature."
+    "heading": "Savings goals, very soon",
+    "description": "You'll be able to give a name, amount and date to what you want to achieve, and Prospero will set aside part of your savings from each payment.",
+    "back": "Back home"
   }
 }

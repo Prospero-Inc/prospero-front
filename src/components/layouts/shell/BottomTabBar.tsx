@@ -134,7 +134,7 @@ export const BottomTabBar = (props: FlexProps) => {
       <Box
         as="button"
         type="button"
-        onClick={openQuickAdd}
+        onClick={() => openQuickAdd()}
         aria-label={t('tabBar.add')}
         w="56px"
         h="56px"

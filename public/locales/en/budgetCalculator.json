@@ -1,17 +1,30 @@
 {
-  "labelSalary": "Salary",
-  "buttonCalculate": "Calculate",
-  "requiredField": "This field is required",
-  "fiftyCard": {
-    "heading": "Needs",
-    "body": "Covers basic needs such as rent, food, utilities, and transportation."
+  "title": "Calculator",
+  "ifIGet": "If I get this payment",
+  "amount": "Payment amount",
+  "invalidAmount": "Enter an amount above 0, with up to 2 decimals.",
+  "withYourSplit": "With your split {{split}}",
+  "rows": {
+    "needs": {
+      "title": "Needs",
+      "hint": "Rent, food, utilities, transport"
+    },
+    "wants": {
+      "title": "Wants",
+      "hint": "Going out, shopping, entertainment"
+    },
+    "savings": {
+      "title": "Savings",
+      "hint": "Emergency fund and goals"
+    }
   },
-  "thirtyCard": {
-    "heading": "Wants",
-    "body": "Non-essential expenses or \"wants,\" such as entertainment, dining out, or personal purchases."
-  },
-  "twentyCard": {
-    "heading": "Savings and Debt",
-    "body": "Savings or debt repayment: emergency funds, long-term goals, or additional debt payments."
+  "howItWorks": {
+    "link": "How does {{split}} work?",
+    "title": "How does it work?",
+    "intro": "Each payment is split in three parts, one for each kind of spending:",
+    "needs": "What you can't skip: rent, food, utilities and transport.",
+    "wants": "What isn't essential: eating out, going out, personal shopping and subscriptions.",
+    "savings": "What you keep: emergency fund, long-term goals or paying debts early.",
+    "yours": "The classic rule is 50 / 30 / 20, but this calculator uses your split. Change it in More → Budget."
   }
 }

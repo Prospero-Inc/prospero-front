@@ -3,6 +3,7 @@ import { ArrowDownIcon } from '@/components/icons/app'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
+import { useIsOnline } from '@/hooks/useIsOnline'
 import { getTodayLocalDate, localApiService } from '@/lib'
 import { useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
 import type { IncomeType, SalaryListItem } from '@/services/salary'
@@ -41,6 +42,12 @@ type Kind = 'expense' | 'income'
 export type EditableMovement =
   | { kind: 'expense'; title: string; item: TransactionListItem }
   | { kind: 'income'; title: string; item: SalaryListItem }
+
+/** How "+" can open: already on income, and on a type. */
+export interface QuickAddPreset {
+  kind: Kind
+  incomeType?: IncomeType
+}
 
 /** Which period an expense counts in: by its date, or forced. */
 type PeriodChoice = 'auto' | PeriodOverride
@@ -135,12 +142,15 @@ const useDateLabel = () => {
 export const QuickAddSheet = ({
   isOpen,
   onClose,
-  movement = null
+  movement = null,
+  preset = null
 }: {
   isOpen: boolean
   onClose: () => void
   /** Given: the sheet edits this movement instead of creating one. */
   movement?: EditableMovement | null
+  /** A new movement already set to this kind (e.g. "Registrar tu pago"). */
+  preset?: QuickAddPreset | null
 }) => {
   const { t } = useTranslation('common')
   const toast = useToast()
@@ -163,6 +173,13 @@ export const QuickAddSheet = ({
   const [destination, setDestination] = useState<Destination>('none')
   const [isSaving, setIsSaving] = useState(false)
   const isEditing = movement !== null
+
+  // Opened with a preset: start there.
+  useEffect(() => {
+    if (!isOpen || movement || !preset) return
+    setKind(preset.kind)
+    if (preset.incomeType) setIncomeType(preset.incomeType)
+  }, [isOpen, movement, preset])
 
   // Opened on a movement: start from what it has now.
   useEffect(() => {
@@ -189,7 +206,9 @@ export const QuickAddSheet = ({
 
   const amount = parseAmount(amountInput)
   const hasChoice = kind === 'expense' ? category !== null : incomeType !== null
-  const canSave = amount !== null && hasChoice && !!date && !isSaving
+  const isOnline = useIsOnline()
+  const canSave =
+    amount !== null && hasChoice && !!date && !isSaving && isOnline
   const showAmountError = amountInput.trim() !== '' && amount === null
 
   const reset = () => {
