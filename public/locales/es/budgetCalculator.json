@@ -1,17 +1,30 @@
 {
-  "labelSalary": "Salario",
-  "buttonCalculate": "Calcular",
-  "requiredField": "Este campo es obligatorio",
-  "fiftyCard": {
-    "heading": "Necesidades",
-    "body": "Cubre necesidades básicas como alquiler, comida, servicios públicos y transporte."
+  "title": "Calculadora",
+  "ifIGet": "Si recibo este pago",
+  "amount": "Monto del pago",
+  "invalidAmount": "Ingresá un monto mayor a 0, con hasta 2 decimales.",
+  "withYourSplit": "Con tu reparto {{split}}",
+  "rows": {
+    "needs": {
+      "title": "Necesidades",
+      "hint": "Alquiler, comida, servicios, transporte"
+    },
+    "wants": {
+      "title": "Deseos",
+      "hint": "Salidas, compras, entretenimiento"
+    },
+    "savings": {
+      "title": "Ahorro",
+      "hint": "Fondo de emergencia y metas"
+    }
   },
-  "thirtyCard": {
-    "heading": "Deseos",
-    "body": "Gastos no esenciales o \"deseos\", como entretenimiento, comer fuera o compras personales."
-  },
-  "twentyCard": {
-    "heading": "Ahorro y Deudas",
-    "body": "Ahorro o pago de deudas: fondos de emergencia, metas a largo plazo o pagos adicionales de deudas."
+  "howItWorks": {
+    "link": "¿Cómo funciona el {{split}}?",
+    "title": "¿Cómo funciona?",
+    "intro": "Cada pago se reparte en tres partes, una para cada tipo de gasto:",
+    "needs": "Lo que no podés dejar de pagar: alquiler, comida, servicios públicos y transporte.",
+    "wants": "Lo que no es esencial: comer afuera, salidas, compras personales y suscripciones.",
+    "savings": "Lo que guardás: fondo de emergencia, metas a largo plazo o pagar deudas antes.",
+    "yours": "La regla clásica es 50 / 30 / 20, pero esta calculadora usa tu reparto. Lo cambiás en Más → Presupuesto."
   }
 }
