@@ -57,7 +57,7 @@ export const RegisterView = () => {
       username: t('account.register.required')
     }),
     ...(!meetsPasswordPolicy(values.password) && {
-      password: t('account.register.weakPassword')
+      password: t('account.register.weakSecret')
     })
   }
   // Errors show once they tried to send, not while typing the first time.
@@ -172,7 +172,7 @@ export const RegisterView = () => {
         </AuthField>
         <AuthField
           id="register-password"
-          label={t('account.register.password')}
+          label={t('account.register.secretLabel')}
           error={errorOf('password')}
           mb="14px"
         >

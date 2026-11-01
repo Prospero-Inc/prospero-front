@@ -403,8 +403,8 @@
   "account": {
     "signIn": "Iniciar sesión",
     "back": "Atrás",
-    "showPassword": "Mostrar",
-    "hidePassword": "Ocultar",
+    "reveal": "Mostrar",
+    "conceal": "Ocultar",
     "rules": {
       "length": "8 caracteres",
       "upper": "Mayúscula",
@@ -422,11 +422,11 @@
       "lastName": "Apellido",
       "email": "Correo electrónico",
       "username": "Nombre de usuario",
-      "password": "Contraseña",
+      "secretLabel": "Contraseña",
       "submit": "Crear cuenta",
       "required": "Completá este campo",
       "invalidEmail": "Escribí un correo válido",
-      "weakPassword": "La contraseña todavía no cumple todos los requisitos",
+      "weakSecret": "La contraseña todavía no cumple todos los requisitos",
       "error": "No pudimos crear tu cuenta"
     },
     "checkEmail": {

@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
           label={t('account.reset.new')}
           error={
             submitted && !meetsPasswordPolicy(password)
-              ? t('account.register.weakPassword')
+              ? t('account.register.weakSecret')
               : undefined
           }
         >

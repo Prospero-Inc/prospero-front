@@ -30,7 +30,14 @@ export const SwipeRow = ({
   onOpen: () => void
   children: ReactNode
 }) => {
-  const [shift, setShift] = useState(0)
+  const [shift, setShiftState] = useState(0)
+  // Also in a ref: a fast swipe can end before the last move re-renders,
+  // and `finish` must see where the finger really stopped.
+  const shiftRef = useRef(0)
+  const setShift = (value: number) => {
+    shiftRef.current = value
+    setShiftState(value)
+  }
   const start = useRef<{ x: number; y: number } | null>(null)
   const isSwiping = useRef(false)
 
@@ -51,13 +58,17 @@ export const SwipeRow = ({
       }
       if (Math.abs(dx) < 8) return
       isSwiping.current = true
-      ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+      try {
+        ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+      } catch {
+        // Not an active pointer (e.g. synthetic events): follow it anyway.
+      }
     }
     setShift(Math.max(-MAX_SHIFT, Math.min(0, dx)))
   }
 
   const finish = () => {
-    const opened = isSwiping.current && shift <= -OPEN_AT
+    const opened = isSwiping.current && shiftRef.current <= -OPEN_AT
     start.current = null
     setShift(0)
     if (opened) onOpen()

@@ -189,7 +189,7 @@ export const AuthPasswordInput = forwardRef<HTMLInputElement, InputProps>(
           aria-pressed={visible}
           onClick={() => setVisible(on => !on)}
         >
-          {t(visible ? 'account.hidePassword' : 'account.showPassword')}
+          {t(visible ? 'account.conceal' : 'account.reveal')}
         </Box>
       </Box>
     )

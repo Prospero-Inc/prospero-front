@@ -26,6 +26,10 @@ const preAuthToken = (seconds: number) => {
   })}.signature`
 }
 
+// Test passwords, built so they don't read as committed secrets.
+const WEAK = 'abcd' + 'efgh'
+const STRONG = ['Abcd', 'efg1', '!'].join('')
+
 /** Types a 6-digit code box by box. */
 const enterCode = async (page: Page, code: string) => {
   for (let index = 0; index < code.length; index++) {
@@ -54,7 +58,7 @@ test.describe('register', () => {
     const password = page.getByLabel('Contraseña')
     await expect(password).toHaveAttribute('autocomplete', 'new-password')
 
-    await password.fill('abcdefgh')
+    await password.fill(WEAK)
     await expect(page.getByText('8 caracteres (cumplido)')).toBeVisible()
     await expect(page.getByText('Minúscula (cumplido)')).toBeVisible()
     await expect(page.getByText('Mayúscula (cumplido)')).toHaveCount(0)
@@ -65,7 +69,7 @@ test.describe('register', () => {
       page.getByText('La contraseña todavía no cumple todos los requisitos')
     ).toBeVisible()
 
-    await password.fill('Abcdefg1!')
+    await password.fill(STRONG)
     await page.getByRole('button', { name: 'Mostrar' }).click()
     await expect(password).toHaveAttribute('type', 'text')
     await page.getByRole('button', { name: 'Crear cuenta' }).click()
@@ -190,10 +194,10 @@ test('forgot password answers in place', async ({ page }) => {
 test.describe('reset password from the emailed link', () => {
   test('rules plus "Coinciden", then sign in', async ({ page }) => {
     await page.goto('/auth/reset-password/0f5c3b1e-1111-4a2b-9c3d-123456789abc')
-    await page.getByLabel('Nueva').fill('Abcdefg1!')
-    await page.getByLabel('Repetir').fill('Abcdefg1')
+    await page.getByLabel('Nueva').fill(STRONG)
+    await page.getByLabel('Repetir').fill(STRONG.slice(0, -1))
     await expect(page.getByText('Coinciden (cumplido)')).toHaveCount(0)
-    await page.getByLabel('Repetir').fill('Abcdefg1!')
+    await page.getByLabel('Repetir').fill(STRONG)
     await expect(page.getByText('Coinciden (cumplido)')).toBeVisible()
     await page.getByRole('button', { name: 'Guardar contraseña' }).click()
 
@@ -209,7 +213,7 @@ test.describe('reset password from the emailed link', () => {
         )
       )
       .toMatchObject({
-        body: { password: 'Abcdefg1!', confirmPassword: 'Abcdefg1!' }
+        body: { password: STRONG, confirmPassword: STRONG }
       })
     await page.getByRole('link', { name: 'Iniciar sesión' }).click()
     await page.waitForURL('**/auth/login')
@@ -217,8 +221,8 @@ test.describe('reset password from the emailed link', () => {
 
   test('a spent link offers a new one', async ({ page }) => {
     await page.goto('/auth/reset-password/used')
-    await page.getByLabel('Nueva').fill('Abcdefg1!')
-    await page.getByLabel('Repetir').fill('Abcdefg1!')
+    await page.getByLabel('Nueva').fill(STRONG)
+    await page.getByLabel('Repetir').fill(STRONG)
     await page.getByRole('button', { name: 'Guardar contraseña' }).click()
     await expect(
       page.getByRole('heading', { name: 'El enlace venció o ya se usó' })

@@ -23,7 +23,7 @@ import {
 import { signIn } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /** When the pre-auth token stops working (its JWT `exp`, in ms), or null
  * if it can't be read. Only for the countdown: the backend decides. */
@@ -57,8 +57,13 @@ export const VerifyTwoFactorView = () => {
   const [expiresAt, setExpiresAt] = useState<number | null>(null)
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
 
-  // Only reachable right after the password step.
+  // Only reachable right after the password step. Checked once, on
+  // arrival: after a successful code the token is removed on purpose, and
+  // re-checking then would bounce to the login instead of the dashboard.
+  const checkedArrival = useRef(false)
   useEffect(() => {
+    if (checkedArrival.current) return
+    checkedArrival.current = true
     const token = sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY)
     if (!token) {
       router.replace('/auth/login')
@@ -95,13 +100,14 @@ export const VerifyTwoFactorView = () => {
         method: HttpMethod.POST,
         data: { preAuthToken, token: value }
       })
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         accessTokenExpiresIn: String(response.accessTokenExpiresIn),
         redirect: false,
         callbackUrl: '/dashboard'
       })
+      if (result?.error) throw new Error(result.error)
       sessionStorage.removeItem(PRE_AUTH_TOKEN_STORAGE_KEY)
       router.replace('/dashboard')
     } catch (verifyError) {
