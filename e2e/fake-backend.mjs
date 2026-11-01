@@ -95,13 +95,19 @@ createServer(async (req, res) => {
   if (path === '/__requests') return res.end(JSON.stringify(requests))
 
   const body = await readBody(req)
-  requests.push({ method: req.method, path, body, headers: req.headers })
+  const query = Object.fromEntries(new URL(req.url, 'http://x').searchParams)
+  requests.push({ method: req.method, path, query, body, headers: req.headers })
 
   // Review queue confirmations: PATCH /api/transactions/:id, /api/salary/:id
   const isPatchById =
     req.method === 'PATCH' && /^\/api\/(transactions|salary)\/\d+$/.test(path)
+  // Fixed expense "Pagar": POST /api/fixed-expenses/:id/pay
+  const isPay =
+    req.method === 'POST' && /^\/api\/fixed-expenses\/\d+\/pay$/.test(path)
   const handler = isPatchById
     ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
+    : isPay
+    ? () => [201, { id: requests.length }]
     : routes[`${req.method} ${path}`]
   const [status, payload] = handler
     ? handler(body)
