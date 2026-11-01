@@ -282,3 +282,17 @@ export const LockIcon = designIcon(
     <path d="M8 11V7a4 4 0 0 1 8 0v4" />
   </>
 )
+
+export const CloudOffIcon = designIcon(
+  'CloudOffIcon',
+  <>
+    <path d="M3 3l18 18M8.5 7.4A6 6 0 0 1 17.7 11 4 4 0 0 1 20 18M17 19H7a5 5 0 0 1-2.6-9.3" />
+  </>
+)
+
+export const FlagIcon = designIcon(
+  'FlagIcon',
+  <>
+    <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+  </>
+)

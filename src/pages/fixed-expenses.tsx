@@ -2,6 +2,7 @@ import { DayHeader } from '@/components/design'
 import { FixedExpenseSheet } from '@/components/fixed-expenses/FixedExpenseSheet'
 import { CheckIcon, PlusIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
+import { LoadError } from '@/components/states/LoadError'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useMovementFormatters } from '@/components/ui/MovementSummary'
@@ -420,7 +421,13 @@ export default function FixedExpensesPage() {
         }}
       />
 
-      {fixedExpenses.length === 0 ? (
+      {fixedExpensesQuery.error && !fixedExpensesQuery.data ? (
+        <LoadError
+          what={t('loadErrorWhat')}
+          onRetry={() => fixedExpensesQuery.mutate()}
+          isRetrying={fixedExpensesQuery.isValidating}
+        />
+      ) : fixedExpenses.length === 0 ? (
         <EmptyState
           icon={MdEventRepeat}
           title={t('list.empty')}

@@ -1,6 +1,7 @@
 import { formatRelativeDay } from '@/components/dashboard/periodText'
 import { BankBadge } from '@/components/design/settings'
 import { ProsperoLayout } from '@/components/layouts'
+import { LoadError } from '@/components/states/LoadError'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
@@ -213,7 +214,17 @@ export default function ReviewPage() {
 
   return layout(
     <Stack spacing="12px" maxW="lg" pb={4}>
-      {items.length === 0 ? (
+      {(expenses.error && !expenses.data) ||
+      (incomes.error && !incomes.data) ? (
+        <LoadError
+          what={t('states.what.review')}
+          onRetry={() => {
+            expenses.mutate()
+            incomes.mutate()
+          }}
+          isRetrying={expenses.isValidating || incomes.isValidating}
+        />
+      ) : items.length === 0 ? (
         <EmptyState
           icon={MdDoneAll}
           title={t('review.empty.title')}
