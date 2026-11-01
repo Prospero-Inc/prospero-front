@@ -22,6 +22,9 @@ interface BottomSheetProps {
   /** Actions (buttons); stay at thumb height above the home bar. */
   footer?: ReactNode
   initialFocusRef?: DrawerProps['initialFocusRef']
+  /** Confirmation layout (design 13, "Confirmar borrado"): this icon on
+   * top, the title centered below it and no close button. */
+  hero?: ReactNode
 }
 
 /**
@@ -36,7 +39,8 @@ export const BottomSheet = ({
   title,
   children,
   footer,
-  initialFocusRef
+  initialFocusRef,
+  hero
 }: BottomSheetProps) => {
   const { t } = useTranslation('common')
   const placement =
@@ -72,36 +76,53 @@ export const BottomSheet = ({
             mb="14px"
           />
         )}
-        <Flex justify="space-between" align="center" px="18px" mb="14px">
-          {/* DrawerHeader names the dialog (aria-labelledby). */}
-          <DrawerHeader
-            as="h2"
-            p={0}
-            // Chakra gives the header flex: 0, which wraps long titles.
-            flex={1}
-            minW={0}
-            fontSize="18px"
-            fontWeight="bold"
-            color="text.primary"
-          >
-            {title}
-          </DrawerHeader>
-          <Box
-            as="button"
-            type="button"
-            onClick={onClose}
-            aria-label={t('confirmSheet.close')}
-            w="36px"
-            h="36px"
-            borderRadius="full"
-            bg="button.soft"
-            color="text.primary"
-            display="grid"
-            placeItems="center"
-          >
-            <CloseIcon boxSize="16px" />
-          </Box>
-        </Flex>
+        {hero ? (
+          <Flex direction="column" align="center" px="18px" mb="8px">
+            {hero}
+            <DrawerHeader
+              as="h2"
+              p={0}
+              mt="14px"
+              textAlign="center"
+              fontSize="19px"
+              fontWeight="bold"
+              color="text.primary"
+            >
+              {title}
+            </DrawerHeader>
+          </Flex>
+        ) : (
+          <Flex justify="space-between" align="center" px="18px" mb="14px">
+            {/* DrawerHeader names the dialog (aria-labelledby). */}
+            <DrawerHeader
+              as="h2"
+              p={0}
+              // Chakra gives the header flex: 0, which wraps long titles.
+              flex={1}
+              minW={0}
+              fontSize="18px"
+              fontWeight="bold"
+              color="text.primary"
+            >
+              {title}
+            </DrawerHeader>
+            <Box
+              as="button"
+              type="button"
+              onClick={onClose}
+              aria-label={t('confirmSheet.close')}
+              w="36px"
+              h="36px"
+              borderRadius="full"
+              bg="button.soft"
+              color="text.primary"
+              display="grid"
+              placeItems="center"
+            >
+              <CloseIcon boxSize="16px" />
+            </Box>
+          </Flex>
+        )}
         <DrawerBody px="18px" pt={0} color="text.primary">
           {children}
         </DrawerBody>

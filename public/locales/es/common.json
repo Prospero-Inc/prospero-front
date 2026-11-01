@@ -390,7 +390,35 @@
     "savedExpense": "Gasto guardado",
     "savedIncome": "Ingreso guardado",
     "error": "No pudimos guardar el movimiento",
-    "note": "Nota"
+    "note": "Nota",
+    "edit": {
+      "titleExpense": "Editar gasto",
+      "titleIncome": "Editar ingreso",
+      "save": "Guardar cambios",
+      "saved": "Cambios guardados",
+      "deleteExpense": "Eliminar gasto",
+      "deleteIncome": "Eliminar ingreso",
+      "confirmDelete": "¿Eliminar \"{{name}}\"?",
+      "deleteExpenseHint": "Deja de contar en tu presupuesto. Esto no se puede deshacer.",
+      "deleteIncomeHint": "Deja de contar en tu presupuesto; si era tu pago de nómina, el período se vuelve a calcular. Esto no se puede deshacer.",
+      "deletedExpense": "Gasto eliminado",
+      "deletedIncome": "Ingreso eliminado",
+      "deleteError": "No pudimos eliminar el movimiento"
+    },
+    "period": {
+      "label": "Contar en",
+      "auto": "Según la fecha",
+      "Previous": "Período anterior",
+      "Current": "Período actual"
+    },
+    "destination": {
+      "label": "Destino",
+      "none": "Sin asignar",
+      "split": "Repartir",
+      "Necesidad": "Necesidad",
+      "Deseo": "Deseo",
+      "Ahorro": "Ahorro"
+    }
   },
   "review": {
     "title": "Por revisar",
@@ -460,7 +488,9 @@
     "incomeTypes": {
       "Payroll": "Nómina",
       "Extra": "Ingreso extra"
-    }
+    },
+    "edit": "Editar",
+    "editRow": "Editar {{name}}"
   },
   "welcome": {
     "pageTitle": "Primeros pasos · Prospero",

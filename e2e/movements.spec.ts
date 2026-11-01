@@ -78,11 +78,13 @@ test('movements lists expenses and income together, filterable', async ({
   await login(page)
   await page.goto('/movements')
 
-  const expenseRow = page.getByRole('link', { name: 'Súper Selectos' })
-  const incomeRow = page.getByRole('link', { name: 'Venta de artesanías' })
+  // Rows open the edit sheet (e2e/movements-edit.spec.ts).
+  const expenseRow = page.getByRole('button', { name: 'Editar Súper Selectos' })
+  const incomeRow = page.getByRole('button', {
+    name: 'Editar Venta de artesanías'
+  })
   await expect(expenseRow).toBeVisible()
   await expect(incomeRow).toBeVisible()
-  await expect(expenseRow).toHaveAttribute('href', /\/expenditures\?edit=1$/)
 
   await page.getByRole('button', { name: 'Gastos' }).click()
   await expect(expenseRow).toBeVisible()
