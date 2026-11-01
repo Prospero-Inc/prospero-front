@@ -20,7 +20,7 @@ import {
   Text,
   useDisclosure
 } from '@chakra-ui/react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -51,6 +51,7 @@ export const VerifyTwoFactorView = () => {
   const { t } = useTranslation('common')
   const router = useRouter()
   const lostAccess = useDisclosure()
+  const { status } = useSession()
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isVerifying, setIsVerifying] = useState(false)
@@ -66,11 +67,13 @@ export const VerifyTwoFactorView = () => {
     checkedArrival.current = true
     const token = sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY)
     if (!token) {
-      router.replace('/auth/login')
+      // Already signed in (e.g. this screen remounted right after the
+      // code worked): the middleware takes it to the dashboard.
+      if (status !== 'authenticated') router.replace('/auth/login')
       return
     }
     setExpiresAt(expiryOf(token))
-  }, [router])
+  }, [router, status])
 
   useEffect(() => {
     if (expiresAt === null) return
@@ -108,8 +111,11 @@ export const VerifyTwoFactorView = () => {
         callbackUrl: '/dashboard'
       })
       if (result?.error) throw new Error(result.error)
+      // Navigate first: signing in re-renders the app (and may remount this
+      // screen), and the arrival check must still find the token until
+      // we've left.
+      await router.replace('/dashboard')
       sessionStorage.removeItem(PRE_AUTH_TOKEN_STORAGE_KEY)
-      router.replace('/dashboard')
     } catch (verifyError) {
       setCode('')
       setError(

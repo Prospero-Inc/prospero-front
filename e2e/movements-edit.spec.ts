@@ -115,11 +115,22 @@ test('swiping a row to the left opens the same sheet', async ({ page }) => {
   const box = await row.boundingBox()
   if (!box) throw new Error('row not visible')
   const y = box.y + box.height / 2
-  await page.mouse.move(box.x + box.width - 20, y)
-  await page.mouse.down()
-  await page.mouse.move(box.x + box.width - 80, y, { steps: 5 })
-  await page.mouse.move(box.x + box.width - 140, y, { steps: 5 })
-  await page.mouse.up()
+  const startX = box.x + box.width - 20
+  // A finger dragging left, as pointer events (works the same on every
+  // emulated device).
+  const pointer = (type: string, x: number) =>
+    row.dispatchEvent(type, {
+      pointerId: 7,
+      pointerType: 'touch',
+      isPrimary: true,
+      clientX: x,
+      clientY: y,
+      bubbles: true
+    })
+  await pointer('pointerdown', startX)
+  for (const dx of [12, 30, 60, 90, 120])
+    await pointer('pointermove', startX - dx)
+  await pointer('pointerup', startX - 120)
 
   await expect(sheet(page, 'Editar gasto')).toBeVisible()
 })
