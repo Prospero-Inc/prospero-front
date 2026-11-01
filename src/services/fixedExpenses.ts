@@ -75,10 +75,17 @@ const deleteFixedExpense = async (
 }
 
 const payFixedExpense = async (_ignore: unknown, params: Params | unknown) => {
-  const { lang, authorization, id } = params as Params & { id: string }
+  const { lang, authorization, id, today } = params as Params & {
+    id: string
+    today?: string
+  }
   return await externalApiService.request({
     method: HttpMethod.POST,
-    endPoint: `/fixed-expenses/${id}/pay`,
+    // The user's local date decides which month's occurrence gets paid (in
+    // the URL: apiService only sends `query` on GETs).
+    endPoint: `/fixed-expenses/${id}/pay${
+      today ? `?today=${encodeURIComponent(today)}` : ''
+    }`,
     headers: {
       'x-lang': `${lang}`,
       Authorization: authorization

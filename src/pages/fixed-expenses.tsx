@@ -7,7 +7,7 @@ import { MovementFormDrawer } from '@/components/ui/MovementFormDrawer'
 import { useMovementFormatters } from '@/components/ui/MovementSummary'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
+import { getTodayLocalDate, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
   DueStatus,
@@ -84,7 +84,13 @@ export default function FixedExpensesPage() {
   const { t } = useTranslation('fixedExpenses')
   const router = useRouter()
   // Client-side data (SWR): saving or paying doesn't reload the page.
-  const fixedExpensesQuery = useApi<FixedExpense[]>('fixed-expenses')
+  // The local date, not the server's: in the evening UTC is already the next
+  // day, and on the last day of the month that made last month's paid bills
+  // show as unpaid. In the key, so it refetches when the day changes.
+  const localToday = getTodayLocalDate()
+  const fixedExpensesQuery = useApi<FixedExpense[]>('fixed-expenses', {
+    today: localToday
+  })
   const fixedExpenses = fixedExpensesQuery.data ?? []
   const revalidateApi = useRevalidateApi()
   const updateApiCache = useUpdateApiCache()
@@ -247,7 +253,7 @@ export default function FixedExpensesPage() {
     setPayingId(id)
     try {
       await localApiService.request({
-        endPoint: `/proxy/pay-fixed-expense?id=${id}`,
+        endPoint: `/proxy/pay-fixed-expense?id=${id}&today=${getTodayLocalDate()}`,
         method: HttpMethod.POST,
         headers: { Authorization: `Bearer ${session?.accessToken}` }
       })
