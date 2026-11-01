@@ -136,6 +136,13 @@ const routes = {
       : [401, { message: 'Invalid 2FA code' }],
   'PATCH /api/auth/request-reset-password': () => [200, { msg: 'Sent' }],
   'POST /api/auth/logout-all': () => [200, { revoked: 2 }],
+  // Account screens.
+  'POST /api/auth/signup': body => [201, { id: 9, email: body?.email }],
+  'POST /api/auth/resend-verification': () => [201, { msg: 'Sent' }],
+  'POST /api/auth/login/verify-2fa': body =>
+    body?.token === '123456'
+      ? [201, tokens()]
+      : [401, { message: 'Invalid 2FA code' }],
   'GET /api/auth/enable-2fa': () => [
     200,
     {
@@ -181,6 +188,21 @@ createServer(async (req, res) => {
   // Bank sheet: PATCH /api/financial-institutions/:id
   const isPatchInstitution =
     req.method === 'PATCH' && /^\/api\/financial-institutions\/\d+$/.test(path)
+  // Reset link: POST /api/auth/reset-password/:token ("used" = spent link)
+  const isReset =
+    req.method === 'POST' && /^\/api\/auth\/reset-password\/[^/]+$/.test(path)
+  if (isReset) {
+    const used = path.endsWith('/used')
+    res.statusCode = used ? 422 : 201
+    return res.end(
+      JSON.stringify(
+        used
+          ? { message: 'This action can not be done' }
+          : { message: 'Password updated' }
+      )
+    )
+  }
+
   // Edit sheets: DELETE /api/transactions/:id, /api/salary/:id,
   // /api/fixed-expenses/:id
   const isDeleteById =

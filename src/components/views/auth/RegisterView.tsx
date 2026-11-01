@@ -1,262 +1,201 @@
-import { PasswordInput } from '@/components/ui'
-import { HttpMethod } from '@/enums'
-import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import { RegisterViewProps } from '@/interfaces'
-import { localApiService } from '@/lib/apiService'
 import {
-  Stack,
-  Heading,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
-  Box,
-  Image,
-  Text,
-  Container,
-  Link,
-  useToast
-} from '@chakra-ui/react'
-import { TFunction, useTranslation } from 'next-i18next'
-import NextLink from 'next/link'
+  AuthField,
+  AuthLead,
+  AuthPasswordInput,
+  AuthScreen,
+  AuthTitle,
+  meetsPasswordPolicy,
+  PasswordRules
+} from '@/components/auth/AuthScreen'
+import { HttpMethod } from '@/enums'
+import { localApiService } from '@/lib'
+import { Box, Button, Flex, Input, useToast } from '@chakra-ui/react'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import * as yup from 'yup'
+import { type FormEvent, useState } from 'react'
 
-const validationSchema = (t: TFunction) =>
-  yup.object().shape({
-    email: yup
-      .string()
-      .email(t('register.yupSchema.email.email'))
-      .required(t('register.yupSchema.email.required')),
-    password: yup
-      .string()
-      .required(t('register.yupSchema.password.required'))
-      .min(8, t('register.yupSchema.password.minLength'))
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
-        t('register.yupSchema.password.matches')
-      ),
-    name: yup.string().required(t('register.yupSchema.firstName')),
-    lastName: yup.string().required(t('register.yupSchema.lastName')),
-    userName: yup.string().required(t('register.yupSchema.userName'))
-  })
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+type Field = 'firstName' | 'lastName' | 'email' | 'username' | 'password'
+type Values = Record<Field, string>
+
+const EMPTY: Values = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  username: '',
+  password: ''
+}
+
+/**
+ * Crear cuenta (docs/diseno-mobile.html, 11): short form with the right
+ * autofill for each field, and the password requirements ticking as you
+ * type instead of one long error after sending. Then "Revisá tu correo".
+ */
 export const RegisterView = () => {
   const { t } = useTranslation('common')
-  const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast()
   const router = useRouter()
-  const {
-    control,
-    formState: { errors },
-    handleSubmit
-  } = useForm({
-    resolver: useYupValidationResolver(validationSchema(t)),
-    defaultValues: {
-      email: '',
-      password: '',
-      name: '',
-      lastName: '',
-      userName: ''
-    }
-  })
+  const toast = useToast()
+  const [values, setValues] = useState<Values>(EMPTY)
+  const [submitted, setSubmitted] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
-  const onSubmit = async ({
-    email,
-    lastName,
-    name: firstName,
-    password,
-    userName
-  }: RegisterViewProps) => {
+  const set = (field: Field) => (value: string) =>
+    setValues(current => ({ ...current, [field]: value }))
+
+  const errors: Partial<Record<Field, string>> = {
+    ...(!values.firstName.trim() && {
+      firstName: t('account.register.required')
+    }),
+    ...(!values.lastName.trim() && {
+      lastName: t('account.register.required')
+    }),
+    ...(!EMAIL.test(values.email.trim()) && {
+      email: t('account.register.invalidEmail')
+    }),
+    ...(!values.username.trim() && {
+      username: t('account.register.required')
+    }),
+    ...(!meetsPasswordPolicy(values.password) && {
+      password: t('account.register.weakPassword')
+    })
+  }
+  // Errors show once they tried to send, not while typing the first time.
+  const errorOf = (field: Field) => (submitted ? errors[field] : undefined)
+
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault()
+    setSubmitted(true)
+    if (Object.keys(errors).length) return
+    setIsSaving(true)
+    const email = values.email.trim()
     try {
-      setIsLoading(true)
-
-      toast.promise(
-        localApiService.request<RegisterViewProps>({
-          method: HttpMethod.POST,
-          endPoint: '/proxy/form',
-          data: {
-            email,
-            lastName,
-            firstName,
-            password,
-            usernName: userName
-          }
-        }),
-        {
-          success: () => {
-            setIsLoading(false)
-            router.push({
-              pathname: '/auth/verify-account',
-              query: { email }
-            })
-            return {
-              title: t('verifyAccount.registered.title'),
-              description: t('verifyAccount.registered.description'),
-              status: 'success',
-              isClosable: true
-            }
-          },
-          loading: {
-            title: t('registerToast.loading.title'),
-            description: t('registerToast.loading.description'),
-            colorScheme: 'primary'
-          },
-          error: error => {
-            setIsLoading(false)
-            return {
-              title: t('registerToast.error.title'),
-              description:
-                error?.message ?? t('registerToast.error.description')
-            }
-          }
+      await localApiService.request({
+        method: HttpMethod.POST,
+        endPoint: '/proxy/form',
+        data: {
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+          email,
+          // The API's field name (sic).
+          usernName: values.username.trim(),
+          password: values.password
         }
-      )
+      })
+      router.push({
+        pathname: '/auth/verify-account',
+        query: { email, sent: '1' }
+      })
     } catch (error) {
       toast({
-        title: t('registerToast.error.title'),
-        description: t('registerToast.error.description'),
+        title: t('account.register.error'),
+        description: error instanceof Error ? error.message : undefined,
         status: 'error',
         isClosable: true
       })
+      setIsSaving(false)
     }
   }
-  return (
-    <Container flex={1} p={2}>
-      <Image
-        mt={['0em', '10em']}
-        mx="auto"
-        height={['2em', '3.5em']}
-        src="/assets/authBrand.svg"
-        alt="Prospero Logo"
-      />
-      <Stack textAlign={'center'}>
-        <Heading fontSize={['2xl', '4x', '6xl']} textAlign="center">
-          {t('register.heading')}
-        </Heading>
-        <Text fontSize={['md', 'lg']} color="gray.600">
-          {t('register.text.one')}{' '}
-          <Text as="span" fontWeight="bold" color="primary.600">
-            {t('register.text.two')}
-          </Text>
-          {t('register.text.three')}{' '}
-        </Text>
-      </Stack>
-      <Box as="form" method="post" onSubmit={handleSubmit(onSubmit)} mt={4}>
-        <Stack spacing={4}>
-          <FormControl>
-            <FormLabel>{t('register.form.labelFirstName')}</FormLabel>
-            <Controller
-              control={control}
-              name="name"
-              render={({ field }) => (
-                <Input
-                  type="text"
-                  autoComplete="given-name"
-                  {...field}
-                  placeholder="John"
-                />
-              )}
-            />
-            {errors.name && <Text color="red">{errors.name.message}</Text>}
-          </FormControl>
-          <FormControl id="lastName">
-            <FormLabel>{t('register.form.labelLastName')}</FormLabel>
-            <Controller
-              control={control}
-              name="lastName"
-              render={({ field }) => (
-                <Input
-                  type="text"
-                  autoComplete="family-name"
-                  {...field}
-                  placeholder="Doe"
-                />
-              )}
-            />
 
-            {errors.lastName && (
-              <Text color="red">{errors.lastName.message}</Text>
-            )}
-          </FormControl>
-          <FormControl>
-            <FormLabel>{t('register.form.labelUsername')}</FormLabel>
-            <Controller
-              control={control}
-              name="userName"
-              render={({ field }) => (
-                <Input
-                  type="text"
-                  autoComplete="username"
-                  autoCapitalize="none"
-                  {...field}
-                  placeholder="johnDoe"
-                />
-              )}
-            />
-            {errors.userName && (
-              <Text color="red">{errors.userName.message}</Text>
-            )}
-          </FormControl>
-          <FormControl id="email">
-            <FormLabel>{t('register.form.labelEmail')}</FormLabel>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => (
-                <Input
-                  colorScheme="primary.500"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  autoCapitalize="none"
-                  {...field}
-                />
-              )}
-            />
-            {errors.email && <Text color="red">{errors.email.message}</Text>}
-          </FormControl>
-          <FormControl id="password">
-            <FormLabel>{t('register.form.labelPassword')}</FormLabel>
-            <Controller
-              control={control}
-              name="password"
-              render={({ field }) => (
-                <PasswordInput
-                  size={['md', 'md', 'lg']}
-                  autoComplete="new-password"
-                  {...field}
-                />
-              )}
-            />
-            {errors.password && (
-              <Text color="red">{errors.password.message}</Text>
-            )}
-          </FormControl>
-          <Link
-            as={NextLink}
-            fontSize={['small', 'medium']}
-            ml="auto"
-            variant={'brandPrimary'}
-            href="/auth/login"
-          >
-            {t('register.backLink')}
-          </Link>
-          <Stack spacing={6}>
-            <Button
-              type="submit"
-              bg="primary.400"
-              color="white"
-              _hover={{ bg: 'primary.500' }}
-              isLoading={isLoading}
-            >
-              {t('register.submit')}
-            </Button>
-          </Stack>
-        </Stack>
+  const textInput = (
+    field: Exclude<Field, 'password'>,
+    props: Record<string, string>
+  ) => (
+    <Input
+      id={`register-${field}`}
+      name={field}
+      variant="design"
+      value={values[field]}
+      onChange={event => set(field)(event.target.value)}
+      isInvalid={!!errorOf(field)}
+      {...props}
+    />
+  )
+
+  return (
+    <AuthScreen
+      title={t('account.register.pageTitle')}
+      back={{ href: '/auth/login', label: t('account.signIn') }}
+    >
+      <Box mt="4px" mb="6px">
+        <AuthTitle>{t('account.register.title')}</AuthTitle>
       </Box>
-    </Container>
+      <Box mb="18px">
+        <AuthLead>{t('account.register.lead')}</AuthLead>
+      </Box>
+
+      <Box as="form" method="post" noValidate onSubmit={onSubmit}>
+        <Flex gap="10px">
+          <AuthField
+            id="register-firstName"
+            label={t('account.register.firstName')}
+            error={errorOf('firstName')}
+          >
+            {textInput('firstName', {
+              autoComplete: 'given-name',
+              autoCapitalize: 'words'
+            })}
+          </AuthField>
+          <AuthField
+            id="register-lastName"
+            label={t('account.register.lastName')}
+            error={errorOf('lastName')}
+          >
+            {textInput('lastName', {
+              autoComplete: 'family-name',
+              autoCapitalize: 'words'
+            })}
+          </AuthField>
+        </Flex>
+        <AuthField
+          id="register-email"
+          label={t('account.register.email')}
+          error={errorOf('email')}
+        >
+          {textInput('email', {
+            type: 'email',
+            inputMode: 'email',
+            autoComplete: 'email',
+            autoCapitalize: 'none'
+          })}
+        </AuthField>
+        <AuthField
+          id="register-username"
+          label={t('account.register.username')}
+          error={errorOf('username')}
+        >
+          {textInput('username', {
+            autoComplete: 'username',
+            autoCapitalize: 'none',
+            spellCheck: 'false'
+          })}
+        </AuthField>
+        <AuthField
+          id="register-password"
+          label={t('account.register.password')}
+          error={errorOf('password')}
+          mb="14px"
+        >
+          <AuthPasswordInput
+            id="register-password"
+            name="password"
+            autoComplete="new-password"
+            value={values.password}
+            onChange={event => set('password')(event.target.value)}
+            isInvalid={!!errorOf('password')}
+          />
+        </AuthField>
+        <PasswordRules value={values.password} />
+        <Button
+          type="submit"
+          variant="brand"
+          size="cta"
+          w="full"
+          isLoading={isSaving}
+        >
+          {t('account.register.submit')}
+        </Button>
+      </Box>
+    </AuthScreen>
   )
 }

@@ -1,132 +1,109 @@
-import { CookiesEnum, HttpMethod } from '@/enums'
-import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
-import { localApiService } from '@/lib/apiService'
-import { cookiesPlugin } from '@/plugins'
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Heading,
-  Image,
-  Input,
-  Link,
-  Stack,
-  Text,
-  useToast
-} from '@chakra-ui/react'
+  AuthField,
+  AuthLead,
+  AuthScreen,
+  AuthTitle,
+  SentNotice
+} from '@/components/auth/AuthScreen'
+import { HttpMethod } from '@/enums'
+import { localApiService } from '@/lib'
+import { Box, Button, Input, Text } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import * as yup from 'yup'
-const validationSchema = yup.object().shape({
-  email: yup.string().email().required()
-})
+import { type FormEvent, useState } from 'react'
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
+ * ¿Olvidaste tu contraseña? (docs/diseno-mobile.html, 12): one field, and
+ * the same "check your email" answer whether or not the account exists —
+ * as the backend already does — shown in place instead of a toast.
+ */
 export const ForgotPasswordView = () => {
   const { t } = useTranslation('common')
-  const router = useRouter()
-  const [isLoading, setisLoading] = useState(false)
-  const toast = useToast()
-  const {
-    control,
-    formState: { errors },
-    handleSubmit
-  } = useForm({
-    resolver: useYupValidationResolver(validationSchema),
-    defaultValues: {
-      email: ''
+  const { locale } = useRouter()
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isSending, setIsSending] = useState(false)
+  const [isSent, setIsSent] = useState(false)
+
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault()
+    const address = email.trim()
+    if (!EMAIL.test(address)) {
+      setError(t('account.register.invalidEmail'))
+      return
     }
-  })
-
-  const onSubmit = async (data: { email: string }) => {
-    setisLoading(true)
-    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
-    toast.promise(
-      localApiService
-        .request<{ email: string }>({
-          method: HttpMethod.PATCH,
-          headers: {
-            'x-lang': `${lang}`
-          },
-          data,
-          endPoint: '/proxy/request-reset-password'
-        })
-        .finally(() => {
-          setisLoading(false)
-        }),
-      {
-        loading: {
-          title: t('forgotPassword.toast.loading.title'),
-          description: t('forgotPassword.toast.loading.description'),
-          colorScheme: 'primary'
-        },
-        success: () => {
-          router.replace('/auth/login')
-          return {
-            title: t('forgotPassword.toast.success.title'),
-            description: t('forgotPassword.toast.success.description'),
-            status: 'success'
-          }
-        },
-        error: error => {
-          console.log(error)
-          return {
-            title: t('forgotPassword.toast.error.title'),
-            description: t('forgotPassword.toast.error.description'),
-            status: 'error'
-          }
-        }
-      }
-    )
+    setIsSending(true)
+    setError(null)
+    try {
+      await localApiService.request({
+        method: HttpMethod.PATCH,
+        endPoint: '/proxy/request-reset-password',
+        data: { email: address },
+        headers: { 'x-lang': locale ?? 'es' }
+      })
+      setIsSent(true)
+    } catch {
+      setError(t('account.forgot.error'))
+    } finally {
+      setIsSending(false)
+    }
   }
-  return (
-    <Stack
-      maxW={'2xl'}
-      as={'form'}
-      method="post"
-      onSubmit={handleSubmit(onSubmit)}
-      w={'full'}
-      justifyContent={'center'}
-    >
-      <Image src={'/assets/authBrand.svg'} alt="Brannd " mb="5rem" />
-      <Heading>{t('forgotPassword.title')}</Heading>
-      <Text my={4}>{t('forgotPassword.descriptionBlockOne')}</Text>
-      <Text my={4}>{t('forgotPassword.descriptionBlockTwo')}</Text>
-      <FormControl my={2}>
-        <FormLabel color={'gray'} fontSize={['small', 'medium']}>
-          {t('forgotPassword.inputLabel')}
-        </FormLabel>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <Input
-              size={['md', 'md', 'lg']}
-              {...field}
-              placeholder="john@doe.com"
-            />
-          )}
-        />
-        {errors.email && <Text color="red">{errors.email.message}</Text>}
-      </FormControl>
 
-      <Link
-        fontSize={['small', 'medium']}
-        variant={'brandPrimary'}
-        ml="auto"
-        href="/auth/login"
-      >
-        {t('forgotPassword.backToLogin')}
-      </Link>
-      <Button
-        colorScheme="primary"
-        my={2}
-        type="submit"
-        h={['3em', '4em']}
-        isLoading={isLoading}
-      >
-        {t('forgotPassword.submitButton')}
-      </Button>
-    </Stack>
+  return (
+    <AuthScreen
+      title={t('account.forgot.pageTitle')}
+      back={{ href: '/auth/login', label: t('account.signIn') }}
+    >
+      <Box mt="4px" mb="6px">
+        <AuthTitle>{t('account.forgot.title')}</AuthTitle>
+      </Box>
+      <Box mb="20px">
+        <AuthLead>{t('account.forgot.lead')}</AuthLead>
+      </Box>
+      <Box as="form" method="post" noValidate onSubmit={onSubmit}>
+        <AuthField
+          id="forgot-email"
+          label={t('account.register.email')}
+          error={error ?? undefined}
+        >
+          <Input
+            id="forgot-email"
+            variant="design"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            value={email}
+            onChange={event => {
+              setEmail(event.target.value)
+              setIsSent(false)
+            }}
+            isInvalid={!!error}
+          />
+        </AuthField>
+        <Button
+          type="submit"
+          variant="brand"
+          size="cta"
+          w="full"
+          mt="6px"
+          isLoading={isSending}
+        >
+          {t(isSent ? 'account.forgot.resend' : 'account.forgot.submit')}
+        </Button>
+      </Box>
+      {isSent && (
+        <SentNotice title={t('account.forgot.sentTitle')}>
+          {t('account.forgot.sentText')}
+        </SentNotice>
+      )}
+      {isSent && (
+        <Text fontSize="12.5px" color="text.secondary" mt="12px" mx="4px">
+          {t('account.forgot.sentHint')}
+        </Text>
+      )}
+    </AuthScreen>
   )
 }

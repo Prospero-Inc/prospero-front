@@ -1,135 +1,146 @@
+import {
+  AuthField,
+  AuthIllustration,
+  AuthLead,
+  AuthScreen,
+  AuthTitle
+} from '@/components/auth/AuthScreen'
+import { AlertIcon, CheckIcon, MailIcon } from '@/components/icons/app'
 import { HttpMethod } from '@/enums'
-import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import { localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
 import {
+  Box,
   Button,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Icon,
-  Image,
   Input,
-  Link,
   Spinner,
   Stack,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { IconType } from 'react-icons'
-import {
-  MdCheckCircleOutline,
-  MdErrorOutline,
-  MdMarkEmailRead,
-  MdOutlineMailOutline,
-  MdRefresh
-} from 'react-icons/md'
-import * as yup from 'yup'
+import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 
-type Status = 'verifying' | 'success' | 'error' | 'retry' | 'pending' | 'sent'
+type LinkStatus = 'verifying' | 'success' | 'invalid' | 'retry'
 
 // Statuses the backend uses for a bad/unknown link. Anything else (429, 5xx,
 // network) says nothing about the link, so it gets a retry instead of
 // "invalid link".
 const INVALID_LINK_STATUSES = [400, 401, 422]
 
-const validationSchema = yup.object().shape({
-  email: yup.string().email().required()
-})
+/** Seconds before "Reenviar correo" can be used again. */
+const RESEND_COOLDOWN = 45
 
-const STATUS_ICON: Record<Exclude<Status, 'verifying'>, IconType> = {
-  success: MdCheckCircleOutline,
-  error: MdErrorOutline,
-  retry: MdRefresh,
-  pending: MdOutlineMailOutline,
-  sent: MdMarkEmailRead
-}
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const STATUS_COLOR: Record<Exclude<Status, 'verifying'>, string> = {
-  success: 'green.400',
-  error: 'red.400',
-  retry: 'orange.400',
-  pending: 'primary.400',
-  sent: 'primary.400'
+/** The mail app to open for the address's provider, when we know it. */
+const MAILBOXES: { domains: string[]; name: string; url: string }[] = [
+  {
+    domains: ['gmail.com', 'googlemail.com'],
+    name: 'Gmail',
+    url: 'https://mail.google.com/'
+  },
+  {
+    domains: ['outlook.com', 'hotmail.com', 'live.com', 'msn.com'],
+    name: 'Outlook',
+    url: 'https://outlook.live.com/mail/'
+  },
+  {
+    domains: ['yahoo.com', 'yahoo.es', 'ymail.com'],
+    name: 'Yahoo Mail',
+    url: 'https://mail.yahoo.com/'
+  },
+  {
+    domains: ['icloud.com', 'me.com', 'mac.com'],
+    name: 'iCloud Mail',
+    url: 'https://www.icloud.com/mail'
+  }
+]
+
+const mailboxOf = (email: string) => {
+  const domain = email.split('@')[1]?.toLowerCase() ?? ''
+  return MAILBOXES.find(mailbox => mailbox.domains.includes(domain))
 }
 
 const firstQueryValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value
 
+/** Counts down one second at a time while above 0. */
+const useCountdown = () => {
+  const [seconds, setSeconds] = useState(0)
+  useEffect(() => {
+    if (seconds <= 0) return
+    const timer = setTimeout(() => setSeconds(left => left - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [seconds])
+  return [seconds, setSeconds] as const
+}
+
+const formatSeconds = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+
 /**
- * Landing page for the account-verification email link
- * (`/auth/verify-account?id=..&code=..`). Without `id`/`code` it renders the
- * "check your inbox" state — LoginView sends inactive users here — with a
- * form to resend the link.
+ * Two jobs on one route:
+ * - "Revisá tu correo" (docs/diseno-mobile.html, 11): where registering (and
+ *   logging in with an inactive account) lands — the address we wrote to,
+ *   a button to open that mail app, resend with a cooldown, use another
+ *   address.
+ * - The activation link from that email (`?id=..&code=..`): activates the
+ *   account and says how it went.
  */
 export const VerifyAccountView = () => {
   const { t } = useTranslation('common')
   const router = useRouter()
-  const [status, setStatus] = useState<Status>('verifying')
-  const [isResending, setIsResending] = useState(false)
-  const [resendError, setResendError] = useState<string | null>(null)
-  // The activation token is single-use: React strict mode / a re-render must
-  // not fire the request twice, or the second call fails and flips a
-  // successful activation to the error state.
-  const hasRequested = useRef(false)
-  const headingRef = useRef<HTMLHeadingElement>(null)
+  const [linkStatus, setLinkStatus] = useState<LinkStatus | null>(null)
   const [linkParams, setLinkParams] = useState<{
     id: string
     code: string
   } | null>(null)
-
-  const cardBg = useColorModeValue('white', 'gray.700')
-  const pageBg = useColorModeValue('gray.50', 'gray.800')
-  const mutedText = useColorModeValue('gray.600', 'gray.300')
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<{ email: string }>({
-    resolver: useYupValidationResolver(validationSchema),
-    defaultValues: { email: '' }
-  })
+  const [email, setEmail] = useState<string | null>(null)
+  const [isEditingEmail, setIsEditingEmail] = useState(false)
+  const [emailInput, setEmailInput] = useState('')
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [isResending, setIsResending] = useState(false)
+  const [cooldown, setCooldown] = useCountdown()
+  // The activation token is single-use: a re-render must not fire the
+  // request twice, or the second call fails and flips a successful
+  // activation to the error state.
+  const hasRead = useRef(false)
 
   useEffect(() => {
-    if (!router.isReady || hasRequested.current) return
-    hasRequested.current = true
-
+    if (!router.isReady || hasRead.current) return
+    hasRead.current = true
     const id = firstQueryValue(router.query.id)
     const code = firstQueryValue(router.query.code)
-    const email = firstQueryValue(router.query.email)
-    if (email) reset({ email })
-
-    if (!id || !code) {
-      setStatus('pending')
+    const queryEmail = firstQueryValue(router.query.email)
+    if (id && code) {
+      setLinkParams({ id, code })
       return
     }
-
-    setLinkParams({ id, code })
-  }, [router.isReady, router.query, reset])
+    if (queryEmail && EMAIL.test(queryEmail)) {
+      setEmail(queryEmail)
+      // Just registered: the email went out a moment ago.
+      if (firstQueryValue(router.query.sent) === '1')
+        setCooldown(RESEND_COOLDOWN)
+    } else setIsEditingEmail(true)
+  }, [router.isReady, router.query, setCooldown])
 
   const verify = useCallback(async (params: { id: string; code: string }) => {
-    setStatus('verifying')
+    setLinkStatus('verifying')
     try {
       await localApiService.request({
         method: HttpMethod.GET,
         endPoint: '/proxy/activate-account',
         query: params
       })
-      setStatus('success')
+      setLinkStatus('success')
     } catch (error) {
-      setStatus(
+      setLinkStatus(
         error instanceof HttpError &&
           INVALID_LINK_STATUSES.includes(error.status)
-          ? 'error'
+          ? 'invalid'
           : 'retry'
       )
     }
@@ -139,170 +150,235 @@ export const VerifyAccountView = () => {
     if (linkParams) void verify(linkParams)
   }, [linkParams, verify])
 
-  // Move focus to the new heading so screen-reader and keyboard users land
-  // on the result instead of wherever they were.
-  useEffect(() => {
-    if (status !== 'verifying') headingRef.current?.focus()
-  }, [status])
-
-  const onResend = async ({ email }: { email: string }) => {
+  const resend = async (address: string) => {
     setIsResending(true)
-    setResendError(null)
+    setEmailError(null)
     try {
+      // The answer is the same whether or not the account exists.
       await localApiService.request({
         method: HttpMethod.POST,
         endPoint: '/proxy/resend-verification',
-        data: { email }
+        data: { email: address }
       })
-      setStatus('sent')
+      setEmail(address)
+      setIsEditingEmail(false)
+      setCooldown(RESEND_COOLDOWN)
     } catch {
-      setResendError(t('verifyAccount.resend.error'))
+      setEmailError(t('account.checkEmail.resendError'))
     } finally {
       setIsResending(false)
     }
   }
 
-  const showResendForm = status === 'error' || status === 'pending'
+  const onSubmitEmail = (event: FormEvent) => {
+    event.preventDefault()
+    const address = emailInput.trim()
+    if (!EMAIL.test(address)) {
+      setEmailError(t('account.register.invalidEmail'))
+      return
+    }
+    void resend(address)
+  }
 
-  return (
-    <Flex minH={'100vh'} align={'center'} justify={'center'} bg={pageBg} px={4}>
-      <Stack
-        spacing={5}
-        w={'full'}
-        maxW={'md'}
-        bg={cardBg}
-        rounded={'xl'}
-        boxShadow={'lg'}
-        p={{ base: 6, md: 8 }}
-        my={10}
-        textAlign={'center'}
-      >
-        <Image
-          src={'/assets/authBrand.svg'}
-          alt="Prospero"
-          maxH={'2.5rem'}
-          mx={'auto'}
-        />
+  const pageTitle = t('account.checkEmail.pageTitle')
 
-        {status === 'verifying' ? (
-          <Stack align={'center'} spacing={4} py={6} role="status">
-            <Spinner
-              size={'xl'}
-              color={'primary.400'}
-              thickness={'4px'}
-              label={t('verifyAccount.verifying')}
-            />
-            <Text color={mutedText}>{t('verifyAccount.verifying')}</Text>
+  // The activation link from the email.
+  if (linkParams) {
+    if (linkStatus === null || linkStatus === 'verifying')
+      return (
+        <AuthScreen title={pageTitle}>
+          <Stack align="center" spacing="16px" pt="80px" role="status">
+            <Spinner size="xl" color="brand.solid" thickness="4px" />
+            <AuthLead center>{t('account.activate.verifying')}</AuthLead>
           </Stack>
-        ) : (
-          <Stack spacing={4} role="status">
-            <Icon
-              as={STATUS_ICON[status]}
-              boxSize={16}
-              color={STATUS_COLOR[status]}
-              mx={'auto'}
-              aria-hidden
-            />
-            <Heading
-              as="h1"
-              ref={headingRef}
-              tabIndex={-1}
-              outline={'none'}
-              fontSize={{ base: '2xl', md: '3xl' }}
-              lineHeight={1.2}
-            >
-              {t(`verifyAccount.${status}.heading`)}
-            </Heading>
-            <Text color={mutedText}>{t(`verifyAccount.${status}.text`)}</Text>
-          </Stack>
-        )}
-
-        {status === 'success' && (
-          <Button
-            as={NextLink}
-            href="/auth/login"
-            colorScheme="primary"
-            size={'lg'}
-          >
-            {t('verifyAccount.goToLogin')}
-          </Button>
-        )}
-
-        {status === 'retry' && linkParams && (
-          <Button
-            colorScheme="primary"
-            size={'lg'}
-            onClick={() => void verify(linkParams)}
-          >
-            {t('verifyAccount.retry.button')}
-          </Button>
-        )}
-
-        {status === 'sent' && (
-          <Button variant={'outline'} onClick={() => setStatus('pending')}>
-            {t('verifyAccount.sent.useAnotherEmail')}
-          </Button>
-        )}
-
-        {showResendForm && (
-          <Stack
-            as="form"
-            method="post"
-            onSubmit={handleSubmit(onResend)}
-            spacing={3}
-            textAlign={'left'}
-            pt={2}
-          >
-            <FormControl isInvalid={!!errors.email}>
-              <FormLabel fontSize={'sm'} color={mutedText}>
-                {t('verifyAccount.resend.label')}
-              </FormLabel>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="email"
-                    autoComplete="email"
-                    placeholder="john@doe.com"
-                    size={'lg'}
-                  />
-                )}
-              />
-              {errors.email && (
-                <FormErrorMessage>
-                  {t('verifyAccount.resend.invalidEmail')}
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            {resendError && (
-              <Text color={'red.400'} fontSize={'sm'} role="alert">
-                {resendError}
-              </Text>
-            )}
+        </AuthScreen>
+      )
+    const ok = linkStatus === 'success'
+    return (
+      <AuthScreen title={pageTitle}>
+        <Stack spacing="14px" pt="28px" role="status">
+          <AuthIllustration
+            icon={
+              ok ? <CheckIcon boxSize="46px" /> : <AlertIcon boxSize="42px" />
+            }
+          />
+          <AuthTitle center>
+            {t(`account.activate.${linkStatus}.title`)}
+          </AuthTitle>
+          <AuthLead center fontSize="14.5px">
+            {t(`account.activate.${linkStatus}.text`)}
+          </AuthLead>
+          {ok && (
             <Button
-              type="submit"
-              colorScheme="primary"
-              size={'lg'}
-              isLoading={isResending}
+              as={NextLink}
+              href="/auth/login"
+              variant="brand"
+              size="cta"
+              mt="6px"
             >
-              {t('verifyAccount.resend.submit')}
+              {t('account.activate.goToLogin')}
             </Button>
-          </Stack>
-        )}
+          )}
+          {linkStatus === 'retry' && (
+            <Button
+              variant="brand"
+              size="cta"
+              mt="6px"
+              onClick={() => void verify(linkParams)}
+            >
+              {t('account.activate.retryButton')}
+            </Button>
+          )}
+          {linkStatus === 'invalid' && (
+            <Button
+              variant="brand"
+              size="cta"
+              mt="6px"
+              onClick={() => {
+                setLinkStatus(null)
+                setLinkParams(null)
+                setIsEditingEmail(true)
+              }}
+            >
+              {t('account.activate.newLink')}
+            </Button>
+          )}
+        </Stack>
+      </AuthScreen>
+    )
+  }
 
-        {status !== 'success' && status !== 'verifying' && (
-          <Link
-            as={NextLink}
-            href="/auth/login"
-            variant={'brandPrimary'}
-            fontSize={'sm'}
+  // No address yet (or "Usar otro correo"): ask for it.
+  if (isEditingEmail || !email)
+    return (
+      <AuthScreen
+        title={pageTitle}
+        back={{ href: '/auth/login', label: t('account.signIn') }}
+      >
+        <Box mt="4px" mb="6px">
+          <AuthTitle>{t('account.checkEmail.askTitle')}</AuthTitle>
+        </Box>
+        <Box mb="20px">
+          <AuthLead>{t('account.checkEmail.askLead')}</AuthLead>
+        </Box>
+        <Box as="form" method="post" noValidate onSubmit={onSubmitEmail}>
+          <AuthField
+            id="resend-email"
+            label={t('account.register.email')}
+            error={emailError ?? undefined}
           >
-            {t('verifyAccount.backToLogin')}
-          </Link>
+            <Input
+              id="resend-email"
+              variant="design"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              value={emailInput}
+              onChange={event => setEmailInput(event.target.value)}
+              isInvalid={!!emailError}
+            />
+          </AuthField>
+          <Button
+            type="submit"
+            variant="brand"
+            size="cta"
+            w="full"
+            mt="6px"
+            isLoading={isResending}
+          >
+            {t('account.checkEmail.send')}
+          </Button>
+        </Box>
+      </AuthScreen>
+    )
+
+  const mailbox = mailboxOf(email)
+  return (
+    <AuthScreen title={pageTitle}>
+      <Stack spacing="14px" pt="28px" px="4px">
+        <AuthIllustration icon={<MailIcon boxSize="46px" />} />
+        <AuthTitle center>{t('account.checkEmail.title')}</AuthTitle>
+        <AuthLead center fontSize="14.5px">
+          {t('account.checkEmail.sentTo')}
+        </AuthLead>
+        <Flex
+          align="center"
+          justify="center"
+          gap="10px"
+          bg="field.bg"
+          borderRadius="16px"
+          px="14px"
+          py="12px"
+          fontSize="14px"
+          fontWeight={600}
+          color="text.primary"
+          wordBreak="break-all"
+        >
+          <MailIcon boxSize="18px" color="text.secondary" flex="none" />
+          {email}
+        </Flex>
+        <AuthLead center fontSize="13px">
+          {t('account.checkEmail.hint')}
+        </AuthLead>
+        {mailbox && (
+          <Button
+            as="a"
+            href={mailbox.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="brand"
+            size="cta"
+            mt="6px"
+          >
+            {t('account.checkEmail.open', { name: mailbox.name })}
+          </Button>
         )}
+        <Button
+          variant="soft"
+          size="cta"
+          isDisabled={cooldown > 0}
+          isLoading={isResending}
+          onClick={() => void resend(email)}
+        >
+          {t('account.checkEmail.resend')}
+        </Button>
+        {cooldown > 0 && (
+          <Text
+            textAlign="center"
+            fontSize="12.5px"
+            color="text.secondary"
+            aria-live="polite"
+          >
+            {t('account.checkEmail.cooldown', {
+              time: formatSeconds(cooldown)
+            })}
+          </Text>
+        )}
+        {emailError && (
+          <Text
+            textAlign="center"
+            fontSize="13px"
+            color="money.expenseText"
+            role="alert"
+          >
+            {emailError}
+          </Text>
+        )}
+        {/* A typo in the address: register again with the right one. */}
+        <Button
+          as={NextLink}
+          href="/auth/register"
+          variant="ghost"
+          h="44px"
+          mt="4px"
+          color="brand.text"
+          fontSize="13.5px"
+          fontWeight={600}
+        >
+          {t('account.checkEmail.useAnother')}
+        </Button>
       </Stack>
-    </Flex>
+    </AuthScreen>
   )
 }

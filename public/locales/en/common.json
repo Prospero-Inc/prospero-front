@@ -1,8 +1,4 @@
 {
-  "authLayout": {
-    "signIn": "Sign In",
-    "createAccount": "Create Account"
-  },
   "switchLanguage": {
     "english": "English",
     "spanish": "Spanish",
@@ -39,37 +35,6 @@
     "noAccount": "Don't have an account?",
     "createAccount": "Create account"
   },
-  "register": {
-    "heading": "Create an Account",
-    "text": {
-      "one": "\"Saving has never been easier, manage your finances in style at",
-      "two": "Prospero",
-      "three": "\""
-    },
-    "form": {
-      "labelFirstName": "First Name",
-      "labelLastName": "Last Name",
-      "labelUsername": "Username",
-      "labelEmail": "Email",
-      "labelPassword": "Password"
-    },
-    "backLink": "Already have an account?",
-    "submit": "Create Account",
-    "yupSchema": {
-      "email": {
-        "required": "Email is required",
-        "email": "Invalid Email"
-      },
-      "password": {
-        "required": "Password is required",
-        "minLength": "Password must be at least 8 characters long",
-        "matches": "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (e.g. !@#$%^&*)"
-      },
-      "firstName": "FirstName is required",
-      "lastName": "LastName is required",
-      "userName": "username is required"
-    }
-  },
   "budgeCalculator": {
     "labelSalary": "Monthly income after taxes",
     "buttoncalculate": "Calculate",
@@ -84,40 +49,6 @@
     "twenty": {
       "heading": "20% Savings and Debt",
       "body": "Reserve the remaining 20% for saving or paying off debt. This includes contributions to emergency funds, savings for long-term goals, or additional debt payments."
-    }
-  },
-  "verifyTwoFactor": {
-    "heading": "Verify your 2 Factor Authentication",
-    "text": "Enter the 6 digit code of your authenticator app",
-    "required": "This field is required",
-    "submit": "Verify",
-    "toast": {
-      "error": {
-        "title": "Error",
-        "description": "An error occurred while verifying your 2FA code"
-      }
-    }
-  },
-  "forgotPassword": {
-    "title": "Forgot your password?",
-    "descriptionBlockOne": "Enter the email address you used when you joined and we will send you instructions on how to reset your password.",
-    "descriptionBlockTwo": "For security reasons, we do NOT store your password, so you can be sure that we will never send you your password by e-mail.",
-    "inputLabel": "E-mail",
-    "submitButton": "Submit",
-    "backToLogin": "Back to login",
-    "toast": {
-      "success": {
-        "title": "Done!",
-        "description": "If an account exists for that email, we sent instructions to reset your password."
-      },
-      "error": {
-        "title": "Error!",
-        "description": "We couldn't send the email. Please try again in a minute."
-      },
-      "loading": {
-        "title": "Loading...",
-        "description": "We are sending an email with instructions to reset your password."
-      }
     }
   },
   "dashboard": {
@@ -237,73 +168,14 @@
     "dayTotalPartial": "{{total}} · {{count}} not shown"
   },
   "routeLoading": "Loading…",
-  "verifyAccount": {
-    "verifying": "Verifying your account…",
-    "success": {
-      "heading": "Account verified!",
-      "text": "Your email is confirmed. You can now log in and start planning your budget."
-    },
-    "error": {
-      "heading": "This link isn't valid",
-      "text": "It may have already been used or expired. If your account is already active, just log in; otherwise we'll send you a new link."
-    },
-    "pending": {
-      "heading": "Check your email",
-      "text": "We sent you a link to activate your account. Open it from your inbox (check spam too). Didn't get it? We'll send another one."
-    },
-    "sent": {
-      "heading": "Link sent",
-      "text": "If there's an account pending activation for that email, a new link will arrive in a few minutes.",
-      "useAnotherEmail": "Use a different email"
-    },
-    "goToLogin": "Log in",
-    "backToLogin": "Back to log in",
-    "resend": {
-      "label": "Email",
-      "submit": "Resend verification link",
-      "invalidEmail": "Enter a valid email",
-      "error": "We couldn't send the email. Please try again in a minute."
-    },
-    "registered": {
-      "title": "Account created",
-      "description": "Check your email to activate your account."
-    },
-    "retry": {
-      "heading": "We couldn't verify right now",
-      "text": "There was a connection problem or the server is busy. Your link is still valid — please try again.",
-      "button": "Try again"
-    }
-  },
   "authPages": {
     "login": {
       "title": "Sign in · Prospero",
       "description": "Access your budget"
-    },
-    "verifyAccount": {
-      "title": "Verify account · Prospero",
-      "description": "Account verification"
-    },
-    "verify2fa": {
-      "title": "Two-step verification · Prospero",
-      "description": "Code from your authenticator app"
-    },
-    "forgotPassword": {
-      "title": "Reset password · Prospero",
-      "description": "Get back into your account"
     }
   },
   "passwordInput": {
     "toggle": "Show or hide the password"
-  },
-  "registerToast": {
-    "loading": {
-      "title": "Creating account",
-      "description": "We're creating your account, please wait"
-    },
-    "error": {
-      "title": "Error",
-      "description": "We couldn't create the account"
-    }
   },
   "offline": {
     "title": "Offline · Prospero",
@@ -526,6 +398,117 @@
       "date": "Payment date",
       "save": "Save and start",
       "later": "I'll do it later"
+    }
+  },
+  "account": {
+    "signIn": "Sign in",
+    "back": "Back",
+    "showPassword": "Show",
+    "hidePassword": "Hide",
+    "rules": {
+      "length": "8 characters",
+      "upper": "Uppercase",
+      "lower": "Lowercase",
+      "number": "Number",
+      "symbol": "Symbol",
+      "match": "Match",
+      "met": "met"
+    },
+    "register": {
+      "pageTitle": "Create account",
+      "title": "Create your account",
+      "lead": "Your budget, anchored to your paydays.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Create account",
+      "required": "Fill in this field",
+      "invalidEmail": "Enter a valid email",
+      "weakPassword": "The password doesn't meet all the requirements yet",
+      "error": "We couldn't create your account"
+    },
+    "checkEmail": {
+      "pageTitle": "Check your email",
+      "title": "Check your email",
+      "sentTo": "We sent a link to activate your account to",
+      "hint": "Open it on this same phone to continue right in the app. If it's not there, check Spam or Promotions.",
+      "open": "Open {{name}}",
+      "resend": "Resend email",
+      "cooldown": "You can resend it in {{time}}",
+      "useAnother": "Use another email",
+      "resendError": "We couldn't resend the email. Try again in a moment.",
+      "askTitle": "Activate your account",
+      "askLead": "Enter the email you signed up with and we'll send you a new link.",
+      "send": "Send link"
+    },
+    "activate": {
+      "verifying": "Activating your account…",
+      "success": {
+        "title": "Your account is active!",
+        "text": "You can now sign in and set up your budget."
+      },
+      "invalid": {
+        "title": "This link isn't valid",
+        "text": "You may have used it already or it expired. Ask for a new one."
+      },
+      "retry": {
+        "title": "We couldn't activate your account",
+        "text": "It was a connection problem. Try again."
+      },
+      "goToLogin": "Sign in",
+      "retryButton": "Try again",
+      "newLink": "Get a new link"
+    },
+    "twoFactor": {
+      "pageTitle": "Two-step verification",
+      "title": "Two-step verification",
+      "lead": "Enter the 6-digit code from your authenticator app.",
+      "digit": "Code digit {{position}}",
+      "expiresIn": "For security, this step expires in {{time}}",
+      "expired": "This step expired for security. Sign in again.",
+      "signInAgain": "Sign in again",
+      "wrongCode": "That code isn't right. Use the one your app shows now.",
+      "error": "We couldn't verify the code. Try again.",
+      "lostAccess": "Lost access to your app?",
+      "lostTitle": "I lost access to my app",
+      "lostIntro": "If you changed or lost your phone, you can link the app again with the key you saved when you turned verification on:",
+      "lostStep1": "Install an authenticator app (Google Authenticator, Microsoft Authenticator or another).",
+      "lostStep2": "Add a new account and choose to enter the key by hand.",
+      "lostStep3": "Paste the key: the app will show the same 6-digit code Prospero expects.",
+      "lostNoKey": "If you didn't save the key, there's no way to recover access from the app for now."
+    },
+    "forgot": {
+      "pageTitle": "Forgot password",
+      "title": "Forgot your password?",
+      "lead": "Enter your email and we'll send you a link to create a new one.",
+      "submit": "Send link",
+      "resend": "Send again",
+      "sentTitle": "Done, check your email",
+      "sentText": "If there's an account with that email, the link arrives in a few minutes. It expires in 1 hour.",
+      "sentHint": "Open it on this same phone. If it's not there, check Spam or Promotions.",
+      "error": "We couldn't send the link. Try again in a moment."
+    },
+    "reset": {
+      "pageTitle": "New password",
+      "title": "Create a new password",
+      "lead": "Pick one you don't use on other sites.",
+      "new": "New",
+      "repeat": "Repeat",
+      "mismatch": "The passwords don't match",
+      "submit": "Save password",
+      "error": "We couldn't save the password",
+      "done": {
+        "title": "Password updated",
+        "text": "We signed you out on all your devices. Sign in with the new password.",
+        "button": "Sign in"
+      },
+      "invalid": {
+        "title": "The link expired or was already used",
+        "text": "Links last 1 hour and work once. Ask for a new one.",
+        "button": "Get another link"
+      }
     }
   }
 }

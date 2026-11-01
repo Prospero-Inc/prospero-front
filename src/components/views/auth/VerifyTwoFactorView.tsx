@@ -1,62 +1,100 @@
+import {
+  AuthIllustration,
+  AuthLead,
+  AuthScreen,
+  AuthTitle
+} from '@/components/auth/AuthScreen'
+import { CodeInput } from '@/components/design/settings'
+import { ShieldIcon } from '@/components/icons/app'
+import { BottomSheet } from '@/components/ui/BottomSheet'
 import { HttpMethod } from '@/enums'
-import { useYupValidationResolver } from '@/hooks/useYupValidationResolver'
 import { LoginSuccessResponse, PRE_AUTH_TOKEN_STORAGE_KEY } from '@/interfaces'
 import { localApiService } from '@/lib'
+import { HttpError } from '@/lib/apiService'
 import {
+  Box,
   Button,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Heading,
-  HStack,
-  PinInput,
-  PinInputField,
+  ListItem,
+  OrderedList,
   Stack,
-  useColorModeValue,
-  useToast
+  Text,
+  useDisclosure
 } from '@chakra-ui/react'
 import { signIn } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import * as yup from 'yup'
 
-const validationSchema = yup.object().shape({
-  ping: yup.string().required()
-})
+/** When the pre-auth token stops working (its JWT `exp`, in ms), or null
+ * if it can't be read. Only for the countdown: the backend decides. */
+const expiryOf = (token: string): number | null => {
+  try {
+    const payload = token.split('.')[1]
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+    const { exp } = JSON.parse(json) as { exp?: number }
+    return typeof exp === 'number' ? exp * 1000 : null
+  } catch {
+    return null
+  }
+}
 
+const formatSeconds = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+
+/**
+ * Código 2FA al iniciar sesión (docs/diseno-mobile.html, 12): six boxes
+ * with the numeric keyboard and one-time-code autofill, sent by themselves
+ * on the sixth digit. The step expires with the pre-auth token (5 min):
+ * a countdown says so, and when it runs out it's back to the login.
+ */
 export const VerifyTwoFactorView = () => {
   const { t } = useTranslation('common')
   const router = useRouter()
-  const toast = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-  const resolver = useYupValidationResolver(validationSchema)
-  const {
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors }
-  } = useForm<{ ping: string }>({ resolver })
+  const lostAccess = useDisclosure()
+  const [code, setCode] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [expiresAt, setExpiresAt] = useState<number | null>(null)
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
 
+  // Only reachable right after the password step.
   useEffect(() => {
-    if (!sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY))
+    const token = sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY)
+    if (!token) {
       router.replace('/auth/login')
+      return
+    }
+    setExpiresAt(expiryOf(token))
   }, [router])
 
-  const onSubmit = async ({ ping }: { ping: string }) => {
-    const preAuthToken = sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY)
-    if (!preAuthToken) return router.replace('/auth/login')
+  useEffect(() => {
+    if (expiresAt === null) return
+    const tick = () =>
+      setSecondsLeft(Math.max(0, Math.round((expiresAt - Date.now()) / 1000)))
+    tick()
+    const timer = setInterval(tick, 1000)
+    return () => clearInterval(timer)
+  }, [expiresAt])
 
-    setIsLoading(true)
+  const isExpired = secondsLeft === 0
+
+  const backToLogin = () => {
+    sessionStorage.removeItem(PRE_AUTH_TOKEN_STORAGE_KEY)
+    router.replace('/auth/login')
+  }
+
+  const verify = async (value: string) => {
+    const preAuthToken = sessionStorage.getItem(PRE_AUTH_TOKEN_STORAGE_KEY)
+    if (!preAuthToken) return backToLogin()
+    if (value.length !== 6 || isVerifying || isExpired) return
+    setIsVerifying(true)
+    setError(null)
     try {
       const response = await localApiService.request<LoginSuccessResponse>({
         endPoint: '/proxy/login-verify-2fa',
         method: HttpMethod.POST,
-        data: { preAuthToken, token: ping }
+        data: { preAuthToken, token: value }
       })
-
       await signIn('credentials', {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
@@ -64,100 +102,104 @@ export const VerifyTwoFactorView = () => {
         redirect: false,
         callbackUrl: '/dashboard'
       })
-
       sessionStorage.removeItem(PRE_AUTH_TOKEN_STORAGE_KEY)
       router.replace('/dashboard')
-    } catch (error) {
-      toast({
-        title: t('verifyTwoFactor.toast.error.title'),
-        description:
-          error instanceof Error
-            ? error.message
-            : t('verifyTwoFactor.toast.error.description'),
-        status: 'error',
-        isClosable: true
-      })
-    } finally {
-      setIsLoading(false)
+    } catch (verifyError) {
+      setCode('')
+      setError(
+        t(
+          verifyError instanceof HttpError && verifyError.status === 401
+            ? 'account.twoFactor.wrongCode'
+            : 'account.twoFactor.error'
+        )
+      )
+      setIsVerifying(false)
     }
   }
 
   return (
-    <Flex
-      minH={'100vh'}
-      align={'center'}
-      justify={'center'}
-      bg={useColorModeValue('gray.50', 'gray.800')}
+    <AuthScreen
+      title={t('account.twoFactor.pageTitle')}
+      back={{ href: '/auth/login', label: t('account.back') }}
     >
-      <Stack
-        as="form"
-        method="post"
-        onSubmit={handleSubmit(onSubmit)}
-        spacing={4}
-        w={'full'}
-        maxW={'sm'}
-        bg={useColorModeValue('white', 'gray.700')}
-        rounded={'xl'}
-        boxShadow={'lg'}
-        p={6}
-        my={10}
-      >
-        <Center>
-          <Heading lineHeight={1.1} fontSize={{ base: '2xl', md: '3xl' }}>
-            {t('verifyTwoFactor.heading')}
-          </Heading>
-        </Center>
-        <Center
-          fontSize={{ base: 'sm', sm: 'md' }}
-          color={useColorModeValue('gray.800', 'gray.400')}
-        >
-          {t('verifyTwoFactor.text')}
-        </Center>
-        <FormControl>
-          <Center>
-            <HStack>
-              <Controller
-                control={control}
-                name="ping"
-                render={({ field }) => (
-                  <PinInput
-                    {...field}
-                    otp
-                    type="number"
-                    autoFocus
-                    onComplete={ping => setValue('ping', ping)}
-                  >
-                    <PinInputField autoComplete="one-time-code" />
-                    <PinInputField />
-                    <PinInputField />
-                    <PinInputField />
-                    <PinInputField />
-                    <PinInputField />
-                  </PinInput>
-                )}
+      <Stack spacing="14px" pt="8px">
+        <AuthIllustration size="72px" icon={<ShieldIcon boxSize="34px" />} />
+        <AuthTitle center>{t('account.twoFactor.title')}</AuthTitle>
+        <AuthLead center>{t('account.twoFactor.lead')}</AuthLead>
+
+        {isExpired ? (
+          <Stack spacing="12px" pt="6px" role="alert">
+            <Text textAlign="center" fontSize="14px" color="money.expenseText">
+              {t('account.twoFactor.expired')}
+            </Text>
+            <Button variant="brand" size="cta" onClick={backToLogin}>
+              {t('account.twoFactor.signInAgain')}
+            </Button>
+          </Stack>
+        ) : (
+          <>
+            <Box pt="4px">
+              <CodeInput
+                value={code}
+                onChange={value => {
+                  setCode(value)
+                  setError(null)
+                }}
+                onComplete={verify}
+                digitLabel={position =>
+                  t('account.twoFactor.digit', { position })
+                }
+                isInvalid={!!error}
+                isDisabled={isVerifying}
               />
-              {errors.ping && (
-                <FormErrorMessage>
-                  {t('verifyTwoFactor.required')}
-                </FormErrorMessage>
-              )}
-            </HStack>
-          </Center>
-        </FormControl>
-        <Stack spacing={6}>
-          <Button
-            bg={'primary.400'}
-            type="submit"
-            color={'white'}
-            isLoading={isLoading}
-            _hover={{
-              bg: 'primary.500'
-            }}
-          >
-            {t('verifyTwoFactor.submit')}
-          </Button>
-        </Stack>
+            </Box>
+            {error && (
+              <Text
+                role="alert"
+                textAlign="center"
+                fontSize="13px"
+                color="money.expenseText"
+              >
+                {error}
+              </Text>
+            )}
+            {secondsLeft !== null && (
+              <Text textAlign="center" fontSize="12.5px" color="text.secondary">
+                {t('account.twoFactor.expiresIn', {
+                  time: formatSeconds(secondsLeft)
+                })}
+              </Text>
+            )}
+          </>
+        )}
+
+        <Button
+          variant="ghost"
+          h="44px"
+          color="brand.text"
+          fontSize="13.5px"
+          fontWeight={600}
+          onClick={lostAccess.onOpen}
+        >
+          {t('account.twoFactor.lostAccess')}
+        </Button>
       </Stack>
-    </Flex>
+
+      <BottomSheet
+        isOpen={lostAccess.isOpen}
+        onClose={lostAccess.onClose}
+        title={t('account.twoFactor.lostTitle')}
+      >
+        <Stack spacing="12px" pb="12px" fontSize="14px" lineHeight="1.5">
+          <Text color="text.secondary">{t('account.twoFactor.lostIntro')}</Text>
+          <OrderedList spacing="8px" color="text.primary" pl="4px">
+            <ListItem>{t('account.twoFactor.lostStep1')}</ListItem>
+            <ListItem>{t('account.twoFactor.lostStep2')}</ListItem>
+            <ListItem>{t('account.twoFactor.lostStep3')}</ListItem>
+          </OrderedList>
+          <Text color="text.secondary">{t('account.twoFactor.lostNoKey')}</Text>
+        </Stack>
+      </BottomSheet>
+    </AuthScreen>
   )
 }
