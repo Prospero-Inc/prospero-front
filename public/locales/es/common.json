@@ -1,8 +1,4 @@
 {
-  "authLayout": {
-    "signIn": "Iniciar sesión",
-    "createAccount": "Crear cuenta"
-  },
   "switchLanguage": {
     "english": "Ingles",
     "spanish": "Español",
@@ -39,37 +35,6 @@
     "noAccount": "¿No tenés cuenta?",
     "createAccount": "Crear cuenta"
   },
-  "register": {
-    "heading": "Crear una Cuenta",
-    "text": {
-      "one": "“Ahorrar nunca fue tan fácil, gestiona tus finanzas con estilo en",
-      "two": "Prospero",
-      "three": "”"
-    },
-    "form": {
-      "labelFirstName": "Nombre",
-      "labelLastName": "Apellido",
-      "labelUsername": "Nombre de usuario",
-      "labelEmail": "Correo",
-      "labelPassword": "Contraseña"
-    },
-    "backLink": "Ya tienes una cuenta?",
-    "submit": "Crear Cuenta",
-    "yupSchema": {
-      "email": {
-        "required": "Correo es requerido",
-        "email": "Correo invalido"
-      },
-      "password": {
-        "required": "Contraseña es requerida",
-        "minLength": "Contraseña debe tener almenos 8 caracteres",
-        "matches": "Contraseña debe contener al menos una minúscula, una mayúscula, un dígito y un carácter especial (ej. !@#$%^&*)"
-      },
-      "firstName": "Nombres es requerido",
-      "lastName": "Apellidos es requerido",
-      "userName": "Nombre de usuario es requerido"
-    }
-  },
   "budgeCalculator": {
     "labelSalary": "Ingresos mensuales después de impuestos",
     "buttonCalculate": "Calcular",
@@ -84,40 +49,6 @@
     "twenty": {
       "heading": "20% Ahorro y Deudas",
       "body": "Reserva el 20% restante para ahorrar o pagar deudas. Esto incluye aportaciones a fondos de emergencia, ahorros para metas a largo plazo o pagos adicionales de deudas."
-    }
-  },
-  "verifyTwoFactor": {
-    "heading": "Verifica tu autenticación de dos factores",
-    "text": "Ingresa el código de 6 dígitos de tu app de autenticación",
-    "required": "Este campo es obligatorio",
-    "submit": "Verificar",
-    "toast": {
-      "error": {
-        "title": "Error",
-        "description": "Ocurrió un error al verificar tu código 2FA"
-      }
-    }
-  },
-  "forgotPassword": {
-    "title": "¿Has olvidado tu contraseña?",
-    "descriptionBlockOne": "Ingrese la dirección de correo electrónico que utilizó cuando se unió y le enviaremos instrucciones para restablecer su contraseña.",
-    "descriptionBlockTwo": "Por razones de seguridad, NO almacenamos su contraseña, por lo que puede estar seguro de que nunca le enviaremos su contraseña por correo electrónico.",
-    "inputLabel": "Correo electrónico",
-    "submitButton": "Enviar",
-    "backToLogin": "Volver a iniciar sesión",
-    "toast": {
-      "success": {
-        "title": "¡Listo!",
-        "description": "Si existe una cuenta con ese correo, te enviamos instrucciones para restablecer tu contraseña."
-      },
-      "error": {
-        "title": "¡Error!",
-        "description": "No pudimos enviar el correo. Inténtalo de nuevo en un minuto."
-      },
-      "loading": {
-        "title": "Cargando...",
-        "description": "Estamos enviando un correo electrónico con instrucciones para restablecer su contraseña."
-      }
     }
   },
   "dashboard": {
@@ -237,73 +168,14 @@
     "dayTotalPartial": "{{total}} · {{count}} sin mostrar"
   },
   "routeLoading": "Cargando…",
-  "verifyAccount": {
-    "verifying": "Verificando tu cuenta…",
-    "success": {
-      "heading": "¡Cuenta verificada!",
-      "text": "Tu correo quedó confirmado. Ya puedes iniciar sesión y empezar a organizar tu presupuesto."
-    },
-    "error": {
-      "heading": "El enlace no es válido",
-      "text": "Puede que ya lo hayas usado o que haya caducado. Si tu cuenta ya está activa, simplemente inicia sesión; si no, te enviamos un enlace nuevo."
-    },
-    "pending": {
-      "heading": "Revisa tu correo",
-      "text": "Te enviamos un enlace para activar tu cuenta. Ábrelo desde tu bandeja de entrada (revisa también spam). ¿No te llegó? Te mandamos otro."
-    },
-    "sent": {
-      "heading": "Enlace enviado",
-      "text": "Si hay una cuenta pendiente de activar con ese correo, te llegará un enlace nuevo en unos minutos.",
-      "useAnotherEmail": "Usar otro correo"
-    },
-    "goToLogin": "Iniciar sesión",
-    "backToLogin": "Volver a iniciar sesión",
-    "resend": {
-      "label": "Correo electrónico",
-      "submit": "Reenviar enlace de verificación",
-      "invalidEmail": "Ingresa un correo válido",
-      "error": "No pudimos enviar el correo. Inténtalo de nuevo en un minuto."
-    },
-    "registered": {
-      "title": "Cuenta creada",
-      "description": "Revisa tu correo para activar tu cuenta."
-    },
-    "retry": {
-      "heading": "No pudimos verificar ahora",
-      "text": "Hubo un problema de conexión o el servidor está ocupado. Tu enlace sigue siendo válido: inténtalo de nuevo.",
-      "button": "Reintentar"
-    }
-  },
   "authPages": {
     "login": {
       "title": "Iniciar sesión · Prospero",
       "description": "Entrá a tu presupuesto"
-    },
-    "verifyAccount": {
-      "title": "Verificar cuenta · Prospero",
-      "description": "Verificación de la cuenta"
-    },
-    "verify2fa": {
-      "title": "Verificación en dos pasos · Prospero",
-      "description": "Código de tu app de autenticación"
-    },
-    "forgotPassword": {
-      "title": "Recuperar contraseña · Prospero",
-      "description": "Recuperá el acceso a tu cuenta"
     }
   },
   "passwordInput": {
     "toggle": "Mostrar u ocultar la contraseña"
-  },
-  "registerToast": {
-    "loading": {
-      "title": "Creando cuenta",
-      "description": "Estamos creando tu cuenta, por favor esperá"
-    },
-    "error": {
-      "title": "Error",
-      "description": "No pudimos crear la cuenta"
-    }
   },
   "offline": {
     "title": "Sin conexión · Prospero",
@@ -526,6 +398,117 @@
       "date": "Fecha del pago",
       "save": "Guardar y empezar",
       "later": "Lo hago después"
+    }
+  },
+  "account": {
+    "signIn": "Iniciar sesión",
+    "back": "Atrás",
+    "reveal": "Mostrar",
+    "conceal": "Ocultar",
+    "rules": {
+      "length": "8 caracteres",
+      "upper": "Mayúscula",
+      "lower": "Minúscula",
+      "number": "Número",
+      "symbol": "Símbolo",
+      "match": "Coinciden",
+      "met": "cumplido"
+    },
+    "register": {
+      "pageTitle": "Crear cuenta",
+      "title": "Creá tu cuenta",
+      "lead": "Tu presupuesto, anclado a tus fechas de pago.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "username": "Nombre de usuario",
+      "secretLabel": "Contraseña",
+      "submit": "Crear cuenta",
+      "required": "Completá este campo",
+      "invalidEmail": "Escribí un correo válido",
+      "weakSecret": "La contraseña todavía no cumple todos los requisitos",
+      "error": "No pudimos crear tu cuenta"
+    },
+    "checkEmail": {
+      "pageTitle": "Revisá tu correo",
+      "title": "Revisá tu correo",
+      "sentTo": "Te mandamos un enlace para activar tu cuenta a",
+      "hint": "Abrilo desde este mismo celular para seguir directo en la app. Si no aparece, revisá Spam o Promociones.",
+      "open": "Abrir {{name}}",
+      "resend": "Reenviar correo",
+      "cooldown": "Podés reenviarlo de nuevo en {{time}}",
+      "useAnother": "Usar otro correo",
+      "resendError": "No pudimos reenviar el correo. Probá de nuevo en un momento.",
+      "askTitle": "Activá tu cuenta",
+      "askLead": "Escribí el correo con el que te registraste y te mandamos un enlace nuevo.",
+      "send": "Mandar enlace"
+    },
+    "activate": {
+      "verifying": "Activando tu cuenta…",
+      "success": {
+        "title": "¡Tu cuenta está activa!",
+        "text": "Ya podés iniciar sesión y configurar tu presupuesto."
+      },
+      "invalid": {
+        "title": "El enlace no es válido",
+        "text": "Puede que ya lo hayas usado o que haya vencido. Pedí uno nuevo."
+      },
+      "retry": {
+        "title": "No pudimos activar tu cuenta",
+        "text": "Fue un problema de conexión. Probá de nuevo."
+      },
+      "goToLogin": "Iniciar sesión",
+      "retryButton": "Reintentar",
+      "newLink": "Pedir un enlace nuevo"
+    },
+    "twoFactor": {
+      "pageTitle": "Verificación en dos pasos",
+      "title": "Verificación en dos pasos",
+      "lead": "Escribí el código de 6 dígitos de tu app de autenticación.",
+      "digit": "Dígito {{position}} del código",
+      "expiresIn": "Por seguridad, este paso vence en {{time}}",
+      "expired": "Este paso venció por seguridad. Volvé a iniciar sesión.",
+      "signInAgain": "Iniciar sesión de nuevo",
+      "wrongCode": "El código no es correcto. Usá el que muestra tu app ahora.",
+      "error": "No pudimos verificar el código. Probá de nuevo.",
+      "lostAccess": "¿Perdiste el acceso a tu app?",
+      "lostTitle": "Perdí el acceso a mi app",
+      "lostIntro": "Si cambiaste o perdiste el celular, podés volver a vincular la app con la clave que guardaste al activar la verificación:",
+      "lostStep1": "Instalá una app de autenticación (Google Authenticator, Microsoft Authenticator u otra).",
+      "lostStep2": "Agregá una cuenta nueva y elegí ingresar la clave a mano.",
+      "lostStep3": "Pegá la clave: la app va a mostrar el mismo código de 6 dígitos que espera Prospero.",
+      "lostNoKey": "Si no guardaste la clave, por ahora no hay forma de recuperar el acceso desde la app."
+    },
+    "forgot": {
+      "pageTitle": "Olvidé mi contraseña",
+      "title": "¿Olvidaste tu contraseña?",
+      "lead": "Escribí tu correo y te mandamos un enlace para crear una nueva.",
+      "submit": "Enviar enlace",
+      "resend": "Enviar de nuevo",
+      "sentTitle": "Listo, revisá tu correo",
+      "sentText": "Si hay una cuenta con ese correo, en unos minutos te llega el enlace. Vence en 1 hora.",
+      "sentHint": "Abrilo desde este mismo celular. Si no aparece, revisá Spam o Promociones.",
+      "error": "No pudimos mandar el enlace. Probá de nuevo en un momento."
+    },
+    "reset": {
+      "pageTitle": "Nueva contraseña",
+      "title": "Creá una contraseña nueva",
+      "lead": "Elegí una que no uses en otros sitios.",
+      "new": "Nueva",
+      "repeat": "Repetir",
+      "mismatch": "Las contraseñas no coinciden",
+      "submit": "Guardar contraseña",
+      "error": "No pudimos guardar la contraseña",
+      "done": {
+        "title": "Contraseña actualizada",
+        "text": "Cerramos la sesión en todos tus dispositivos. Iniciá sesión con la contraseña nueva.",
+        "button": "Iniciar sesión"
+      },
+      "invalid": {
+        "title": "El enlace venció o ya se usó",
+        "text": "Los enlaces duran 1 hora y sirven una sola vez. Pedí uno nuevo.",
+        "button": "Pedir otro enlace"
+      }
     }
   }
 }

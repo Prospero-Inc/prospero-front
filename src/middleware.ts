@@ -101,8 +101,12 @@ export async function middleware(req: NextRequest) {
   // `redirectTo` would drop the `id`/`code` query on the way to /dashboard.
   // `/_offline` is the service worker's fallback page: precached at install
   // time whether or not anyone is logged in, so it must never redirect.
+  // `/auth/reset-password/<token>` likewise: the emailed link must work
+  // from any browser, signed in or not.
   const isPublicPage =
-    pathname.startsWith('/auth/verify-account') || pathname === '/_offline'
+    pathname.startsWith('/auth/verify-account') ||
+    pathname.startsWith('/auth/reset-password') ||
+    pathname === '/_offline'
 
   const isProtectedPage = !isAuthPage && !isPublicPage
   if (pathname === '/') return redirectTo('/dashboard')
