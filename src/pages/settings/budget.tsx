@@ -177,7 +177,7 @@ export default function BudgetSettingsPage() {
                   />
                   {t(`budget.split.${key}`)}
                 </Flex>
-                <Flex align="center" gap="10px">
+                <Flex align="center" gap="6px">
                   <StepperButton
                     label={t('budget.decrease', {
                       name: t(`budget.split.${key}`)

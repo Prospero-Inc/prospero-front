@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Locator, type Page, test } from '@playwright/test'
 
 // Configuración dividida (docs/diseno-mobile.html, 06–09): each row of
 // "Más" opens its own screen under /settings/*, with "‹ Más" and no tab bar.
@@ -28,6 +28,16 @@ const lastRequest = async (page: Page, method: string, path: string) => {
 
 const tabBar = (page: Page) =>
   page.getByRole('navigation', { name: 'Navegación principal' })
+
+/** Types a 6-digit code box by box (typing in one go races with the boxes
+ * moving focus by themselves when the machine is slow). */
+const enterCode = async (scope: Page | Locator, code: string) => {
+  for (const [index, digit] of [...code].entries()) {
+    const box = scope.getByLabel(`Dígito ${index + 1} del código`)
+    await expect(box).toBeEnabled()
+    await box.fill(digit)
+  }
+}
 
 const heading = (page: Page, name: string) =>
   page.getByRole('heading', { level: 1, name })
@@ -67,6 +77,9 @@ test('old links land on the new screens', async ({ page }) => {
 
   await page.goto('/profile')
   await expect(page).toHaveURL(/\/settings\/profile$/)
+
+  await page.goto('/profile/2fa')
+  await expect(page).toHaveURL(/\/settings\/security\/2fa$/)
 
   // Google's consent screen used to come back to /settings?gmail=…
   await page.goto('/settings?gmail=connected')
@@ -220,14 +233,10 @@ test('security: turning 2FA off asks for the code in a sheet', async ({
   const sheet = page.getByRole('dialog', {
     name: 'Desactivar la verificación'
   })
-  await sheet
-    .getByLabel('Dígito 1 del código')
-    .pressSequentially('000000', { delay: 60 })
+  await enterCode(sheet, '000000')
   await expect(sheet.getByRole('alert')).toBeVisible()
 
-  await sheet
-    .getByLabel('Dígito 1 del código')
-    .pressSequentially('123456', { delay: 60 })
+  await enterCode(sheet, '123456')
   await expect
     .poll(() => lastRequest(page, 'POST', '/api/auth/disable-2fa'))
     .toMatchObject({ body: { token: '123456' } })
@@ -246,10 +255,67 @@ test('security: changing the password sends the reset email', async ({
   await expect(page.getByText('Revisá tu correo')).toBeVisible()
 })
 
+test('security: signing out of every device', async ({ page }) => {
+  await page.goto('/settings/security')
+  await page
+    .getByRole('button', { name: 'Cerrar sesión en todos los dispositivos' })
+    .click()
+  await page.getByRole('button', { name: 'Cerrar sesión en todos' }).click()
+  await page.waitForURL('**/auth/login')
+  expect(await lastRequest(page, 'POST', '/api/auth/logout-all')).toBeTruthy()
+})
+
+test('2FA setup: open the app or copy the key, then the first code', async ({
+  page
+}) => {
+  await page.goto('/settings/security')
+  await page.getByRole('link', { name: 'Activar' }).click()
+  await page.waitForURL('**/settings/security/2fa')
+
+  await expect(
+    page.getByRole('link', { name: 'Abrir app de autenticación' })
+  ).toHaveAttribute('href', /^otpauth:\/\/totp\//)
+  await expect(page.getByText('JBSW Y3DP EHPK 3PXP')).toBeVisible()
+  await expect(
+    page.getByRole('img', {
+      name: 'Código QR para vincular tu app de autenticación'
+    })
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Ya la agregué, continuar' }).click()
+  await expect(page).toHaveURL(/step=2/)
+  await expect(page.getByRole('link', { name: 'Atrás' })).toBeVisible()
+
+  await enterCode(page, '000000')
+  await expect(page.getByText(/El código no es correcto/)).toBeVisible()
+
+  await enterCode(page, '123456')
+  await page.waitForURL(/\/settings\/security$/)
+  await expect
+    .poll(() => lastRequest(page, 'POST', '/api/auth/validate-2fa'))
+    .toMatchObject({ body: { token: '123456' } })
+})
+
+test("gmail: a bank's reader can be changed from its sheet", async ({
+  page
+}) => {
+  await page.goto('/settings/gmail')
+  await page.getByRole('button', { name: /BAC Credomatic/ }).click()
+  const sheet = page.getByRole('dialog', { name: 'BAC Credomatic' })
+  await expect(
+    sheet.getByRole('button', { name: /BAC Credomatic/ })
+  ).toHaveAttribute('aria-pressed', 'true')
+  await sheet.getByRole('button', { name: 'Ninguno (solo manual)' }).click()
+  await expect
+    .poll(() => lastRequest(page, 'PATCH', '/api/financial-institutions/7'))
+    .toMatchObject({ body: { parserKey: null } })
+})
+
 test('settings screens follow the mobile rules', async ({ page }) => {
   for (const path of [
     '/settings/profile',
     '/settings/budget',
+    '/settings/security/2fa',
     '/settings/gmail',
     '/settings/notifications',
     '/settings/security'
@@ -263,18 +329,13 @@ test('settings screens follow the mobile rules', async ({ page }) => {
       )
     for (const size of fontSizes) expect(size).toBeGreaterThanOrEqual(16)
 
-    // The split's − / + are the design's 40 px stepper (as in /welcome).
-    const buttons = await page
-      .locator(
-        'button:visible:not([aria-label^="Subir"]):not([aria-label^="Bajar"])'
-      )
-      .evaluateAll(elements =>
-        elements.map(element => ({
-          label:
-            element.textContent?.trim() || element.getAttribute('aria-label'),
-          height: element.getBoundingClientRect().height
-        }))
-      )
+    const buttons = await page.locator('button:visible').evaluateAll(elements =>
+      elements.map(element => ({
+        label:
+          element.textContent?.trim() || element.getAttribute('aria-label'),
+        height: element.getBoundingClientRect().height
+      }))
+    )
     for (const button of buttons)
       expect(button.height, `${path}: ${button.label}`).toBeGreaterThanOrEqual(
         44

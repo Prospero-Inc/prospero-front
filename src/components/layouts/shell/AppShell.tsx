@@ -16,7 +16,6 @@ const APP_SHELL_ROUTES = [
   '/goals',
   '/budget-calculator',
   '/settings',
-  '/profile',
   '/more',
   '/movements',
   '/review'

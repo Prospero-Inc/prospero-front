@@ -29,4 +29,15 @@ const logout = async (data: RefreshTokenData, params: Params | unknown) => {
   })
 }
 
-export { logout, refreshToken }
+/** Revokes every refresh token of the signed-in user ("Cerrar sesión en
+ * todos los dispositivos"). */
+const logoutAll = async (_ignore: unknown, params: Params | unknown) => {
+  const { lang, authorization } = params as Params
+  return await externalApiService.request({
+    method: HttpMethod.POST,
+    endPoint: '/auth/logout-all',
+    headers: { 'x-lang': `${lang}`, Authorization: authorization }
+  })
+}
+
+export { logout, logoutAll, refreshToken }

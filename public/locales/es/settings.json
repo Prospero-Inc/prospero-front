@@ -17,8 +17,14 @@
     "title": "Presupuesto",
     "frequencyTitle": "¿Cada cuánto te pagan?",
     "frequency": {
-      "Biweekly": { "title": "Quincenal", "hint": "Dos pagos al mes" },
-      "Monthly": { "title": "Mensual", "hint": "Un pago al mes" }
+      "Biweekly": {
+        "title": "Quincenal",
+        "hint": "Dos pagos al mes"
+      },
+      "Monthly": {
+        "title": "Mensual",
+        "hint": "Un pago al mes"
+      }
     },
     "splitTitle": "Reparto de cada pago",
     "split": {
@@ -105,7 +111,9 @@
       "addSender": "Agregar",
       "sendersHelp": "Buscamos en tu Gmail los avisos que llegan desde estas direcciones.",
       "delete": "Eliminar banco",
-      "confirmDelete": "¿Eliminar {{name}}?"
+      "confirmDelete": "¿Eliminar {{name}}?",
+      "reader": "Qué avisos sabemos leer",
+      "readerManual": "Ninguno (solo manual)"
     }
   },
   "notifications": {
@@ -174,6 +182,33 @@
     "passwordDescription": "Te mandamos a {{email}} un enlace para crear una nueva. Vence en 60 minutos.",
     "passwordConfirm": "Mandar enlace",
     "passwordSent": "Revisá tu correo",
-    "passwordSentDescription": "Te mandamos el enlace a {{email}}."
+    "passwordSentDescription": "Te mandamos el enlace a {{email}}.",
+    "sessions": "Sesiones",
+    "everywhere": "Cerrar sesión en todos los dispositivos",
+    "everywhereHelp": "Útil si perdiste un celular o iniciaste sesión en una computadora ajena.",
+    "everywhereTitle": "¿Cerrar sesión en todos los dispositivos?",
+    "everywhereDescription": "Vas a tener que volver a iniciar sesión en cada celular y computadora, también en este. Los demás se desconectan en menos de 15 minutos.",
+    "everywhereConfirm": "Cerrar sesión en todos"
+  },
+  "twoFactorSetup": {
+    "title": "Activar 2FA",
+    "back": "Atrás",
+    "step1": "Vinculá tu app de autenticación",
+    "step1Hint": "Usá Google Authenticator, Microsoft Authenticator o la que prefieras.",
+    "openApp": "Abrir app de autenticación",
+    "manual": "O ingresá la clave a mano",
+    "secretLabel": "Clave para ingresar a mano",
+    "copy": "Copiar",
+    "copied": "Copiada",
+    "keepKey": "Guardala en tu gestor de contraseñas: si cambiás de celular, con esta clave volvés a vincular la app.",
+    "computer": "¿Lo hacés desde la computadora?",
+    "qrAlt": "Código QR para vincular tu app de autenticación",
+    "continue": "Ya la agregué, continuar",
+    "step2": "Escribí el código que muestra la app",
+    "step2Hint": "Cambia cada 30 segundos. Con el primer código correcto, la verificación queda activada.",
+    "verifying": "Verificando…",
+    "invalidCode": "El código no es correcto. Usá el que muestra tu app ahora mismo.",
+    "genericError": "No pudimos verificar el código. Probá de nuevo.",
+    "enabled": "Verificación en dos pasos activada"
   }
 }

@@ -133,7 +133,19 @@ const routes = {
     body?.token === '123456'
       ? [201, { msg: '2FA disabled' }]
       : [401, { message: 'Invalid 2FA code' }],
-  'PATCH /api/auth/request-reset-password': () => [200, { msg: 'Sent' }]
+  'PATCH /api/auth/request-reset-password': () => [200, { msg: 'Sent' }],
+  'POST /api/auth/logout-all': () => [200, { revoked: 2 }],
+  'GET /api/auth/enable-2fa': () => [
+    200,
+    {
+      secret: 'JBSWY3DPEHPK3PXP',
+      qr: 'otpauth://totp/Prospero:ana%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Prospero'
+    }
+  ],
+  'POST /api/auth/validate-2fa': body => [
+    201,
+    { verified: body?.token === '123456' }
+  ]
 }
 
 const readBody = req =>
@@ -165,11 +177,15 @@ createServer(async (req, res) => {
   // Fixed expense "Pagar": POST /api/fixed-expenses/:id/pay
   const isPay =
     req.method === 'POST' && /^\/api\/fixed-expenses\/\d+\/pay$/.test(path)
-  const handler = isPatchById
-    ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
-    : isPay
-    ? () => [201, { id: requests.length }]
-    : routes[`${req.method} ${path}`]
+  // Bank sheet: PATCH /api/financial-institutions/:id
+  const isPatchInstitution =
+    req.method === 'PATCH' && /^\/api\/financial-institutions\/\d+$/.test(path)
+  const handler =
+    isPatchById || isPatchInstitution
+      ? patchBody => [200, { id: Number(path.split('/').pop()), ...patchBody }]
+      : isPay
+      ? () => [201, { id: requests.length }]
+      : routes[`${req.method} ${path}`]
   const [status, payload] = handler
     ? handler(body)
     : [404, { message: 'Not found (fake backend)' }]

@@ -304,15 +304,18 @@ export const AddBankSheet = ({
 }
 
 /**
- * One bank: pause or resume reading it, its sender addresses and delete.
+ * One bank: pause or resume reading it, which of our readers understands its
+ * emails, its sender addresses and delete.
  * Opened by tapping the bank's card.
  */
 export const BankSheet = ({
   institution,
+  parsers,
   onClose,
   onSaved
 }: {
   institution: FinancialInstitution | null
+  parsers: SupportedParser[]
   onClose: () => void
   onSaved: () => Promise<unknown>
 }) => {
@@ -397,6 +400,51 @@ export const BankSheet = ({
             }
           />
         </Box>
+
+        {parsers.length > 0 && (
+          <>
+            <Group>{t('gmail.banks.reader')}</Group>
+            <OptionCard>
+              {[
+                ...parsers.map(parser => ({
+                  key: parser.key as string | null,
+                  label: parser.label,
+                  icon: <BankBadge name={parser.label} size="32px" />
+                })),
+                {
+                  key: null,
+                  label: t('gmail.banks.readerManual'),
+                  icon: (
+                    <IconBox
+                      icon={<BankIcon boxSize="18px" />}
+                      bg="seg.bg"
+                      color="text.secondary"
+                    />
+                  )
+                }
+              ].map(option => (
+                <OptionRow
+                  key={option.key ?? OTHER}
+                  icon={option.icon}
+                  label={option.label}
+                  isSelected={institution.parserKey === option.key}
+                  isDisabled={busy !== null}
+                  onClick={() =>
+                    institution.parserKey !== option.key &&
+                    run('reader', () =>
+                      request(
+                        `/proxy/update-financial-institution?id=${id}`,
+                        HttpMethod.PATCH,
+                        // null goes back to "manual only" explicitly.
+                        { parserKey: option.key }
+                      )
+                    )
+                  }
+                />
+              ))}
+            </OptionCard>
+          </>
+        )}
 
         <Group>{t('gmail.banks.senders')}</Group>
         {institution.senders.length > 0 && (

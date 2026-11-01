@@ -4,6 +4,9 @@ import {
   Button,
   Flex,
   type FlexProps,
+  HStack,
+  PinInput,
+  PinInputField,
   Stack,
   Text
 } from '@chakra-ui/react'
@@ -342,7 +345,8 @@ export const ChoiceCard = ({
   </Flex>
 )
 
-/** `.stepper .b`: 40 px soft square with − / +. */
+/** `.stepper .b`: 40 px soft square with − / +, inside a 44 px touch
+ * target (place them 6 px apart to get the design's 10 px between squares). */
 export const StepperButton = ({
   label,
   isDisabled,
@@ -356,20 +360,30 @@ export const StepperButton = ({
 }) => (
   <Button
     aria-label={label}
-    boxSize="40px"
-    minW="40px"
+    variant="unstyled"
+    boxSize="44px"
+    minW="44px"
     p={0}
-    borderRadius="12px"
-    bg="button.soft"
+    display="grid"
+    placeItems="center"
     color="text.primary"
-    fontSize="20px"
-    fontWeight={600}
-    _hover={{ bg: 'button.soft' }}
     _active={{ opacity: 0.8 }}
     isDisabled={isDisabled}
     onClick={onClick}
   >
-    {children}
+    <Box
+      as="span"
+      boxSize="40px"
+      borderRadius="12px"
+      bg="button.soft"
+      display="grid"
+      placeItems="center"
+      fontSize="20px"
+      fontWeight={600}
+      aria-hidden
+    >
+      {children}
+    </Box>
   </Button>
 )
 
@@ -419,3 +433,115 @@ export const BankBadge = ({
     </Flex>
   )
 }
+
+const CODE_LENGTH = 6
+
+/** design .otp: six 46 × 56 boxes, 24 px digits, a wider gap after the
+ * third; numeric keyboard and the OS's one-time-code autofill. `onComplete`
+ * fires with the sixth digit. */
+export const CodeInput = ({
+  value,
+  onChange,
+  onComplete,
+  digitLabel,
+  isInvalid = false,
+  isDisabled = false,
+  autoFocus = true
+}: {
+  value: string
+  onChange: (_value: string) => void
+  onComplete?: (_value: string) => void
+  /** Accessible name of each box, e.g. position => `Dígito ${position}`. */
+  digitLabel: (_position: number) => string
+  isInvalid?: boolean
+  isDisabled?: boolean
+  autoFocus?: boolean
+}) => (
+  <HStack justify="center" spacing="8px">
+    <PinInput
+      otp
+      type="number"
+      placeholder=""
+      autoFocus={autoFocus}
+      value={value}
+      onChange={onChange}
+      onComplete={onComplete}
+      isInvalid={isInvalid}
+      isDisabled={isDisabled}
+    >
+      {Array.from({ length: CODE_LENGTH }, (_, index) => (
+        <PinInputField
+          key={index}
+          aria-label={digitLabel(index + 1)}
+          {...(index === 0 ? { autoComplete: 'one-time-code' } : {})}
+          ml={index === 3 ? '8px' : undefined}
+          w="46px"
+          h="56px"
+          borderRadius="14px"
+          border="1.5px solid"
+          borderColor="field.border"
+          bg="bg.surface"
+          fontSize="24px"
+          fontWeight="bold"
+          color="text.primary"
+          _focusVisible={{ borderColor: 'brand.solid', borderWidth: '2px' }}
+          _invalid={{ borderColor: 'money.expenseText' }}
+        />
+      ))}
+    </PinInput>
+  </HStack>
+)
+
+/** design .stepnum: numbered brand circle and the step's title. */
+export const StepTitle = ({
+  number,
+  children
+}: {
+  number: number
+  children: ReactNode
+}) => (
+  <Flex
+    as="h2"
+    align="center"
+    gap="10px"
+    fontSize="14px"
+    fontWeight="bold"
+    color="text.primary"
+  >
+    <Flex
+      as="span"
+      boxSize="26px"
+      flexShrink={0}
+      borderRadius="full"
+      bg="brand.solid"
+      color="white"
+      fontSize="13px"
+      align="center"
+      justify="center"
+    >
+      {number}
+    </Flex>
+    {children}
+  </Flex>
+)
+
+/** design .steps: one 5 px bar per step, filled up to the current one. */
+export const StepBars = ({
+  current,
+  total
+}: {
+  current: number
+  total: number
+}) => (
+  <Flex gap="6px" my="8px" aria-hidden>
+    {Array.from({ length: total }, (_, index) => (
+      <Box
+        key={index}
+        flex={1}
+        h="5px"
+        borderRadius="3px"
+        bg={index < current ? 'brand.solid' : 'steps.off'}
+      />
+    ))}
+  </Flex>
+)

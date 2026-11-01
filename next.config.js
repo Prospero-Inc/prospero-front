@@ -45,7 +45,16 @@ const nextConfig = {
         permanent: false
       },
       { source: '/settings', destination: '/more', permanent: false },
-      { source: '/profile', destination: '/settings/profile', permanent: false }
+      {
+        source: '/profile',
+        destination: '/settings/profile',
+        permanent: false
+      },
+      {
+        source: '/profile/:step(2fa|verify-2fa)',
+        destination: '/settings/security/2fa',
+        permanent: false
+      }
     ]
   }
 }

@@ -536,7 +536,7 @@ const PAGE_SKELETONS: Record<string, FC> = {
   '/settings/gmail': SettingsListSkeleton,
   '/settings/notifications': SettingsListSkeleton,
   '/settings/security': SettingsListSkeleton,
-  '/profile/2fa': TwoFactorSetupSkeleton,
+  '/settings/security/2fa': TwoFactorSetupSkeleton,
   '/goals': GoalsSkeleton,
   '/budget-calculator': BudgetCalculatorSkeleton
 }
@@ -545,10 +545,9 @@ const PAGE_SKELETONS: Record<string, FC> = {
  * Skeleton de la pantalla. Cualquier página con el layout de la app que no
  * esté en el mapa recibe uno genérico, así ninguna navegación queda sin
  * feedback. Sin skeleton: `/auth/*` y `/500`, que no usan ese layout (son
- * estáticas, sin datos que esperar), y `/profile/verify-2fa`, que solo
- * redirige a `/profile/2fa`.
+ * estáticas, sin datos que esperar).
  */
-const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/profile/verify-2fa', '/500']
+const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/500']
 
 export const getPageSkeleton = (pathname: string): FC | null => {
   if (PAGES_WITHOUT_APP_LAYOUT.some(prefix => pathname.startsWith(prefix)))

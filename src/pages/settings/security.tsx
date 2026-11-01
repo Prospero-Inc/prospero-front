@@ -1,13 +1,15 @@
 import {
   Chevron,
+  CodeInput,
   Group,
+  Help,
   IconBox,
   ListCard,
   ListRow,
   StatusCardHeader,
   StatusPill
 } from '@/components/design/settings'
-import { KeyIcon, ShieldIcon } from '@/components/icons/app'
+import { KeyIcon, ShieldIcon, SignOutIcon } from '@/components/icons/app'
 import { SettingsLayout } from '@/components/settings/SettingsLayout'
 import { settingsStaticProps } from '@/components/settings/settingsStaticProps'
 import { useSettingsRequest } from '@/components/settings/useSettingsRequest'
@@ -15,36 +17,15 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
 import type { Profile } from '@/interfaces'
+import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
-import {
-  Box,
-  Button,
-  HStack,
-  PinInput,
-  PinInputField,
-  Text,
-  useDisclosure,
-  useToast
-} from '@chakra-ui/react'
+import { Box, Button, Text, useDisclosure, useToast } from '@chakra-ui/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useState } from 'react'
 
 const CODE_LENGTH = 6
-
-/** design .otp div: 46 × 56 box, 24 px digit, brand border on focus. */
-const OTP_FIELD_STYLE = {
-  w: '46px',
-  h: '56px',
-  borderRadius: '14px',
-  border: '1.5px solid',
-  borderColor: 'field.border',
-  bg: 'bg.surface',
-  fontSize: '24px',
-  fontWeight: 'bold',
-  color: 'text.primary',
-  _focusVisible: { borderColor: 'brand.solid', borderWidth: '2px' }
-} as const
 
 /** Asks for the authenticator's code before turning 2FA off: a stolen
  * session alone can't lower the account's security. */
@@ -108,32 +89,18 @@ const DisableTwoFactorSheet = ({
       <Text fontSize="14px" color="text.secondary" lineHeight="1.5" mb="18px">
         {t('security.disableDescription')}
       </Text>
-      <HStack justify="center" spacing="8px">
-        <PinInput
-          otp
-          type="number"
-          placeholder=""
-          autoFocus
-          value={code}
-          onChange={value => {
-            setCode(value)
-            setHasError(false)
-          }}
-          // Sent on the sixth digit, like the design's 2FA screens.
-          onComplete={submit}
-          isInvalid={hasError}
-          isDisabled={isSaving}
-        >
-          {Array.from({ length: CODE_LENGTH }, (_, index) => (
-            <PinInputField
-              key={index}
-              {...OTP_FIELD_STYLE}
-              aria-label={t('security.codeDigit', { position: index + 1 })}
-              {...(index === 0 ? { autoComplete: 'one-time-code' } : {})}
-            />
-          ))}
-        </PinInput>
-      </HStack>
+      <CodeInput
+        value={code}
+        onChange={value => {
+          setCode(value)
+          setHasError(false)
+        }}
+        // Sent on the sixth digit, like the design's 2FA screens.
+        onComplete={submit}
+        digitLabel={position => t('security.codeDigit', { position })}
+        isInvalid={hasError}
+        isDisabled={isSaving}
+      />
       {hasError && (
         <Text
           role="alert"
@@ -151,8 +118,8 @@ const DisableTwoFactorSheet = ({
 
 /**
  * Seguridad (docs/diseno-mobile.html, 09): two-step verification with its
- * state and one button, and changing the password by email. "Cerrar sesión
- * en todos los dispositivos" waits for its backend endpoint.
+ * state and one button, changing the password by email, and signing out of
+ * every device.
  */
 export default function SecuritySettingsPage() {
   const { t } = useTranslation('settings')
@@ -161,6 +128,7 @@ export default function SecuritySettingsPage() {
   const request = useSettingsRequest()
   const revalidateApi = useRevalidateApi()
   const disableSheet = useDisclosure()
+  const { data: session } = useSession()
   const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const profile = data?.user
   const isOn = profile?.enable2FA ?? false
@@ -196,6 +164,33 @@ export default function SecuritySettingsPage() {
       toast({
         title: t('error'),
         description: sendError instanceof Error ? sendError.message : undefined,
+        status: 'error'
+      })
+    }
+  }
+
+  // Revokes every refresh token (other devices can't renew their session
+  // and drop out within 15 minutes), then signs this one out right away.
+  const onSignOutEverywhere = async () => {
+    if (
+      !(await confirm({
+        title: t('security.everywhereTitle'),
+        description: t('security.everywhereDescription'),
+        confirmLabel: t('security.everywhereConfirm'),
+        destructive: true
+      }))
+    )
+      return
+    try {
+      await request('/proxy/logout-all', HttpMethod.POST)
+      await signOutAndUnsubscribePush(session?.accessToken, {
+        callbackUrl: '/auth/login'
+      })
+    } catch (signOutError) {
+      toast({
+        title: t('error'),
+        description:
+          signOutError instanceof Error ? signOutError.message : undefined,
         status: 'error'
       })
     }
@@ -243,7 +238,7 @@ export default function SecuritySettingsPage() {
         ) : (
           <Button
             as={NextLink}
-            href="/profile/2fa"
+            href="/settings/security/2fa"
             variant="brand"
             size="ctaSm"
             w="full"
@@ -266,6 +261,23 @@ export default function SecuritySettingsPage() {
           </ListCard>
         </>
       )}
+
+      <Group>{t('security.sessions')}</Group>
+      <ListCard>
+        <ListRow
+          onClick={onSignOutEverywhere}
+          color="money.expenseText"
+          icon={
+            <IconBox
+              icon={<SignOutIcon boxSize="18px" />}
+              bg="tint.expense"
+              color="money.expense"
+            />
+          }
+          label={t('security.everywhere')}
+        />
+      </ListCard>
+      <Help>{t('security.everywhereHelp')}</Help>
 
       <DisableTwoFactorSheet
         isOpen={disableSheet.isOpen}

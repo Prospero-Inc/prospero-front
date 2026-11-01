@@ -17,8 +17,14 @@
     "title": "Budget",
     "frequencyTitle": "How often are you paid?",
     "frequency": {
-      "Biweekly": { "title": "Biweekly", "hint": "Two payments a month" },
-      "Monthly": { "title": "Monthly", "hint": "One payment a month" }
+      "Biweekly": {
+        "title": "Biweekly",
+        "hint": "Two payments a month"
+      },
+      "Monthly": {
+        "title": "Monthly",
+        "hint": "One payment a month"
+      }
     },
     "splitTitle": "How each payment is split",
     "split": {
@@ -105,7 +111,9 @@
       "addSender": "Add",
       "sendersHelp": "We look in your Gmail for the alerts coming from these addresses.",
       "delete": "Delete bank",
-      "confirmDelete": "Delete {{name}}?"
+      "confirmDelete": "Delete {{name}}?",
+      "reader": "Which alerts we can read",
+      "readerManual": "None (manual only)"
     }
   },
   "notifications": {
@@ -174,6 +182,33 @@
     "passwordDescription": "We'll send {{email}} a link to create a new one. It expires in 60 minutes.",
     "passwordConfirm": "Send link",
     "passwordSent": "Check your email",
-    "passwordSentDescription": "We sent the link to {{email}}."
+    "passwordSentDescription": "We sent the link to {{email}}.",
+    "sessions": "Sessions",
+    "everywhere": "Sign out of all devices",
+    "everywhereHelp": "Useful if you lost a phone or signed in on someone else's computer.",
+    "everywhereTitle": "Sign out of all devices?",
+    "everywhereDescription": "You'll have to sign in again on every phone and computer, this one included. The others drop out within 15 minutes.",
+    "everywhereConfirm": "Sign out everywhere"
+  },
+  "twoFactorSetup": {
+    "title": "Turn on 2FA",
+    "back": "Back",
+    "step1": "Link your authenticator app",
+    "step1Hint": "Use Google Authenticator, Microsoft Authenticator or whichever you prefer.",
+    "openApp": "Open authenticator app",
+    "manual": "Or enter the key by hand",
+    "secretLabel": "Key to enter by hand",
+    "copy": "Copy",
+    "copied": "Copied",
+    "keepKey": "Save it in your password manager: if you change phones, this key links the app again.",
+    "computer": "Doing it from a computer?",
+    "qrAlt": "QR code to link your authenticator app",
+    "continue": "I added it, continue",
+    "step2": "Type the code the app shows",
+    "step2Hint": "It changes every 30 seconds. With the first correct code, verification is turned on.",
+    "verifying": "Verifying…",
+    "invalidCode": "That code isn't right. Use the one your app shows right now.",
+    "genericError": "We couldn't verify the code. Try again.",
+    "enabled": "Two-step verification turned on"
   }
 }

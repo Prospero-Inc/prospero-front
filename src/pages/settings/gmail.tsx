@@ -428,6 +428,7 @@ export default function GmailSettingsPage() {
       />
       <BankSheet
         institution={openBank}
+        parsers={parsers}
         onClose={() => setOpenBankId(null)}
         onSaved={mutateInstitutions}
       />
