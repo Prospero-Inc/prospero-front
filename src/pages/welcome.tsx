@@ -1,3 +1,4 @@
+import { ChoiceCard, StepperButton } from '@/components/design/settings'
 import { parseAmount } from '@/components/quick-add/parseAmount'
 import {
   adjustSplit,
@@ -82,83 +83,6 @@ const PRIMARY_BUTTON_STYLE = {
   _active: { opacity: 0.85 },
   _disabled: { opacity: 0.45, cursor: 'not-allowed' }
 } as const
-
-/** `.choice`: title, hint and a radio dot; 2 px brand border when chosen. */
-const ChoiceCard = ({
-  title,
-  hint,
-  isSelected,
-  onClick
-}: {
-  title: string
-  hint: string
-  isSelected: boolean
-  onClick: () => void
-}) => (
-  <Flex
-    as="button"
-    type="button"
-    aria-pressed={isSelected}
-    onClick={onClick}
-    align="center"
-    gap="14px"
-    p={isSelected ? '15.5px' : '16px'}
-    borderRadius="18px"
-    borderWidth={isSelected ? '2px' : '1.5px'}
-    borderColor={isSelected ? 'brand.solid' : 'choice.border'}
-    bg={isSelected ? 'choice.onBg' : 'bg.surface'}
-    textAlign="left"
-    _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
-  >
-    <Box flex={1} minW={0}>
-      <Text fontSize="15.5px" fontWeight={650} color="text.primary">
-        {title}
-      </Text>
-      <Text fontSize="12.5px" color="text.secondary" mt="3px">
-        {hint}
-      </Text>
-    </Box>
-    <Box
-      boxSize="22px"
-      flexShrink={0}
-      borderRadius="full"
-      borderWidth={isSelected ? '7px' : '2px'}
-      borderColor={isSelected ? 'brand.solid' : 'radio.off'}
-      aria-hidden
-    />
-  </Flex>
-)
-
-/** `.stepper .b`: 40 px soft square with − / +. */
-const StepperButton = ({
-  label,
-  isDisabled,
-  onClick,
-  children
-}: {
-  label: string
-  isDisabled: boolean
-  onClick: () => void
-  children: string
-}) => (
-  <Button
-    aria-label={label}
-    boxSize="40px"
-    minW="40px"
-    p={0}
-    borderRadius="12px"
-    bg="button.soft"
-    color="text.primary"
-    fontSize="20px"
-    fontWeight={600}
-    _hover={{ bg: 'button.soft' }}
-    _active={{ opacity: 0.8 }}
-    isDisabled={isDisabled}
-    onClick={onClick}
-  >
-    {children}
-  </Button>
-)
 
 /**
  * First steps (docs/diseno-mobile.html, 04): how often you're paid, how to
@@ -370,7 +294,7 @@ export default function WelcomePage() {
                       />
                       {t(`welcome.split.${key}`)}
                     </Flex>
-                    <Flex align="center" gap="10px">
+                    <Flex align="center" gap="6px">
                       <StepperButton
                         label={t('welcome.split.decrease', {
                           name: t(`welcome.split.${key}`)

@@ -1,189 +1,214 @@
 {
-  "title": "Settings",
-  "account": {
-    "title": "Account",
+  "save": "Save",
+  "error": "We couldn't save your changes",
+  "profile": {
+    "title": "Profile",
+    "memberSince": "Member since {{date}}",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "username": "Username",
     "email": "Email",
-    "username": "Username"
+    "emailHelp": "This is the email you sign in with; it can't be changed from the app.",
+    "security": "Security and 2FA",
+    "saved": "Profile saved",
+    "error": "We couldn't save your profile"
   },
   "budget": {
     "title": "Budget",
-    "labelFrequency": "Pay frequency",
+    "frequencyTitle": "How often are you paid?",
     "frequency": {
-      "Biweekly": "Biweekly",
-      "Monthly": "Monthly"
-    },
-    "labelNeeds": "Needs (%)",
-    "labelWants": "Wants (%)",
-    "labelSavings": "Savings (%)",
-    "total": "Total: {{total}}% (must add up to 100%)",
-    "submit": "Save budget",
-    "toast": {
-      "success": {
-        "title": "Budget saved",
-        "description": "Your settings were saved successfully"
+      "Biweekly": {
+        "title": "Biweekly",
+        "hint": "Two payments a month"
       },
-      "error": {
-        "title": "Error",
-        "description": "We could not save your settings"
+      "Monthly": {
+        "title": "Monthly",
+        "hint": "One payment a month"
       }
-    }
-  },
-  "language": {
-    "title": "Language"
+    },
+    "splitTitle": "How each payment is split",
+    "split": {
+      "needs": "Needs",
+      "wants": "Wants",
+      "savings": "Savings"
+    },
+    "decrease": "Lower {{name}}",
+    "increase": "Raise {{name}}",
+    "total": "Total",
+    "missing_one": "{{total}} % · {{count}} % missing",
+    "missing_other": "{{total}} % · {{count}} % missing",
+    "over_one": "{{total}} % · {{count}} % over",
+    "over_other": "{{total}} % · {{count}} % over",
+    "help": "Applies to the current period and the next ones. Past periods don't change.",
+    "reset": "Back to 50 / 30 / 20",
+    "submit": "Save budget",
+    "saved": "Budget saved",
+    "error": "We couldn't save your budget"
   },
   "gmail": {
-    "title": "Gmail",
+    "title": "Gmail and banks",
+    "account": "Gmail",
     "status": {
       "connected": "Connected",
+      "reconnect": "Needs reconnecting",
       "disconnected": "Not connected"
     },
+    "lastSync": "Last sync: {{date}} · repeats every hour",
+    "neverSynced": "Not synced yet · repeats every hour",
+    "connectHint": "Connect it so we detect your spending and income from your banks' alerts. We only read those emails.",
+    "reconnectHint": "Google cut off access. Connect Gmail again to keep detecting movements.",
     "connect": "Connect Gmail",
-    "disconnect": "Disconnect Gmail",
-    "confirmDisconnect": "Disconnect your Gmail account? We'll stop automatically detecting income and expenses.",
+    "reconnect": "Reconnect",
     "syncNow": "Sync now",
-    "lastSync": {
-      "value": "Last sync: {{date}}",
-      "never": "Not synced yet (runs automatically every hour)"
-    },
-    "toggles": {
-      "autoDetect": "Automatically detect transactions",
-      "notifyIncome": "Notify me when income is detected"
-    },
+    "autoDetect": "Detect movements",
+    "autoDetectHint": "Reads your banks' alerts",
+    "notifyIncome": "Tell me about income",
+    "disconnect": "Disconnect Gmail",
+    "confirmDisconnect": "Disconnect Gmail?",
+    "confirmDisconnectDescription": "We'll stop detecting your spending and income. Your banks and movements stay as they are.",
     "toast": {
-      "connected": {
-        "title": "Gmail connected",
-        "description": "Your Gmail account was connected successfully"
+      "connected": "Gmail connected",
+      "notConnected": "Gmail wasn't connected",
+      "synced": "We checked your latest emails",
+      "syncRevoked": "Google cut off access: connect Gmail again to sync",
+      "syncThrottled": "You synced a moment ago; wait a minute",
+      "disconnected": "Gmail disconnected"
+    },
+    "errors": {
+      "cancelled": "You cancelled the Gmail connection.",
+      "invalid_state": "The connection expired or isn't valid. Try again.",
+      "exchange_failed": "We couldn't finish connecting to Google. Try again.",
+      "no_refresh_token": "Google didn't give us the permissions we need. Try again and accept all of them.",
+      "google_unavailable": "Google isn't available right now. Try later.",
+      "invalid_request": "The connection request isn't valid. Try again.",
+      "unknown_error": "Something went wrong connecting Gmail. Try again."
+    },
+    "banks": {
+      "title": "Banks we read",
+      "add": "Add",
+      "empty": "You haven't added any banks yet. Add the ones that email you about your purchases.",
+      "badge": {
+        "auto": "Automatic detection",
+        "manual": "Manual only",
+        "paused": "Paused"
       },
-      "disconnected": {
-        "title": "Gmail disconnected",
-        "description": "Your Gmail account was disconnected successfully"
-      },
-      "synced": {
-        "title": "Sync complete",
-        "description": "We checked your most recent emails"
-      },
-      "syncRevoked": "The Gmail connection was revoked, reconnect your account to sync again",
-      "syncThrottled": "You've synced several times in the last minute, wait a moment before trying again",
-      "error": {
-        "title": "Error",
-        "description": "We could not complete the action"
-      },
-      "errors": {
-        "cancelled": "You cancelled the connection with Gmail",
-        "invalid_state": "The connection expired or is invalid, please try again",
-        "exchange_failed": "We couldn't complete the connection with Google, please try again",
-        "no_refresh_token": "Google didn't grant the required permissions, please try again and accept all requested permissions",
-        "google_unavailable": "Google is unavailable right now, please try again later",
-        "invalid_request": "The connection request is invalid, please try again",
-        "unknown_error": "An unexpected error occurred while connecting Gmail, please try again"
-      }
+      "addTitle": "Add bank",
+      "addSubmit": "Add bank",
+      "supported": "With automatic detection",
+      "alreadyAdded": "Added",
+      "other": "Another bank",
+      "name": "Bank name",
+      "sender": "Email that sends the alerts",
+      "senderPlaceholder": "alerts@bank.com",
+      "manualNotice": "We can't read this bank's emails yet: you'll log its movements by hand.",
+      "added": "Bank added",
+      "duplicateSender": "That email is already in another of your banks",
+      "active": "Read this bank",
+      "activeHint": "If you pause it, we stop looking for its alerts in Gmail",
+      "activeHintManual": "We keep its emails for when we can read them",
+      "senders": "Emails that send the alerts",
+      "removeSender": "Remove {{email}}",
+      "addSender": "Add",
+      "sendersHelp": "We look in your Gmail for the alerts coming from these addresses.",
+      "delete": "Delete bank",
+      "confirmDelete": "Delete {{name}}?",
+      "reader": "Which alerts we can read",
+      "readerManual": "None (manual only)"
     }
   },
   "notifications": {
     "title": "Notifications",
-    "toggles": {
-      "gmailReview": "Email me",
-      "gmailReviewReplacedByPush": "Only if you don't have push on any device (or if push fails)."
-    },
-    "toast": {
-      "success": {
-        "title": "Preferences saved",
-        "description": "Your notification preferences were saved successfully"
-      },
-      "error": {
-        "title": "Error",
-        "description": "We could not save your notification preferences"
-      }
-    },
+    "device": "On this device",
     "push": {
-      "device": "Push notifications on this device",
-      "deviceHelp": {
-        "loading": "Checking whether this browser supports push notifications…",
-        "available": "We'll notify you even when Prospero is closed. Turn it on on each device where you want alerts.",
-        "unsupported": "This browser doesn't support push notifications.",
-        "iosRequiresInstall": "On iPhone and iPad, Safari only allows push notifications if you add Prospero to your Home Screen (iOS 16.4 or later): tap Share → \"Add to Home Screen\" and open the app from that icon.",
-        "noServiceWorker": "Push notifications aren't available in this version of the app (the service worker is missing). Reload the page and try again.",
+      "title": "Push notifications",
+      "state": {
+        "on": "On for this device",
+        "off": "Off for this device",
+        "loading": "Checking this device…",
+        "iosRequiresInstall": "Install the app to turn them on",
+        "unsupported": "This browser doesn't support them",
+        "noServiceWorker": "Not available in this version",
+        "serverDisabled": "Not available yet",
+        "denied": "Blocked in this browser",
+        "available": "Off for this device"
+      },
+      "help": "We notify you even when Prospero is closed. Turn it on in each phone or computer where you want alerts.",
+      "fix": {
+        "iosRequiresInstall": "On iPhone and iPad, Safari only allows notifications if you install Prospero: tap Share → \"Add to Home Screen\" and open the app from that icon.",
+        "unsupported": "Try another browser, or install the app on your phone.",
+        "noServiceWorker": "Reload the page and try again.",
         "serverDisabled": "Push notifications aren't enabled in Prospero yet.",
-        "denied": "You blocked notifications for this site. To turn them back on, open this site's settings in your browser (the icon next to the address bar), allow notifications and reload the page."
+        "denied": "To turn them on, open the site settings in your browser (the icon next to the address), allow notifications and reload the page."
       },
-      "toast": {
-        "enabled": {
-          "title": "Push enabled",
-          "description": "This device will receive push notifications"
-        },
-        "disabled": {
-          "title": "Push disabled",
-          "description": "This device will no longer receive push notifications"
-        }
-      },
+      "errorTitle": "We couldn't change push notifications",
       "errors": {
-        "unsupported": "This browser doesn't support push notifications",
-        "noServiceWorker": "The service worker isn't available, reload the page and try again",
-        "serverDisabled": "Push notifications aren't enabled on the server",
-        "permissionDenied": "You blocked notifications; re-enable them from this site's settings in your browser",
-        "permissionDismissed": "You didn't grant permission to show notifications",
-        "subscribeFailed": "We couldn't enable push notifications on this device",
-        "backendFailed": "We couldn't save the push subscription, please try again"
+        "unsupported": "This browser doesn't support push notifications.",
+        "noServiceWorker": "Reload the page and try again.",
+        "serverDisabled": "Push notifications aren't enabled on the server.",
+        "permissionDenied": "You blocked notifications; allow them in your browser's site settings.",
+        "permissionDismissed": "You didn't allow notifications.",
+        "subscribeFailed": "We couldn't turn them on for this device.",
+        "backendFailed": "We couldn't save the subscription. Try again."
       }
     },
-    "gmailSection": "Alerts when we detect new transactions in your Gmail."
+    "what": "What we tell you about",
+    "review": "Movements to review",
+    "reviewHint": "When Gmail detects new spending or income",
+    "income": "Detected income",
+    "incomeHint": "When a deposit arrives",
+    "needsGmail": "Connect Gmail to get this alert",
+    "email": "Email backup",
+    "emailToggle": "Email me",
+    "emailHint": "Only if you don't have push on any device, or if push fails"
   },
-  "financialInstitutions": {
-    "title": "Banks",
-    "form": {
-      "labelName": "Bank name",
-      "submit": "Add bank",
-      "labelBank": "Bank",
-      "bankPlaceholder": "Select your bank",
-      "bankOtherOption": "Other bank",
-      "labelNameOther": "Bank name",
-      "unsupportedBankNotice": "We don't support automatic detection for this bank yet, but you can keep adding senders for when we do."
-    },
-    "list": {
-      "empty": "You haven't configured any banks yet.",
-      "confirmDelete": "Delete this bank and all its configured senders?",
-      "actions": {
-        "delete": "Delete bank"
-      }
-    },
-    "senders": {
-      "labelEmail": "Sender email",
-      "add": "Add sender",
-      "empty": "This bank doesn't have any senders configured yet.",
-      "actions": {
-        "delete": "Delete sender"
-      }
-    },
-    "toast": {
-      "success": {
-        "title": "Bank added",
-        "description": "The bank was added successfully"
-      },
-      "deleted": {
-        "title": "Bank deleted",
-        "description": "The bank was deleted successfully"
-      },
-      "senderAdded": {
-        "title": "Sender added",
-        "description": "The sender was added successfully"
-      },
-      "senderDeleted": {
-        "title": "Sender deleted",
-        "description": "The sender was deleted successfully"
-      },
-      "duplicateSender": {
-        "title": "Duplicate sender",
-        "description": "That email is already configured on another one of your banks"
-      },
-      "error": {
-        "title": "Error",
-        "description": "We could not complete the action"
-      }
-    },
-    "badges": {
-      "autoDetect": "Automatic detection active",
-      "manualOnly": "No automatic detection"
-    }
+  "security": {
+    "title": "Security",
+    "on": "On",
+    "off": "Off",
+    "twoFactor": "Two-step verification",
+    "statusOn": "On",
+    "statusOff": "Off",
+    "twoFactorDescription": "When you sign in we ask for a 6-digit code from your authenticator app, besides your password.",
+    "enable": "Turn on",
+    "disable": "Turn off",
+    "disableTitle": "Turn off verification",
+    "disableDescription": "Your account will be protected by your password only. To confirm, type the 6-digit code from your authenticator app.",
+    "codeDigit": "Code digit {{position}}",
+    "wrongCode": "The code isn't right or has expired. Try the one your app shows now.",
+    "disabled": "Two-step verification turned off",
+    "accessGroup": "Password",
+    "changePassword": "Change password",
+    "resetLinkTitle": "Change your password?",
+    "resetLinkDescription": "We'll send {{email}} a link to create a new one. It expires in 60 minutes.",
+    "resetLinkConfirm": "Send link",
+    "resetLinkSent": "Check your email",
+    "resetLinkSentDescription": "We sent the link to {{email}}.",
+    "sessions": "Sessions",
+    "everywhere": "Sign out of all devices",
+    "everywhereHelp": "Useful if you lost a phone or signed in on someone else's computer.",
+    "everywhereTitle": "Sign out of all devices?",
+    "everywhereDescription": "You'll have to sign in again on every phone and computer, this one included. The others drop out within 15 minutes.",
+    "everywhereConfirm": "Sign out everywhere"
   },
-  "logout": "Log out"
+  "twoFactorSetup": {
+    "title": "Turn on 2FA",
+    "back": "Back",
+    "step1": "Link your authenticator app",
+    "step1Hint": "Use Google Authenticator, Microsoft Authenticator or whichever you prefer.",
+    "openApp": "Open authenticator app",
+    "manual": "Or enter the key by hand",
+    "secretLabel": "Key to enter by hand",
+    "copy": "Copy",
+    "copied": "Copied",
+    "keepKey": "Save it in your password manager: if you change phones, this key links the app again.",
+    "computer": "Doing it from a computer?",
+    "qrAlt": "QR code to link your authenticator app",
+    "continue": "I added it, continue",
+    "step2": "Type the code the app shows",
+    "step2Hint": "It changes every 30 seconds. With the first correct code, verification is turned on.",
+    "verifying": "Verifying…",
+    "invalidCode": "That code isn't right. Use the one your app shows right now.",
+    "genericError": "We couldn't verify the code. Try again.",
+    "enabled": "Two-step verification turned on"
+  }
 }

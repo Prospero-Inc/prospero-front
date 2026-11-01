@@ -77,6 +77,9 @@ export const BottomSheet = ({
           <DrawerHeader
             as="h2"
             p={0}
+            // Chakra gives the header flex: 0, which wraps long titles.
+            flex={1}
+            minW={0}
             fontSize="18px"
             fontWeight="bold"
             color="text.primary"

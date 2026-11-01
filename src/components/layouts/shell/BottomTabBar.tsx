@@ -40,7 +40,7 @@ const TABS: [Tab, Tab, Tab, Tab] = [
     key: 'more',
     href: '/more',
     icon: MoreIcon,
-    matches: ['/more', '/settings', '/profile', '/budget-calculator', '/goals']
+    matches: ['/more', '/settings', '/budget-calculator', '/goals']
   }
 ]
 

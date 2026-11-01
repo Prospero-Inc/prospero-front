@@ -1,6 +1,7 @@
 import { extendTheme } from '@chakra-ui/react'
 
 import { colors } from './colors'
+import { layerStyles, textStyles } from './designStyles'
 import { fonts } from './fonts'
 import { linkTheme } from './link'
 import { semanticTokens } from './semanticTokens'
@@ -10,6 +11,8 @@ import { buttonTheme, inputTheme, numberInputTheme, selectTheme } from './sizes'
 export const theme = extendTheme({
   colors,
   semanticTokens,
+  layerStyles,
+  textStyles,
   shadows,
   fonts,
   config: {
