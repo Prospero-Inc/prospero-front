@@ -57,6 +57,12 @@ export const semanticTokens = {
     'field.label': { default: '#3B3D52', _dark: '#C9CADB' },
     'icon.subtle': { default: '#A0A2B5', _dark: '#6E7085' },
     'toggle.off': { default: '#D3D4E0', _dark: '#3A3A52' },
+    // Outlined buttons (design .btn.line / .btn.danger) and the selected
+    // option of .seg-2 cards.
+    'brand.border': { default: '#C8C8FC', _dark: '#3A3A7A' },
+    'danger.border': { default: '#F3C4C5', _dark: '#5A2A2E' },
+    // Unsupported-bank notice in "Agregar banco" (design .alert #FFF6E5).
+    'notice.bg': { default: '#FFF6E5', _dark: '#3A2E14' },
 
     // Fills (bars, dots, icons) and their AA text variants.
     'money.income': { default: '#12B886', _dark: '#38D9A9' },

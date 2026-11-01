@@ -1,160 +1,183 @@
-import { ProsperoLayout } from '@/components/layouts'
-import { MotionUl } from '@/components/ui/MotionUl'
-import { BudgetCard } from '@/components/views/budgetCalculator'
-import { CookiesEnum, HttpMethod } from '@/enums'
-import { IBudgetResponse } from '@/interfaces/budgetCalculator'
-import { localApiService } from '@/lib'
-import { cookiesPlugin } from '@/plugins'
-// import * as budgeCalculator from '@/languages/es/budgeCalculator.json'
-import {
-  Box,
-  Button,
-  Container,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-  useToast
-} from '@chakra-ui/react'
+import { categoryIcon } from '@/components/design'
+import { AmountField } from '@/components/quick-add/fields'
+import { parseAmount } from '@/components/quick-add/parseAmount'
+import { SettingsLayout } from '@/components/settings/SettingsLayout'
+import { BottomSheet } from '@/components/ui/BottomSheet'
+import type { Profile } from '@/interfaces'
+import { formatMoney } from '@/lib/formatMoney'
+import { useApi } from '@/lib/useApi'
+import type { BudgetCategory } from '@/services/transactions'
+import { Box, Button, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
-import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
 
-const index = () => {
-  const { data } = useSession()
+const ROWS: {
+  category: BudgetCategory
+  key: 'needs' | 'wants' | 'savings'
+  percent: (_profile: Profile) => number
+}[] = [
+  { category: 'Necesidad', key: 'needs', percent: p => p.needsPercent },
+  { category: 'Deseo', key: 'wants', percent: p => p.wantsPercent },
+  { category: 'Ahorro', key: 'savings', percent: p => p.savingsPercent }
+]
+
+/** What a new account starts with, until the profile loads. */
+const DEFAULT_SPLIT = { needs: 0.5, wants: 0.3, savings: 0.2 }
+
+/**
+ * Calculadora (docs/diseno-mobile.html, 14): a big amount on top and what
+ * goes to each category below, recalculated as you type, with *your* split
+ * (not always 50/30/20). The long explanation sits behind "¿Cómo funciona?".
+ */
+export default function BudgetCalculatorPage() {
   const { t } = useTranslation('budgetCalculator')
-  const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast()
-  const [amounts, setAmounts] = useState({
-    fifty: 0,
-    thirty: 0,
-    twenty: 0
-  })
-  const {
-    handleSubmit,
-    formState: { errors },
-    control
-  } = useForm<{ salary: number }>({})
+  const { locale } = useRouter()
+  const howItWorks = useDisclosure()
+  const { data } = useApi<{ user: Profile }>('auth/profile')
+  const profile = data?.user
+  const [amountInput, setAmountInput] = useState('')
+  const amount = parseAmount(amountInput) ?? 0
 
-  const onSubmit = async ({ salary }: { salary: number }) => {
-    const lang = cookiesPlugin.getName(CookiesEnum.NEXT_LOCALE)
-    try {
-      setIsLoading(true)
-      const {
-        distribution: { necesidad, deseo, ahorro }
-      } = await localApiService.request<IBudgetResponse>({
-        endPoint: '/proxy/budget-calculator',
-        method: HttpMethod.GET,
-        headers: {
-          'x-lang': `${lang}`,
-          Authorization: `Bearer ${data?.accessToken}`
-        },
-        query: { amount: +salary }
-      })
-      setAmounts({
-        fifty: necesidad,
-        thirty: deseo,
-        twenty: ahorro
-      })
-    } catch (error) {
-      if (error instanceof Error)
-        toast({
-          title: 'Error',
-          description: error?.message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true
-        })
-    } finally {
-      setIsLoading(false)
+  const shares = ROWS.map(row => {
+    const share = profile ? row.percent(profile) : DEFAULT_SPLIT[row.key]
+    return {
+      ...row,
+      percent: Math.round(share * 100),
+      value: Math.round(amount * share * 100) / 100
     }
-  }
-  return (
-    <ProsperoLayout
-      title="Budge Calculator"
-      pageDescription="Budge calculator is a calculator of distributions your salary"
-    >
-      <Container>
-        <MotionUl>
-          <Stack>
-            <Box
-              border={'1px'}
-              borderColor={'primary.500'}
-              borderRadius="md"
-              p={4}
-              textAlign={'center'}
-              mb="1.75rem"
-            >
-              <FormControl textAlign={'center'}>
-                <FormLabel>{t('labelSalary')}</FormLabel>
-                <Controller
-                  control={control}
-                  name="salary"
-                  rules={{
-                    required: t('requiredField')
-                  }}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="number"
-                      placeholder="525"
-                      size={'lg'}
-                      fontWeight={'bold'}
-                    />
-                  )}
-                />
-                {errors.salary && (
-                  <Text color="red.500">{errors.salary.message}</Text>
-                )}
-              </FormControl>
-            </Box>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              colorScheme="primary"
-              size={'xl'}
-              w="full"
-              isLoading={isLoading}
-            >
-              {t('buttonCalculate')}
-            </Button>
-          </Stack>
-          <Stack my={'2rem'}>
-            <BudgetCard
-              heading={t('fiftyCard.heading')}
-              body={t('fiftyCard.body')}
-              amount={amounts.fifty}
-            />
-            <BudgetCard
-              heading={t('thirtyCard.heading')}
-              body={t('thirtyCard.body')}
-              amount={amounts.thirty}
-            />
+  })
+  const splitLabel = shares.map(share => share.percent).join(' / ')
 
-            <BudgetCard
-              heading={t('twentyCard.heading')}
-              body={t('twentyCard.body')}
-              amount={amounts.twenty}
-            />
-          </Stack>
-        </MotionUl>
-      </Container>
-    </ProsperoLayout>
+  return (
+    <SettingsLayout title={t('title')}>
+      <Box bg="bg.surface" borderRadius="20px" px="16px" pt="14px" pb="10px">
+        <Text
+          textAlign="center"
+          fontSize="13px"
+          fontWeight={600}
+          color="text.secondary"
+        >
+          {t('ifIGet')}
+        </Text>
+        <AmountField
+          label={t('amount')}
+          value={amountInput}
+          onChange={setAmountInput}
+          error={
+            amountInput.trim() !== '' && parseAmount(amountInput) === null
+              ? t('invalidAmount')
+              : null
+          }
+        />
+        <Text textAlign="center" fontSize="12.5px" color="text.secondary">
+          {t('withYourSplit', { split: splitLabel })}
+        </Text>
+      </Box>
+
+      <Stack
+        spacing={0}
+        bg="bg.surface"
+        borderRadius="20px"
+        px="14px"
+        divider={<Box borderTopWidth="1px" borderColor="border.subtle" />}
+        aria-live="polite"
+      >
+        {shares.map(share => {
+          const CategoryIcon = categoryIcon(share.category)
+          return (
+            <Flex
+              key={share.key}
+              align="center"
+              gap="12px"
+              minH="68px"
+              py="10px"
+            >
+              <Flex
+                boxSize="44px"
+                flex="none"
+                borderRadius="13px"
+                bg={`tint.${share.category}`}
+                color="text.primary"
+                direction="column"
+                align="center"
+                justify="center"
+                fontSize="11px"
+                fontWeight={800}
+              >
+                {/* The category's color on the icon only: as text, the
+                    yellow of "Deseos" fails AA on its tint. */}
+                <CategoryIcon
+                  boxSize="16px"
+                  color={`category.${share.category}`}
+                  aria-hidden
+                />
+                {share.percent}%
+              </Flex>
+              <Box flex={1} minW={0}>
+                <Text fontSize="14.5px" fontWeight={650} color="text.primary">
+                  {t(`rows.${share.key}.title`)}
+                </Text>
+                <Text fontSize="12px" color="text.secondary" mt="2px">
+                  {t(`rows.${share.key}.hint`)}
+                </Text>
+              </Box>
+              <Text
+                fontSize="16px"
+                fontWeight="bold"
+                color="text.primary"
+                sx={{ fontVariantNumeric: 'tabular-nums' }}
+                whiteSpace="nowrap"
+              >
+                {formatMoney(share.value, locale)}
+              </Text>
+            </Flex>
+          )
+        })}
+      </Stack>
+
+      <Button
+        variant="ghost"
+        h="44px"
+        color="brand.text"
+        fontSize="13.5px"
+        fontWeight={600}
+        onClick={howItWorks.onOpen}
+      >
+        {t('howItWorks.link', { split: splitLabel })}
+      </Button>
+
+      <BottomSheet
+        isOpen={howItWorks.isOpen}
+        onClose={howItWorks.onClose}
+        title={t('howItWorks.title')}
+      >
+        <Stack spacing="12px" pb="12px" fontSize="14px" lineHeight="1.5">
+          <Text color="text.secondary">{t('howItWorks.intro')}</Text>
+          {shares.map(share => (
+            <Box key={share.key}>
+              <Text fontWeight={650} color="text.primary">
+                {t(`rows.${share.key}.title`)} · {share.percent}%
+              </Text>
+              <Text color="text.primary">{t(`howItWorks.${share.key}`)}</Text>
+            </Box>
+          ))}
+          <Text color="text.secondary">{t('howItWorks.yours')}</Text>
+        </Stack>
+      </BottomSheet>
+    </SettingsLayout>
   )
 }
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale as string, [
-        'common',
-        'sidebar',
-        'mobileNav',
-        'budgetCalculator'
-      ]))
-    }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale as string, [
+      'common',
+      'sidebar',
+      'mobileNav',
+      'budgetCalculator'
+    ]))
   }
-}
-export default index
+})

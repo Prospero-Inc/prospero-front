@@ -1,4 +1,4 @@
-import { CloseIcon } from '@/components/icons/app'
+import { ChevronRightIcon, CloseIcon } from '@/components/icons/app'
 import { useAppShellTitle } from '@/components/layouts/shell/AppShellTitle'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
@@ -40,18 +40,25 @@ export const MobileNav = (props: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
-  const { title, greeting, trailing = 'avatar' } = useAppShellTitle()
-  const closeHref = typeof trailing === 'object' ? trailing.closeHref : null
+  const { title, greeting, trailing = 'avatar', back } = useAppShellTitle()
+  const closeHref =
+    typeof trailing === 'object' && 'closeHref' in trailing
+      ? trailing.closeHref
+      : null
+  const action =
+    typeof trailing === 'object' && 'action' in trailing
+      ? trailing.action
+      : null
   if (status === 'loading') return null
 
   const handleChangeColorMode = () => {
     toggleColorMode()
   }
   const handleClick = () => {
-    router.push('/profile')
+    router.push('/settings/profile')
   }
   const handleSettingsClick = () => {
-    router.push('/settings')
+    router.push('/more')
   }
   const themeToggleLabel =
     colorMode === 'light' ? t('toggleToDarkMode') : t('toggleToLightMode')
@@ -71,7 +78,42 @@ export const MobileNav = (props: MobileProps) => {
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
       {...props}
     >
-      <Box display={{ base: 'block', md: 'none' }} minW={0}>
+      {back && (
+        <>
+          {/* design .navbar: "‹ Más" on the left, title centered. */}
+          <Flex
+            as={NextLink}
+            href={back.href}
+            align="center"
+            gap="2px"
+            h="44px"
+            ml="-6px"
+            mr="auto"
+            color="brand.text"
+            fontSize="15px"
+            fontWeight={600}
+            _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
+          >
+            <ChevronRightIcon boxSize="22px" transform="rotate(180deg)" />
+            {back.label}
+          </Flex>
+          <Text
+            as="h1"
+            display={{ base: 'block', md: 'none' }}
+            position="absolute"
+            left="50%"
+            transform="translateX(-50%)"
+            maxW="50%"
+            fontSize="16px"
+            fontWeight="bold"
+            color="text.primary"
+            noOfLines={1}
+          >
+            {title}
+          </Text>
+        </>
+      )}
+      <Box display={{ base: back ? 'none' : 'block', md: 'none' }} minW={0}>
         {greeting && (
           <Text fontSize="13px" fontWeight="medium" color="text.secondary">
             {greeting}
@@ -100,6 +142,22 @@ export const MobileNav = (props: MobileProps) => {
         <Box display={{ base: 'none', md: 'block' }}>
           <SwitchLanguage />
         </Box>
+        {action && (
+          <Button
+            type="submit"
+            form={action.form}
+            variant="ghost"
+            px="8px"
+            mr="-8px"
+            color="brand.text"
+            fontSize="15px"
+            fontWeight={600}
+            isDisabled={action.isDisabled}
+            isLoading={action.isLoading}
+          >
+            {action.label}
+          </Button>
+        )}
         {closeHref && (
           <IconButton
             as={NextLink}

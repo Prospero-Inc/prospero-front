@@ -414,85 +414,64 @@ const MoreSkeleton: FC = () => (
   </ScreenStack>
 )
 
-const Field = () => (
-  <Stack spacing={2}>
-    <Skeleton h="14px" w="90px" />
-    <Skeleton h="40px" borderRadius="md" />
-  </Stack>
+/** Perfil: avatar, the editable rows and the locked email. */
+const ProfileSettingsSkeleton: FC = () => (
+  <ScreenStack>
+    <Flex direction="column" align="center" gap="10px" pt="6px" pb="4px">
+      <SkeletonCircle
+        size="72px"
+        startColor="track.bg"
+        endColor="border.subtle"
+      />
+      <Bone h="11px" w="150px" />
+    </Flex>
+    <ListRowsBone widths={['40%', '50%', '35%']} />
+    <ListRowsBone widths={['60%']} />
+  </ScreenStack>
 )
 
-/** Bloque "título + descripción + contenido" de las secciones de
- * Configuración. */
-const SettingsSection = ({ children }: { children: ReactNode }) => (
-  <Box>
-    <SectionTitle w="180px" />
-    <Skeleton h="14px" w="70%" mb={4} />
-    {children}
-  </Box>
+/** Presupuesto: the two frequency cards and the split card. */
+const BudgetSettingsSkeleton: FC = () => (
+  <ScreenStack>
+    <GroupLabel w="160px" />
+    <Flex gap="10px">
+      {['90px', '80px'].map(w => (
+        <Box key={w} flex={1}>
+          <Card radius="16px" p="14px">
+            <Bone h="14px" w={w} />
+            <Bone h="11px" w="70%" mt="8px" />
+          </Card>
+        </Box>
+      ))}
+    </Flex>
+    <GroupLabel w="140px" />
+    <Card radius="18px">
+      <Stack spacing="18px">
+        <Bone h="22px" radius="11px" />
+        {['45%', '35%', '30%'].map(w => (
+          <Flex key={w} align="center" justify="space-between">
+            <Bone h="14px" w={w} />
+            <Bone h="40px" w="140px" radius="12px" />
+          </Flex>
+        ))}
+      </Stack>
+    </Card>
+  </ScreenStack>
 )
 
-/** Configuración: perfil, idioma, Gmail, notificaciones y bancos. */
-const SettingsSkeleton: FC = () => (
-  <SkeletonPage>
-    <Stack spacing={8} maxW="lg">
-      <SettingsSection>
-        <Stack spacing={4}>
-          <Field />
-          <Field />
-          <Field />
-          <Skeleton h="40px" w="140px" borderRadius="md" />
-        </Stack>
-      </SettingsSection>
-      <SettingsSection>
-        <Skeleton h="32px" w="120px" borderRadius="md" />
-      </SettingsSection>
-      <SettingsSection>
-        <Skeleton h="72px" borderRadius="md" />
-      </SettingsSection>
-      <SettingsSection>
-        <Stack spacing={3}>
-          <Skeleton h="24px" w="60%" />
-          <Skeleton h="24px" w="50%" />
-        </Stack>
-      </SettingsSection>
-      <SettingsSection>
-        <Skeleton h="96px" borderRadius="md" />
-      </SettingsSection>
-    </Stack>
-  </SkeletonPage>
-)
-
-/** Sección "Información personal" del perfil. Exportada: la vista la
- * muestra en vez de `null` hasta montar. */
-export const ProfileInfoSkeleton: FC = () => (
-  <SkeletonPage>
-    <Box>
-      <SectionTitle w="220px" />
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-        <Field />
-        <Field />
-        <Field />
-      </SimpleGrid>
-      <Skeleton h="40px" w="120px" mt={4} borderRadius="md" />
-    </Box>
-  </SkeletonPage>
-)
-
-/** Sección "Seguridad" del perfil, mismo uso que `ProfileInfoSkeleton`. */
-export const ProfileSecuritySkeleton: FC = () => (
-  <SkeletonPage>
-    <Box>
-      <SectionTitle w="160px" />
-      <Skeleton h="72px" borderRadius="md" />
-    </Box>
-  </SkeletonPage>
-)
-
-const ProfileSkeleton: FC = () => (
-  <Stack spacing={10}>
-    <ProfileInfoSkeleton />
-    <ProfileSecuritySkeleton />
-  </Stack>
+/** Gmail y bancos, Notificaciones, Seguridad: a status card and lists. */
+const SettingsListSkeleton: FC = () => (
+  <ScreenStack>
+    <Card radius="18px">
+      <Flex align="center" gap="12px" mb="16px">
+        <Bone h="44px" w="44px" radius="13px" flexShrink={0} />
+        <TwoLines w="50%" />
+      </Flex>
+      <Bone h="44px" radius="13px" />
+    </Card>
+    <GroupLabel w="120px" />
+    <ListRowsBone widths={['55%', '45%']} />
+  </ScreenStack>
 )
 
 /** Activar 2FA: título, instrucción, QR, código y acciones. */
@@ -552,9 +531,12 @@ const PAGE_SKELETONS: Record<string, FC> = {
   '/expenditures': MovementsSkeleton,
   '/entries': MovementsSkeleton,
   '/fixed-expenses': FixedExpensesSkeleton,
-  '/settings': SettingsSkeleton,
-  '/profile': ProfileSkeleton,
-  '/profile/2fa': TwoFactorSetupSkeleton,
+  '/settings/profile': ProfileSettingsSkeleton,
+  '/settings/budget': BudgetSettingsSkeleton,
+  '/settings/gmail': SettingsListSkeleton,
+  '/settings/notifications': SettingsListSkeleton,
+  '/settings/security': SettingsListSkeleton,
+  '/settings/security/2fa': TwoFactorSetupSkeleton,
   '/goals': GoalsSkeleton,
   '/budget-calculator': BudgetCalculatorSkeleton
 }
@@ -563,10 +545,9 @@ const PAGE_SKELETONS: Record<string, FC> = {
  * Skeleton de la pantalla. Cualquier página con el layout de la app que no
  * esté en el mapa recibe uno genérico, así ninguna navegación queda sin
  * feedback. Sin skeleton: `/auth/*` y `/500`, que no usan ese layout (son
- * estáticas, sin datos que esperar), y `/profile/verify-2fa`, que solo
- * redirige a `/profile/2fa`.
+ * estáticas, sin datos que esperar).
  */
-const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/profile/verify-2fa', '/500']
+const PAGES_WITHOUT_APP_LAYOUT = ['/auth/', '/500']
 
 export const getPageSkeleton = (pathname: string): FC | null => {
   if (PAGES_WITHOUT_APP_LAYOUT.some(prefix => pathname.startsWith(prefix)))

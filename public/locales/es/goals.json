@@ -1,7 +1,8 @@
 {
   "title": "Metas",
   "comingSoon": {
-    "heading": "Muy pronto",
-    "description": "Las metas de ahorro detalladas todavía no están disponibles. Estamos trabajando en esta función."
+    "heading": "Metas de ahorro, muy pronto",
+    "description": "Vas a poder ponerle nombre, monto y fecha a lo que querés lograr, y Prospero va a separar una parte de tu ahorro de cada pago.",
+    "back": "Volver al inicio"
   }
 }

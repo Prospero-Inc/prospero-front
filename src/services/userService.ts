@@ -1,6 +1,7 @@
 import { HttpMethod } from '@/enums'
 import { RegisterViewProps } from '@/interfaces'
 import { externalApiService } from '@/lib/apiService'
+import { Params } from '@/types'
 import { User } from 'next-auth'
 
 const registerUser = async (user: RegisterViewProps): Promise<User> => {
@@ -27,6 +28,21 @@ const forgotPassword = async (
     data: { email }
   })
 }
+/** Sets the new password with the emailed reset link's token (single use,
+ * 60 min). */
+const resetPassword = async (
+  data: { password: string; confirmPassword: string },
+  params: Params | unknown
+): Promise<unknown> => {
+  const { lang, token } = params as Params & { token: string }
+  return await externalApiService.request({
+    method: HttpMethod.POST,
+    endPoint: `/auth/reset-password/${encodeURIComponent(token)}`,
+    data,
+    headers: { 'x-lang': `${lang}` }
+  })
+}
+
 const activateAccount = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _: unknown,
@@ -53,4 +69,10 @@ const resendVerification = async (
   })
 }
 
-export { registerUser, forgotPassword, activateAccount, resendVerification }
+export {
+  registerUser,
+  forgotPassword,
+  resetPassword,
+  activateAccount,
+  resendVerification
+}

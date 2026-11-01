@@ -12,6 +12,9 @@ import {
 } from '@/components/design'
 import { FilterIcon, MailIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
+import { SwipeRow } from '@/components/movements/SwipeRow'
+import { type EditableMovement, useEditMovement } from '@/components/quick-add'
+import { LoadError } from '@/components/states/LoadError'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { usePeriodLabel } from '@/components/ui/MovementFiltersBar'
@@ -57,8 +60,8 @@ interface Row {
   amount: number
   category: BudgetCategory | null
   source: string
-  /** Where the movement is edited. */
-  href: string
+  /** Opens it in the edit sheet. */
+  movement: EditableMovement
 }
 
 const pick = <T extends string>(value: unknown, allowed: T[], fallback: T): T =>
@@ -73,6 +76,7 @@ export default function MovementsPage() {
   const { t } = useTranslation('common')
   const router = useRouter()
   const locale = router.locale ?? 'es'
+  const editMovement = useEditMovement()
   const periodLabel = usePeriodLabel()
   const [sheet, setSheet] = useState<'period' | 'filters' | null>(null)
   const [isSearching, setIsSearching] = useState(false)
@@ -149,7 +153,14 @@ export default function MovementsPage() {
           amount: item.amount,
           category: item.category,
           source: item.source,
-          href: `/expenditures?edit=${item.id}`
+          movement: {
+            kind: 'expense',
+            title:
+              item.description ||
+              item.fixedExpenseName ||
+              t('review.untitledExpense'),
+            item
+          }
         })
       ),
     ...(filter === 'expense' ? [] : incomes.data ?? [])
@@ -169,7 +180,11 @@ export default function MovementsPage() {
           amount: item.amount,
           category: null,
           source: item.source,
-          href: `/entries?edit=${item.id}`
+          movement: {
+            kind: 'income',
+            title: item.description || t('review.untitledIncome'),
+            item
+          }
         })
       )
   ]
@@ -312,7 +327,18 @@ export default function MovementsPage() {
           </Flex>
         )}
 
-        {rows.length === 0 ? (
+        {(expenses.error && !expenses.data) ||
+        (incomes.error && !incomes.data) ? (
+          // A failed load is not "no movements" (design 15).
+          <LoadError
+            what={t('states.what.movements')}
+            onRetry={() => {
+              expenses.mutate()
+              incomes.mutate()
+            }}
+            isRetrying={expenses.isValidating || incomes.isValidating}
+          />
+        ) : rows.length === 0 ? (
           <EmptyState
             icon={MdSwapVert}
             title={t('movements.empty.title')}
@@ -324,34 +350,36 @@ export default function MovementsPage() {
               <DayHeader>
                 {formatDayTitle(group.day, locale, dayLabels)}
               </DayHeader>
-              <ListCard>
-                {group.rows.map(row => (
-                  <Box
-                    key={`${row.kind}-${row.id}`}
-                    as={NextLink}
-                    href={row.href}
-                    display="block"
-                    aria-label={row.title}
-                  >
-                    <MovementRow
-                      icon={
-                        <CategoryIconBox
-                          category={row.category}
-                          isIncome={row.kind === 'income'}
-                        />
-                      }
-                      title={row.title}
-                      subtitle={row.subtitle}
-                      isIncome={row.kind === 'income'}
-                      amount={
-                        row.kind === 'income'
-                          ? `+${formatMoney(row.amount, locale)}`
-                          : formatMoney(-row.amount, locale).replace('-', '−')
-                      }
-                    />
-                  </Box>
-                ))}
-              </ListCard>
+              {/* Rounded clip so the swipe layer keeps the card's corners. */}
+              <Box borderRadius="20px" overflow="hidden">
+                <ListCard>
+                  {group.rows.map(row => (
+                    <SwipeRow
+                      key={`${row.kind}-${row.id}`}
+                      label={t('movements.editRow', { name: row.title })}
+                      action={t('movements.edit')}
+                      onOpen={() => editMovement(row.movement)}
+                    >
+                      <MovementRow
+                        icon={
+                          <CategoryIconBox
+                            category={row.category}
+                            isIncome={row.kind === 'income'}
+                          />
+                        }
+                        title={row.title}
+                        subtitle={row.subtitle}
+                        isIncome={row.kind === 'income'}
+                        amount={
+                          row.kind === 'income'
+                            ? `+${formatMoney(row.amount, locale)}`
+                            : formatMoney(-row.amount, locale).replace('-', '−')
+                        }
+                      />
+                    </SwipeRow>
+                  ))}
+                </ListCard>
+              </Box>
             </Stack>
           ))
         )}

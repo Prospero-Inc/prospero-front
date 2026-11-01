@@ -9,6 +9,8 @@ import {
   defineStyleConfig
 } from '@chakra-ui/react'
 
+import { designButtonSizes, designButtonVariants } from './designStyles'
+
 // Phones (below `md`): every button at least 44 px tall — the minimum
 // comfortable touch target — and every field at 16 px text, below which iOS
 // zooms the page on focus. From `md` up, Chakra's usual sizes apply.
@@ -33,8 +35,10 @@ export const buttonTheme = defineStyleConfig({
     xs: touchButton(6),
     sm: touchButton(8),
     md: touchButton(10),
-    xl
-  }
+    xl,
+    ...designButtonSizes
+  },
+  variants: designButtonVariants
 })
 
 const touchField = (desktopFontSize: string, desktopHeight: number) =>
@@ -51,7 +55,30 @@ const inputXl = defineStyle({
   h: '16'
 })
 
+// docs/diseno-mobile.html .lfield .box: 54 px, radius 14, 1.5 px border
+// that turns into a 2 px brand one on focus.
+const designField = inputHelpers.definePartsStyle({
+  field: {
+    h: '54px',
+    borderRadius: '14px',
+    border: '1.5px solid',
+    borderColor: 'field.border',
+    bg: 'bg.surface',
+    fontSize: '16px',
+    px: '14px',
+    color: 'text.primary',
+    _placeholder: { color: 'icon.subtle' },
+    _focusVisible: {
+      borderColor: 'brand.solid',
+      borderWidth: '2px',
+      px: '13.5px'
+    },
+    _invalid: { borderColor: 'money.expenseText' }
+  }
+})
+
 export const inputTheme = inputHelpers.defineMultiStyleConfig({
+  variants: { design: designField },
   sizes: {
     xs: inputHelpers.definePartsStyle({ field: touchField('xs', 6) }),
     sm: inputHelpers.definePartsStyle({ field: touchField('sm', 8) }),

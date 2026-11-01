@@ -118,4 +118,22 @@ const getSalaryDetails = async (
   })
 }
 
-export { createSalary, updateSalary, getSalaryList, getSalaryDetails }
+const deleteSalary = async (_ignore: unknown, params: Params | unknown) => {
+  const { lang, authorization, id } = params as Params & { id: string }
+  return await externalApiService.request({
+    method: HttpMethod.DELETE,
+    endPoint: `/salary/${id}`,
+    headers: {
+      'x-lang': `${lang}`,
+      Authorization: authorization
+    }
+  })
+}
+
+export {
+  createSalary,
+  updateSalary,
+  deleteSalary,
+  getSalaryList,
+  getSalaryDetails
+}

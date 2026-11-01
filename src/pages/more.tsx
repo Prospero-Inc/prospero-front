@@ -1,4 +1,11 @@
 import {
+  Group,
+  IconBox,
+  ListCard as List,
+  ListRow as Row,
+  Toggle
+} from '@/components/design/settings'
+import {
   BellIcon,
   CalculatorIcon,
   CheckIcon,
@@ -6,6 +13,7 @@ import {
   GlobeIcon,
   MailIcon,
   MoonIcon,
+  PieIcon,
   ShieldIcon,
   SignOutIcon
 } from '@/components/icons/app'
@@ -34,143 +42,10 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import type { ReactElement, ReactNode } from 'react'
 
 const LANGUAGES = ['es', 'en'] as const
 
 const percent = (value: number) => Math.round(value * 100)
-
-/** docs/diseno-mobile.html `.li .ic`: 32 px soft square holding an 18 px icon. */
-const IconBox = ({
-  icon,
-  bg = 'button.soft',
-  color = 'text.primary'
-}: {
-  icon: ReactElement
-  bg?: string
-  color?: string
-}) => (
-  <Flex
-    boxSize="32px"
-    flexShrink={0}
-    borderRadius="10px"
-    bg={bg}
-    color={color}
-    align="center"
-    justify="center"
-  >
-    {icon}
-  </Flex>
-)
-
-/** One `.li` row: 56 px, icon box, 15 px label, muted value on the right.
- * A link when `href` is given, a button when `onClick` is. */
-const Row = ({
-  icon,
-  label,
-  value,
-  href,
-  onClick,
-  color = 'text.primary',
-  ...rest
-}: {
-  icon: ReactElement
-  label: string
-  value?: ReactNode
-  href?: string
-  onClick?: () => void
-  color?: string
-  role?: 'switch'
-  'aria-checked'?: boolean
-  'aria-current'?: 'true'
-}) => (
-  <Flex
-    as={href ? NextLink : 'button'}
-    {...(href ? { href } : { type: 'button', onClick })}
-    {...rest}
-    w="full"
-    align="center"
-    gap="12px"
-    h="56px"
-    fontSize="15px"
-    fontWeight={550}
-    color={color}
-    textAlign="left"
-    _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
-  >
-    {icon}
-    <Box as="span" flex={1} minW={0} noOfLines={1}>
-      {label}
-    </Box>
-    {value !== undefined && (
-      <Flex
-        as="span"
-        align="center"
-        gap="6px"
-        fontSize="13.5px"
-        fontWeight="normal"
-        color="text.secondary"
-        flexShrink={0}
-      >
-        {value}
-      </Flex>
-    )}
-  </Flex>
-)
-
-/** `.list`: white card, radius 18, hairlines between rows. */
-const List = ({ children }: { children: ReactNode }) => (
-  <Stack
-    spacing={0}
-    bg="bg.surface"
-    borderRadius="18px"
-    px="14px"
-    divider={<Box borderTopWidth="1px" borderColor="border.subtle" />}
-  >
-    {children}
-  </Stack>
-)
-
-/** `.grp`: 12 px uppercase section label. */
-const Group = ({ children }: { children: ReactNode }) => (
-  <Text
-    as="h2"
-    fontSize="12px"
-    fontWeight="bold"
-    color="text.secondary"
-    textTransform="uppercase"
-    letterSpacing=".06em"
-    mx="4px"
-    mt="6px"
-    mb="-4px"
-  >
-    {children}
-  </Text>
-)
-
-/** `.toggle`: 46 × 28 green pill (the row itself is the switch). */
-const Toggle = ({ isOn }: { isOn: boolean }) => (
-  <Box
-    as="span"
-    position="relative"
-    w="46px"
-    h="28px"
-    borderRadius="14px"
-    bg={isOn ? 'money.income' : 'toggle.off'}
-    transition="background .2s"
-  >
-    <Box
-      as="span"
-      position="absolute"
-      top="3px"
-      left={isOn ? '21px' : '3px'}
-      boxSize="22px"
-      borderRadius="full"
-      bg="white"
-      transition="left .2s"
-    />
-  </Box>
-)
 
 /**
  * "Más" tab (docs/diseno-mobile.html, Más): profile, connections, account,
@@ -230,8 +105,7 @@ export default function MorePage() {
       <Stack spacing="12px" maxW="lg" pb={4}>
         <Flex
           as={NextLink}
-          // The card shows the pay frequency and split: tapping it edits them.
-          href="/settings#budget"
+          href="/settings/profile"
           align="center"
           gap="12px"
           p="14px"
@@ -266,7 +140,7 @@ export default function MorePage() {
         <Group>{t('more.sections.connections')}</Group>
         <List>
           <Row
-            href="/settings#gmail"
+            href="/settings/gmail"
             icon={<IconBox icon={<MailIcon boxSize="18px" />} />}
             label={t('more.gmail')}
             value={
@@ -288,7 +162,7 @@ export default function MorePage() {
             }
           />
           <Row
-            href="/settings#notifications"
+            href="/settings/notifications"
             icon={<IconBox icon={<BellIcon boxSize="18px" />} />}
             label={t('more.notifications')}
             value={isSubscribed ? t('more.push') : chevron}
@@ -298,7 +172,23 @@ export default function MorePage() {
         <Group>{t('more.sections.account')}</Group>
         <List>
           <Row
-            href="/profile"
+            href="/settings/budget"
+            icon={<IconBox icon={<PieIcon boxSize="18px" />} />}
+            label={t('more.budget')}
+            value={
+              profile ? (
+                <>
+                  {percent(profile.needsPercent)} /{' '}
+                  {percent(profile.wantsPercent)} /{' '}
+                  {percent(profile.savingsPercent)}
+                </>
+              ) : (
+                chevron
+              )
+            }
+          />
+          <Row
+            href="/settings/security"
             icon={<IconBox icon={<ShieldIcon boxSize="18px" />} />}
             label={t('more.security')}
             value={
