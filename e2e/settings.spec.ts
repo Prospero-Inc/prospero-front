@@ -261,7 +261,9 @@ test('security: signing out of every device', async ({ page }) => {
   await page
     .getByRole('button', { name: 'Cerrar sesión en todos los dispositivos' })
     .click()
-  await page.getByRole('button', { name: 'Cerrar sesión en todos' }).click()
+  await page
+    .getByRole('button', { name: 'Cerrar sesión en todos', exact: true })
+    .click()
   await page.waitForURL('**/auth/login')
   expect(await lastRequest(page, 'POST', '/api/auth/logout-all')).toBeTruthy()
 })

@@ -79,16 +79,6 @@
         "cta": "Agregar primer gasto"
       }
     },
-    "budgetEmpty": {
-      "heading": "Aún no registraste un ingreso para este período",
-      "description": "Prospero calcula tu presupuesto a partir de tu último pago. Registrá uno para ver el desglose.",
-      "cta": "Configurar mi presupuesto"
-    },
-    "error": {
-      "heading": "No pudimos cargar tu período actual",
-      "description": "Intentá recargar la página. Si el problema continúa, contactanos.",
-      "retry": "Reintentar"
-    },
     "paymentToday": "pago estimado hoy",
     "paymentOverdue": "tu próximo pago se esperaba el {{date}}.",
     "registerPayment": "Registrarlo",
@@ -176,12 +166,6 @@
   },
   "passwordInput": {
     "toggle": "Mostrar u ocultar la contraseña"
-  },
-  "offline": {
-    "title": "Sin conexión · Prospero",
-    "heading": "Sin conexión",
-    "text": "No pudimos cargar esta pantalla. Revisá tu conexión e intentá de nuevo; tus datos siguen guardados en tu cuenta.",
-    "retry": "Reintentar"
   },
   "swUpdate": {
     "text": "Hay una nueva versión de Prospero.",
@@ -510,5 +494,49 @@
         "button": "Pedir otro enlace"
       }
     }
+  },
+  "states": {
+    "retry": "Reintentar",
+    "offline": {
+      "pageTitle": "Sin conexión · Prospero",
+      "title": "Estás sin conexión",
+      "text": "Prospero necesita internet para mostrar tus datos. Por seguridad, no guardamos tus movimientos en el teléfono.",
+      "banner": "Sin conexión · los cambios no se pueden guardar"
+    },
+    "serverError": {
+      "pageTitle": "Algo salió mal · Prospero",
+      "title": "Algo salió mal de nuestro lado",
+      "text": "Tus datos están a salvo. Probá de nuevo en un momento."
+    },
+    "loadError": {
+      "title": "No pudimos cargar {{what}}",
+      "text": "Puede ser tu conexión o un problema nuestro. Tus datos están a salvo.",
+      "home": "Ir al inicio"
+    },
+    "what": {
+      "period": "tu período actual",
+      "movements": "tus movimientos",
+      "review": "los movimientos por revisar"
+    }
+  },
+  "firstSteps": {
+    "eyebrow": "Tu primer período",
+    "title": "Registrá tu pago para ver cuánto te queda",
+    "text": "Con tu fecha de pago armamos el período y repartimos el dinero en necesidades, deseos y ahorro.",
+    "split": "Elegir cómo repartir",
+    "splitHint": "{{split}}, {{frequency}}",
+    "splitHintEmpty": "Necesidades, deseos y ahorro",
+    "frequency": {
+      "Biweekly": "quincenal",
+      "Monthly": "mensual"
+    },
+    "payment": "Registrar tu último pago",
+    "paymentHint": "Monto y fecha en que llegó",
+    "add": "Agregar",
+    "addLabel": "Agregar tu último pago",
+    "gmail": "Conectar Gmail",
+    "gmailHint": "Opcional · detecta gastos solo",
+    "noMovements": "Todavía no hay movimientos",
+    "noMovementsHint": "Usá el botón + para anotar tu primer gasto."
   }
 }

@@ -1,3 +1,4 @@
+import { FirstSteps, NoMovementsCard } from '@/components/dashboard/FirstSteps'
 import {
   HomeHero,
   RecentCard,
@@ -5,52 +6,18 @@ import {
   SplitCard
 } from '@/components/dashboard/HomeCards'
 import { ProsperoLayout } from '@/components/layouts'
+import { LoadError } from '@/components/states/LoadError'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { Profile } from '@/interfaces'
 import { useApi } from '@/lib/useApi'
 import { PeriodSummary } from '@/services/periods'
 import { ReviewQueueSummary } from '@/services/reviewQueue'
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-
-/** New user / no income logged for this period yet: a legitimate empty
- * state (not an error) that leads to the first steps. */
-const BudgetEmptyCard = () => {
-  const { t } = useTranslation('common')
-  return (
-    <Box bg="bg.surface" borderRadius="20px" p="16px" textAlign="center">
-      <Text fontWeight="bold" fontSize="15px" color="text.primary">
-        {t('dashboard.budgetEmpty.heading')}
-      </Text>
-      <Text fontSize="13px" color="text.secondary" mt={1}>
-        {t('dashboard.budgetEmpty.description')}
-      </Text>
-      <Button
-        as={NextLink}
-        href="/welcome"
-        colorScheme="primary"
-        mt={4}
-        borderRadius="12px"
-      >
-        {t('dashboard.budgetEmpty.cta')}
-      </Button>
-    </Box>
-  )
-}
 
 /**
  * Inicio (docs/diseno-mobile.html, 01): what's left to spend this period
@@ -92,38 +59,34 @@ const Dashboard = () => {
 
   if (!period)
     return layout(
-      <Alert
-        status="error"
-        borderRadius="16px"
-        flexDirection={{ base: 'column', sm: 'row' }}
-        alignItems={{ base: 'flex-start', sm: 'center' }}
-        gap={3}
-      >
-        <AlertIcon />
-        <Box flex="1">
-          <AlertTitle>{t('dashboard.error.heading')}</AlertTitle>
-          <AlertDescription display="block">
-            {t('dashboard.error.description')}
-          </AlertDescription>
-        </Box>
-        <Button
-          onClick={() => periodQuery.mutate()}
-          colorScheme="red"
-          size="sm"
-          flexShrink={0}
-        >
-          {t('dashboard.error.retry')}
-        </Button>
-      </Alert>
+      <Stack spacing="12px" maxW="lg" pb={4}>
+        <LoadError
+          what={t('states.what.period')}
+          onRetry={() => periodQuery.mutate()}
+          isRetrying={periodQuery.isValidating}
+        />
+      </Stack>
+    )
+
+  // First use: no income this period yet (design 13, "Inicio vacío").
+  if (period.income === 0)
+    return layout(
+      <Stack spacing="12px" maxW="lg" pb={4}>
+        <FirstSteps />
+        {reviewQueue && <ReviewAlertCard summary={reviewQueue} />}
+        {period.recentTransactions.length > 0 ? (
+          <RecentCard transactions={period.recentTransactions} />
+        ) : (
+          <NoMovementsCard />
+        )}
+      </Stack>
     )
 
   return layout(
     <Stack spacing="12px" maxW="lg" pb={4}>
-      {period.income === 0 ? <BudgetEmptyCard /> : <HomeHero period={period} />}
+      <HomeHero period={period} />
       {reviewQueue && <ReviewAlertCard summary={reviewQueue} />}
-      {period.income > 0 && (
-        <SplitCard budget={period.budget} income={period.income} />
-      )}
+      <SplitCard budget={period.budget} income={period.income} />
       <RecentCard transactions={period.recentTransactions} />
     </Stack>
   )

@@ -104,15 +104,22 @@ test('review: one tap confirms, "Deshacer" cancels before anything is sent', asy
   await page.goto('/review')
   const card = page.getByRole('article').filter({ hasText: 'Cinemark' })
   await expect(card).toBeVisible()
-  // The fake backend is shared by both device projects: count from here.
-  const before = (await patches(page)).length
-
   // Tap, then undo: the card comes back and nothing reached the backend.
+  // (The fake backend is shared by every test running in parallel, so look
+  // for this exact change, not at how many PATCHes there are.)
+  const undone = (rows: { path: string; body: unknown }[]) =>
+    rows.filter(
+      row =>
+        row.path === '/api/transactions/42' &&
+        (row.body as { category?: string })?.category === 'Deseo'
+    )
   await card.getByRole('button', { name: 'Deseo' }).click()
   await expect(card).toBeHidden()
   await page.getByRole('button', { name: 'Deshacer' }).click()
   await expect(card).toBeVisible()
-  expect(await patches(page)).toHaveLength(before)
+  // Past the 5 s window: had undo failed, it would have been sent by now.
+  await page.waitForTimeout(6_000)
+  expect(undone(await patches(page))).toHaveLength(0)
 
   // Tap and let the undo window pass: now it's sent.
   await card.getByRole('button', { name: 'Necesidad' }).click()

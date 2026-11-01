@@ -1,4 +1,5 @@
 import { QuickAddProvider } from '@/components/quick-add'
+import { OfflineBanner } from '@/components/states/OfflineBanner'
 import { MobileNav } from '@/components/ui/MobileNav'
 import { SidebarContent } from '@/components/ui/SidebarContent'
 import { Box } from '@chakra-ui/react'
@@ -49,6 +50,9 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     <QuickAddProvider>
       <Box minH="100dvh" bg="bg.canvas">
         <SidebarContent display={{ base: 'none', md: 'block' }} />
+        <Box ml={{ base: 0, md: 60 }}>
+          <OfflineBanner />
+        </Box>
         <MobileNav />
         <Box
           ml={{ base: 0, md: 60 }}

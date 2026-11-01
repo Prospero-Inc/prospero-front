@@ -8,6 +8,7 @@ import {
 } from '@/components/quick-add/fields'
 import { parseAmount } from '@/components/quick-add/parseAmount'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { useIsOnline } from '@/hooks/useIsOnline'
 import { dueDateFromDay, dueDayOf } from '@/lib/fixedExpenseDue'
 import type { FixedExpenseData } from '@/services/fixedExpenses'
 import type { BudgetCategory } from '@/services/transactions'
@@ -79,8 +80,13 @@ export const FixedExpenseSheet = ({
   }, [isOpen, fixedExpense])
 
   const amount = parseAmount(amountInput)
+  const isOnline = useIsOnline()
   const canSave =
-    amount !== null && name.trim() !== '' && category !== null && !isSaving
+    amount !== null &&
+    name.trim() !== '' &&
+    category !== null &&
+    !isSaving &&
+    isOnline
   const showAmountError = amountInput.trim() !== '' && amount === null
 
   const submit = (event?: FormEvent) => {
