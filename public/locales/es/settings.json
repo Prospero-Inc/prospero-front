@@ -1,189 +1,179 @@
 {
-  "title": "Configuración",
-  "account": {
-    "title": "Cuenta",
-    "email": "Correo electrónico",
-    "username": "Nombre de usuario"
+  "save": "Guardar",
+  "error": "No pudimos guardar los cambios",
+  "profile": {
+    "title": "Perfil",
+    "memberSince": "Miembro desde {{date}}",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "username": "Usuario",
+    "email": "Correo",
+    "emailHelp": "El correo es con el que iniciás sesión y no se puede cambiar desde la app.",
+    "security": "Seguridad y 2FA",
+    "saved": "Perfil guardado",
+    "error": "No pudimos guardar tu perfil"
   },
   "budget": {
     "title": "Presupuesto",
-    "labelFrequency": "Frecuencia de pago",
+    "frequencyTitle": "¿Cada cuánto te pagan?",
     "frequency": {
-      "Biweekly": "Quincenal",
-      "Monthly": "Mensual"
+      "Biweekly": { "title": "Quincenal", "hint": "Dos pagos al mes" },
+      "Monthly": { "title": "Mensual", "hint": "Un pago al mes" }
     },
-    "labelNeeds": "Necesidad (%)",
-    "labelWants": "Deseo (%)",
-    "labelSavings": "Ahorro (%)",
-    "total": "Total: {{total}}% (debe sumar 100%)",
+    "splitTitle": "Reparto de cada pago",
+    "split": {
+      "needs": "Necesidades",
+      "wants": "Deseos",
+      "savings": "Ahorro"
+    },
+    "decrease": "Bajar {{name}}",
+    "increase": "Subir {{name}}",
+    "total": "Total",
+    "missing_one": "{{total}} % · falta {{count}} %",
+    "missing_other": "{{total}} % · faltan {{count}} %",
+    "over_one": "{{total}} % · sobra {{count}} %",
+    "over_other": "{{total}} % · sobran {{count}} %",
+    "help": "Se aplica al período actual y a los siguientes. Los períodos anteriores no cambian.",
+    "reset": "Volver a 50 / 30 / 20",
     "submit": "Guardar presupuesto",
-    "toast": {
-      "success": {
-        "title": "Presupuesto guardado",
-        "description": "Tu configuración se guardó con éxito"
-      },
-      "error": {
-        "title": "Error",
-        "description": "No pudimos guardar tu configuración"
-      }
-    }
-  },
-  "language": {
-    "title": "Idioma"
+    "saved": "Presupuesto guardado",
+    "error": "No pudimos guardar tu presupuesto"
   },
   "gmail": {
-    "title": "Gmail",
+    "title": "Gmail y bancos",
+    "account": "Gmail",
     "status": {
       "connected": "Conectado",
-      "disconnected": "No conectado"
+      "reconnect": "Hay que reconectar",
+      "disconnected": "Sin conectar"
     },
+    "lastSync": "Última sincronización: {{date}} · se repite cada hora",
+    "neverSynced": "Todavía no sincronizamos · se repite cada hora",
+    "connectHint": "Conectalo para que detectemos tus gastos e ingresos en los avisos de tus bancos. Solo leemos esos correos.",
+    "reconnectHint": "Google cortó el acceso. Volvé a conectar Gmail para seguir detectando movimientos.",
     "connect": "Conectar Gmail",
-    "disconnect": "Desconectar Gmail",
-    "confirmDisconnect": "¿Desconectar tu cuenta de Gmail? Dejaremos de detectar ingresos y gastos automáticamente.",
+    "reconnect": "Volver a conectar",
     "syncNow": "Sincronizar ahora",
-    "lastSync": {
-      "value": "Última sincronización: {{date}}",
-      "never": "Todavía no se sincronizó (corre automático cada hora)"
-    },
-    "toggles": {
-      "autoDetect": "Detectar movimientos automáticamente",
-      "notifyIncome": "Notificarme cuando se detecte un ingreso"
-    },
+    "autoDetect": "Detectar movimientos",
+    "autoDetectHint": "Lee los avisos de tus bancos",
+    "notifyIncome": "Avisarme de ingresos",
+    "disconnect": "Desconectar Gmail",
+    "confirmDisconnect": "¿Desconectar Gmail?",
+    "confirmDisconnectDescription": "Dejamos de detectar tus gastos e ingresos. Tus bancos y movimientos quedan como están.",
     "toast": {
-      "connected": {
-        "title": "Gmail conectado",
-        "description": "Tu cuenta de Gmail se conectó con éxito"
+      "connected": "Gmail conectado",
+      "notConnected": "No se conectó Gmail",
+      "synced": "Ya revisamos tus correos más recientes",
+      "syncRevoked": "Google cortó el acceso: volvé a conectar Gmail para sincronizar",
+      "syncThrottled": "Ya sincronizaste hace un momento; esperá un minuto",
+      "disconnected": "Gmail desconectado"
+    },
+    "errors": {
+      "cancelled": "Cancelaste la conexión con Gmail.",
+      "invalid_state": "La conexión venció o no es válida. Probá de nuevo.",
+      "exchange_failed": "No pudimos completar la conexión con Google. Probá de nuevo.",
+      "no_refresh_token": "Google no nos dio los permisos necesarios. Probá de nuevo y aceptá todos los permisos.",
+      "google_unavailable": "Google no está disponible en este momento. Probá más tarde.",
+      "invalid_request": "La solicitud de conexión no es válida. Probá de nuevo.",
+      "unknown_error": "Algo salió mal al conectar Gmail. Probá de nuevo."
+    },
+    "banks": {
+      "title": "Bancos que leemos",
+      "add": "Agregar",
+      "empty": "Todavía no agregaste ningún banco. Agregá los que te mandan avisos de tus compras por correo.",
+      "badge": {
+        "auto": "Detección automática",
+        "manual": "Solo manual",
+        "paused": "Pausado"
       },
-      "disconnected": {
-        "title": "Gmail desconectado",
-        "description": "Tu cuenta de Gmail se desconectó con éxito"
-      },
-      "synced": {
-        "title": "Sincronización completa",
-        "description": "Ya revisamos tus correos más recientes"
-      },
-      "syncRevoked": "La conexión con Gmail fue revocada, reconectá tu cuenta para volver a sincronizar",
-      "syncThrottled": "Ya sincronizaste varias veces en el último minuto, esperá un momento antes de intentar de nuevo",
-      "error": {
-        "title": "Error",
-        "description": "No pudimos completar la acción"
-      },
-      "errors": {
-        "cancelled": "Cancelaste la conexión con Gmail",
-        "invalid_state": "La conexión expiró o no es válida, intentá de nuevo",
-        "exchange_failed": "No pudimos completar la conexión con Google, intentá de nuevo",
-        "no_refresh_token": "Google no nos dio los permisos necesarios, intentá de nuevo y aceptá todos los permisos solicitados",
-        "google_unavailable": "Google no está disponible en este momento, intentá más tarde",
-        "invalid_request": "La solicitud de conexión no es válida, intentá de nuevo",
-        "unknown_error": "Ocurrió un error inesperado al conectar Gmail, intentá de nuevo"
-      }
+      "addTitle": "Agregar banco",
+      "addSubmit": "Agregar banco",
+      "supported": "Con detección automática",
+      "alreadyAdded": "Agregado",
+      "other": "Otro banco",
+      "name": "Nombre del banco",
+      "sender": "Correo que envía los avisos",
+      "senderPlaceholder": "avisos@banco.com",
+      "manualNotice": "Todavía no leemos los correos de este banco: sus movimientos los registrás a mano.",
+      "added": "Banco agregado",
+      "duplicateSender": "Ese correo ya está en otro de tus bancos",
+      "active": "Leer este banco",
+      "activeHint": "Si lo pausás, dejamos de buscar sus avisos en Gmail",
+      "activeHintManual": "Guardamos sus correos para cuando podamos leerlos",
+      "senders": "Correos que envían los avisos",
+      "removeSender": "Quitar {{email}}",
+      "addSender": "Agregar",
+      "sendersHelp": "Buscamos en tu Gmail los avisos que llegan desde estas direcciones.",
+      "delete": "Eliminar banco",
+      "confirmDelete": "¿Eliminar {{name}}?"
     }
   },
   "notifications": {
     "title": "Notificaciones",
-    "toggles": {
-      "gmailReview": "Avisarme por correo",
-      "gmailReviewReplacedByPush": "Solo si no tenés push activo en ningún dispositivo (o si el push falla)."
-    },
-    "toast": {
-      "success": {
-        "title": "Preferencias guardadas",
-        "description": "Tus preferencias de notificación se guardaron con éxito"
-      },
-      "error": {
-        "title": "Error",
-        "description": "No pudimos guardar tus preferencias de notificación"
-      }
-    },
+    "device": "En este dispositivo",
     "push": {
-      "device": "Notificaciones push en este dispositivo",
-      "deviceHelp": {
-        "loading": "Comprobando si este navegador admite notificaciones push…",
-        "available": "Te avisamos aunque Prospero esté cerrado. Activalo en cada dispositivo donde quieras recibir los avisos.",
-        "unsupported": "Este navegador no admite notificaciones push.",
-        "iosRequiresInstall": "En iPhone y iPad, Safari solo permite notificaciones push si instalás Prospero en la pantalla de inicio (iOS 16.4 o posterior): tocá Compartir → \"Agregar a pantalla de inicio\" y abrí la app desde ese ícono.",
-        "noServiceWorker": "Las notificaciones push no están disponibles en esta versión de la app (falta el service worker). Recargá la página e intentá de nuevo.",
+      "title": "Notificaciones push",
+      "state": {
+        "on": "Activas en este dispositivo",
+        "off": "Desactivadas en este dispositivo",
+        "loading": "Revisando este dispositivo…",
+        "iosRequiresInstall": "Instalá la app para activarlas",
+        "unsupported": "Este navegador no las admite",
+        "noServiceWorker": "No disponibles en esta versión",
+        "serverDisabled": "Todavía no disponibles",
+        "denied": "Bloqueadas en este navegador",
+        "available": "Desactivadas en este dispositivo"
+      },
+      "help": "Te avisamos aunque Prospero esté cerrado. Activalo en cada celular o computadora donde quieras recibir avisos.",
+      "fix": {
+        "iosRequiresInstall": "En iPhone y iPad, Safari solo permite notificaciones si instalás Prospero: tocá Compartir → \"Agregar a pantalla de inicio\" y abrí la app desde ese ícono.",
+        "unsupported": "Probá desde otro navegador, o instalá la app en tu celular.",
+        "noServiceWorker": "Recargá la página y probá de nuevo.",
         "serverDisabled": "Las notificaciones push todavía no están habilitadas en Prospero.",
-        "denied": "Bloqueaste las notificaciones para este sitio. Para reactivarlas, abrí la configuración del sitio en tu navegador (el ícono junto a la dirección), permití las notificaciones y recargá la página."
+        "denied": "Para activarlas, abrí la configuración del sitio en tu navegador (el ícono junto a la dirección), permití las notificaciones y recargá la página."
       },
-      "toast": {
-        "enabled": {
-          "title": "Push activado",
-          "description": "Este dispositivo va a recibir notificaciones push"
-        },
-        "disabled": {
-          "title": "Push desactivado",
-          "description": "Este dispositivo dejó de recibir notificaciones push"
-        }
-      },
+      "errorTitle": "No pudimos cambiar las notificaciones push",
       "errors": {
-        "unsupported": "Este navegador no admite notificaciones push",
-        "noServiceWorker": "El service worker no está disponible, recargá la página e intentá de nuevo",
-        "serverDisabled": "Las notificaciones push no están habilitadas en el servidor",
-        "permissionDenied": "Bloqueaste las notificaciones; reactivalas desde la configuración del sitio en tu navegador",
-        "permissionDismissed": "No diste permiso para mostrar notificaciones",
-        "subscribeFailed": "No pudimos activar las notificaciones push en este dispositivo",
-        "backendFailed": "No pudimos guardar la suscripción push, intentá de nuevo"
+        "unsupported": "Este navegador no admite notificaciones push.",
+        "noServiceWorker": "Recargá la página y probá de nuevo.",
+        "serverDisabled": "Las notificaciones push no están habilitadas en el servidor.",
+        "permissionDenied": "Bloqueaste las notificaciones; activalas desde la configuración del sitio en tu navegador.",
+        "permissionDismissed": "No diste permiso para mostrar notificaciones.",
+        "subscribeFailed": "No pudimos activarlas en este dispositivo.",
+        "backendFailed": "No pudimos guardar la suscripción. Probá de nuevo."
       }
     },
-    "gmailSection": "Avisos cuando detectamos movimientos nuevos en tu Gmail."
+    "what": "Qué te avisamos",
+    "review": "Movimientos por revisar",
+    "reviewHint": "Cuando Gmail detecta gastos o ingresos nuevos",
+    "income": "Ingresos detectados",
+    "incomeHint": "Cuando llega un depósito",
+    "needsGmail": "Conectá Gmail para recibir este aviso",
+    "email": "Respaldo por correo",
+    "emailToggle": "Avisarme por correo",
+    "emailHint": "Solo si no tenés push activo en ningún dispositivo, o si el push falla"
   },
-  "financialInstitutions": {
-    "title": "Bancos",
-    "form": {
-      "labelName": "Nombre del banco",
-      "submit": "Agregar banco",
-      "labelBank": "Banco",
-      "bankPlaceholder": "Seleccioná tu banco",
-      "bankOtherOption": "Otro banco",
-      "labelNameOther": "Nombre del banco",
-      "unsupportedBankNotice": "Aún no soportamos la detección automática de este banco, pero podés seguir agregando remitentes para cuando lo soportemos."
-    },
-    "list": {
-      "empty": "Todavía no configuraste ningún banco.",
-      "confirmDelete": "¿Eliminar este banco y todos sus remitentes configurados?",
-      "actions": {
-        "delete": "Eliminar banco"
-      }
-    },
-    "senders": {
-      "labelEmail": "Correo del remitente",
-      "add": "Agregar remitente",
-      "empty": "Este banco todavía no tiene remitentes configurados.",
-      "actions": {
-        "delete": "Eliminar remitente"
-      }
-    },
-    "toast": {
-      "success": {
-        "title": "Banco agregado",
-        "description": "El banco se agregó con éxito"
-      },
-      "deleted": {
-        "title": "Banco eliminado",
-        "description": "El banco se eliminó con éxito"
-      },
-      "senderAdded": {
-        "title": "Remitente agregado",
-        "description": "El remitente se agregó con éxito"
-      },
-      "senderDeleted": {
-        "title": "Remitente eliminado",
-        "description": "El remitente se eliminó con éxito"
-      },
-      "duplicateSender": {
-        "title": "Remitente duplicado",
-        "description": "Ese correo ya está configurado en otro de tus bancos"
-      },
-      "error": {
-        "title": "Error",
-        "description": "No pudimos completar la acción"
-      }
-    },
-    "badges": {
-      "autoDetect": "Detección automática activa",
-      "manualOnly": "Sin detección automática"
-    }
-  },
-  "logout": "Cerrar sesión"
+  "security": {
+    "title": "Seguridad",
+    "on": "Activado",
+    "off": "Desactivado",
+    "twoFactor": "Verificación en dos pasos",
+    "statusOn": "Activada",
+    "statusOff": "Desactivada",
+    "twoFactorDescription": "Al iniciar sesión te pedimos un código de 6 dígitos de tu app de autenticación, además de la contraseña.",
+    "enable": "Activar",
+    "disable": "Desactivar",
+    "disableTitle": "Desactivar la verificación",
+    "disableDescription": "Tu cuenta va a quedar protegida solo con tu contraseña. Para confirmar, escribí el código de 6 dígitos de tu app de autenticación.",
+    "codeDigit": "Dígito {{position}} del código",
+    "wrongCode": "El código no es correcto o ya venció. Probá con el que muestra ahora la app.",
+    "disabled": "Verificación en dos pasos desactivada",
+    "password": "Contraseña",
+    "changePassword": "Cambiar contraseña",
+    "passwordTitle": "¿Cambiar tu contraseña?",
+    "passwordDescription": "Te mandamos a {{email}} un enlace para crear una nueva. Vence en 60 minutos.",
+    "passwordConfirm": "Mandar enlace",
+    "passwordSent": "Revisá tu correo",
+    "passwordSentDescription": "Te mandamos el enlace a {{email}}."
+  }
 }

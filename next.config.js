@@ -32,7 +32,22 @@ const withSerwist = require('@serwist/next').default({
 
 const nextConfig = {
   reactStrictMode: true,
-  i18n
+  i18n,
+  // Configuración is no longer one long page: each section is its own
+  // screen under /settings/*, reached from "Más". Old links keep working
+  // (the query string, e.g. Google's ?gmail=connected, is carried over).
+  async redirects() {
+    return [
+      {
+        source: '/settings',
+        has: [{ type: 'query', key: 'gmail' }],
+        destination: '/settings/gmail',
+        permanent: false
+      },
+      { source: '/settings', destination: '/more', permanent: false },
+      { source: '/profile', destination: '/settings/profile', permanent: false }
+    ]
+  }
 }
 
 module.exports = withSerwist(nextConfig)

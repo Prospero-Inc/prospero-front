@@ -109,7 +109,7 @@ const TwoFactorSetup = ({ data: { qr, secret } }: Props) => {
         description: t('toast.enabled.description'),
         status: 'success'
       })
-      router.replace('/profile')
+      router.replace('/settings/security')
     } catch {
       setError(t('errors.generic'))
     } finally {
@@ -122,7 +122,7 @@ const TwoFactorSetup = ({ data: { qr, secret } }: Props) => {
       <Container maxW="container.sm" px={0}>
         <Link
           as={NextLink}
-          href="/profile"
+          href="/settings/security"
           display="inline-flex"
           alignItems="center"
           gap={1}
@@ -300,7 +300,7 @@ export const getServerSideProps: GetServerSideProps = withClientIp(
     } catch (error) {
       return {
         redirect: {
-          destination: '/profile',
+          destination: '/settings/security',
           permanent: false
         }
       }

@@ -1,4 +1,5 @@
 import { formatRelativeDay } from '@/components/dashboard/periodText'
+import { BankBadge } from '@/components/design/settings'
 import { ProsperoLayout } from '@/components/layouts'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
@@ -41,44 +42,6 @@ const money = (value: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`
-
-/** "BAC", "Agrícola" → "BAC", "AGR": the design's 3-letter bank badge. */
-const bankInitials = (name: string) =>
-  name
-    .normalize('NFD')
-    .replace(/[^A-Za-z]/g, '')
-    .slice(0, 3)
-    .toUpperCase()
-
-// The design's colors for the two banks it shows; others get a stable pick.
-const KNOWN_BANK_PALETTES: Record<string, 'a' | 'b'> = { BAC: 'a', AGR: 'b' }
-
-/** Same bank, same palette: a stable pick between the two badge colors. */
-const bankPalette = (name: string) =>
-  KNOWN_BANK_PALETTES[bankInitials(name)] ??
-  name.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 2 === 0
-    ? 'a'
-    : 'b'
-
-const BankBadge = ({ name }: { name: string | null }) => {
-  const palette = name ? bankPalette(name) : 'a'
-  return (
-    <Flex
-      boxSize="40px"
-      flexShrink={0}
-      borderRadius="12px"
-      bg={`bank.${palette}Bg`}
-      color={`bank.${palette}Text`}
-      fontSize="12px"
-      fontWeight={800}
-      align="center"
-      justify="center"
-      aria-hidden
-    >
-      {name ? bankInitials(name) : '·'}
-    </Flex>
-  )
-}
 
 /** `.rev .opts div`: 44 px outlined choice. */
 const OptionButton = ({

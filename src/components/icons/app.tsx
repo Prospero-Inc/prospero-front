@@ -227,3 +227,58 @@ export const WifiIcon = designIcon(
   </>,
   { filled: true }
 )
+
+export const UserIcon = designIcon(
+  'UserIcon',
+  <>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+  </>
+)
+
+export const PieIcon = designIcon(
+  'PieIcon',
+  <>
+    <path d="M12 3v9h9a9 9 0 1 1-9-9z" />
+    <path d="M15 3.5A9 9 0 0 1 20.5 9H15z" />
+  </>
+)
+
+export const SyncIcon = designIcon(
+  'SyncIcon',
+  <>
+    <path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 13a8 8 0 0 0 14.5 4.5L20 16" />
+    <path d="M4 4v4h4M20 20v-4h-4" />
+  </>
+)
+
+export const TrashIcon = designIcon(
+  'TrashIcon',
+  <>
+    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+  </>
+)
+
+export const PhoneIcon = designIcon(
+  'PhoneIcon',
+  <>
+    <rect x="6" y="2" width="12" height="20" rx="3" />
+    <path d="M11 18h2" />
+  </>
+)
+
+export const AlertIcon = designIcon(
+  'AlertIcon',
+  <>
+    <path d="M12 3 2 20h20z" />
+    <path d="M12 10v4M12 17h.01" />
+  </>
+)
+
+export const LockIcon = designIcon(
+  'LockIcon',
+  <>
+    <rect x="4" y="11" width="16" height="10" rx="2.5" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </>
+)

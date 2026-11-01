@@ -55,7 +55,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'fixedExpenses', icon: FixedExpenseIcon, route: '/fixed-expenses' },
   // Metas is out of the menu until the feature exists (plan, ola 4).
   { name: 'budgetCalculator', icon: BagIcon, route: '/budget-calculator' },
-  { name: 'settings', icon: SettingsIcon, route: '/settings' }
+  { name: 'settings', icon: SettingsIcon, route: '/more' }
 ]
 interface SidebarProps extends BoxProps {
   /** Only when shown inside a drawer: renders its close button. */

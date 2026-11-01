@@ -14,6 +14,8 @@ const user = {
   firstName: 'Ana',
   lastName: 'Martínez',
   enable2FA: false,
+  isGoogleAccount: false,
+  createdAt: '2026-03-14T12:00:00.000Z',
   payFrequency: 'Biweekly',
   needsPercent: 0.5,
   wantsPercent: 0.3,
@@ -72,7 +74,66 @@ const routes = {
   'GET /api/review-queue/summary': () => [
     200,
     { pendingTransactions: 0, pendingSalaries: 0 }
-  ]
+  ],
+  // Settings screens: Gmail connected, one bank we read, default prefs.
+  'GET /api/gmail/connection': () => [
+    200,
+    {
+      connected: true,
+      status: 'Connected',
+      lastSyncAt: '2026-10-31T18:00:00.000Z',
+      autoDetectEnabled: true,
+      notifyIncomeEnabled: true
+    }
+  ],
+  'PATCH /api/gmail/connection': body => [200, body],
+  'GET /api/financial-institutions': () => [
+    200,
+    [
+      {
+        id: 7,
+        userId: 1,
+        name: 'BAC Credomatic',
+        isActive: true,
+        parserKey: 'bac',
+        senders: [
+          {
+            id: 70,
+            institutionId: 7,
+            emailAddress: 'notificacion@baccredomatic.com',
+            createdAt: '2026-10-01T00:00:00.000Z'
+          }
+        ],
+        createdAt: '2026-10-01T00:00:00.000Z',
+        updatedAt: '2026-10-01T00:00:00.000Z'
+      }
+    ]
+  ],
+  'GET /api/financial-institutions/supported-parsers': () => [
+    200,
+    [
+      { key: 'bac', label: 'BAC Credomatic' },
+      { key: 'agricola', label: 'Banco Agrícola' }
+    ]
+  ],
+  'POST /api/financial-institutions': body => [
+    201,
+    { id: 8, userId: 1, isActive: true, senders: [], ...body }
+  ],
+  'GET /api/notifications/preferences': () => [
+    200,
+    {
+      gmailReviewEmailEnabled: false,
+      gmailReviewPushEnabled: true,
+      budgetAlertEmailEnabled: false
+    }
+  ],
+  'PATCH /api/notifications/preferences': body => [200, body],
+  'POST /api/auth/disable-2fa': body =>
+    body?.token === '123456'
+      ? [201, { msg: '2FA disabled' }]
+      : [401, { message: 'Invalid 2FA code' }],
+  'PATCH /api/auth/request-reset-password': () => [200, { msg: 'Sent' }]
 }
 
 const readBody = req =>

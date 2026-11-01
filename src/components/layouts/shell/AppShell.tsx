@@ -27,7 +27,13 @@ export const usesAppShell = (pathname: string): boolean =>
     route => pathname === route || pathname.startsWith(`${route}/`)
   )
 
-const NO_TAB_BAR_ROUTES = ['/review']
+// Sub-screens: they go back with the top bar's X or "‹ Más" instead.
+const NO_TAB_BAR_ROUTES = ['/review', '/settings/']
+
+const hasTabBarOn = (pathname: string) =>
+  !NO_TAB_BAR_ROUTES.some(route =>
+    route.endsWith('/') ? pathname.startsWith(route) : pathname === route
+  )
 
 /** Height the content leaves free above the phone tab bar. */
 const TAB_BAR_SPACE = 'calc(72px + env(safe-area-inset-bottom))'
@@ -39,8 +45,7 @@ const TAB_BAR_SPACE = 'calc(72px + env(safe-area-inset-bottom))'
  */
 export const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useRouter()
-  // Sub-screens (Por revisar) close back with the top bar's X instead.
-  const hasTabBar = !NO_TAB_BAR_ROUTES.includes(pathname)
+  const hasTabBar = hasTabBarOn(pathname)
   return (
     <QuickAddProvider>
       <Box minH="100dvh" bg="bg.canvas">

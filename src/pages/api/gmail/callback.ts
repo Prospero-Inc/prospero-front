@@ -12,8 +12,8 @@ import { getServerSession } from 'next-auth/next'
 
 const settingsUrl = (outcome: string): string =>
   outcome === 'connected'
-    ? '/settings?gmail=connected'
-    : `/settings?gmail=error&reason=${encodeURIComponent(outcome)}`
+    ? '/settings/gmail?gmail=connected'
+    : `/settings/gmail?gmail=error&reason=${encodeURIComponent(outcome)}`
 
 /** Completes the flow and returns where to send the browser. */
 const completeAndGetRedirect = async (

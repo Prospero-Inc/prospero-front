@@ -1,49 +1,8 @@
 {
-  "userSection": {
-    "title": "Información del Usuario",
-    "username": "Nombre de Usuario",
-    "firstName": "Nombre",
-    "lastName": "Apellido",
-    "email": "Correo Electrónico",
-    "buttonAction": {
-      "edit": "Editar",
-      "save": "Guardar",
-      "cancel": "Cancelar"
-    },
-    "toast": {
-      "success": {
-        "title": "Perfil actualizado",
-        "description": "Tu información se guardó con éxito"
-      },
-      "error": {
-        "title": "Error",
-        "description": "No pudimos actualizar tu perfil"
-      }
-    }
-  },
-  "securitySection": {
-    "title": "Seguridad",
-    "twoFactorAuth": "Autenticación de Dos Factores",
-    "enabled": "Activado",
-    "disabled": "Desactivado",
-    "buttonAction": {
-      "enable": "Activar 2FA",
-      "disable": "Desactivar 2FA"
-    },
-    "disableTitle": "Desactivar 2FA",
-    "disableConfirm": "Tu cuenta va a quedar protegida solo con tu contraseña. Para confirmar, ingresá el código de 6 dígitos de tu app de autenticación.",
-    "cancel": "Cancelar",
-    "confirm": "Desactivar",
-    "toast": {
-      "disabling": "Desactivando 2FA…",
-      "disabled": "2FA desactivado",
-      "error": "No pudimos desactivar el 2FA"
-    }
-  },
   "twoFactorSetup": {
     "title": "Activar autenticación de dos factores",
     "description": "Además de tu contraseña, al iniciar sesión vas a necesitar un código de 6 dígitos de una app en tu celular.",
-    "back": "Volver al perfil",
+    "back": "Volver a Seguridad",
     "step1": {
       "title": "1. Vinculá tu app de autenticación",
       "qrAlt": "Código QR para configurar la autenticación de dos factores",
