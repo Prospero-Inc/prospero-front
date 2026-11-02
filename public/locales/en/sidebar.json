@@ -1,11 +1,9 @@
 {
   "dashboard": "Dashboard",
-  "entries": "Entries",
-  "expenditures": "Expenditures",
+  "movements": "Movements",
   "fixedExpenses": "Fixed Expenses",
   "goals": "Goals",
   "budgetCalculator": "Budget Calculator",
   "settings": "Settings",
-  "pendingBadgeEntries": "{{count}} pending income entries to review",
-  "pendingBadgeExpenditures": "{{count}} pending expenses to review"
+  "pendingBadgeMovements": "{{count}} movements pending review"
 }

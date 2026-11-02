@@ -37,12 +37,13 @@ test('logs in and lands on the dashboard', async ({ page }) => {
   await expectNoHorizontalScroll(page)
 })
 
-test('adds an expense from the expenditures page', async ({ page }) => {
+test('adds an expense from the movements page', async ({ page }) => {
   await login(page)
-  await page.goto('/expenditures')
+  await page.goto('/movements')
 
-  await page.getByRole('button', { name: 'Nuevo gasto' }).click()
+  await page.getByRole('button', { name: 'Agregar movimiento' }).click()
   await page.getByLabel('Monto').fill('12.50')
+  await page.getByRole('button', { name: 'Necesidad' }).click()
   await page.getByRole('button', { name: 'Guardar gasto' }).click()
 
   await expect
@@ -66,14 +67,15 @@ test('saving an expense refreshes the list without reloading the page', async ({
   page
 }) => {
   await login(page)
-  await page.goto('/expenditures')
+  await page.goto('/movements')
   // A full page load would reset this marker.
   await page.evaluate(() => {
     ;(window as unknown as { marker: string }).marker = 'same-page'
   })
 
-  await page.getByRole('button', { name: 'Nuevo gasto' }).click()
+  await page.getByRole('button', { name: 'Agregar movimiento' }).click()
   await page.getByLabel('Monto').fill('7.25')
+  await page.getByRole('button', { name: 'Necesidad' }).click()
   const refetch = page.waitForRequest(
     request =>
       request.url().includes('/api/proxy/read/periods/transactions') &&

@@ -71,14 +71,11 @@ test.describe('login page', () => {
 test.describe('signed-in pages', () => {
   test.beforeEach(async ({ page }) => {
     await login(page)
-    await page.goto('/expenditures')
   })
 
   test('content uses a single 16 px side gutter', async ({ page }) => {
-    const box = await page
-      .getByRole('heading', { level: 2 })
-      .first()
-      .boundingBox()
+    await page.goto('/movements')
+    const box = await page.getByRole('group', { name: 'Mostrar' }).boundingBox()
     expect(box?.x).toBe(16)
   })
 
@@ -92,7 +89,7 @@ test.describe('signed-in pages', () => {
   test('the amount field opens empty, with a decimal keyboard', async ({
     page
   }) => {
-    await page.getByRole('button', { name: 'Nuevo gasto' }).click()
+    await page.getByRole('button', { name: 'Agregar movimiento' }).click()
     const amount = page.getByLabel('Monto')
     await expect(amount).toHaveValue('')
     await expect(amount).toHaveAttribute('inputmode', 'decimal')

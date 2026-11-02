@@ -77,7 +77,9 @@ already-authenticated session; it's unrelated to the login gate.
   opciones"; posts to the existing create proxies and revalidates with `useRevalidateApi`.
 - **Movimientos / Por revisar:** the "Movimientos" tab is `pages/movements.tsx` (expenses and
   income of a period in one day-grouped list, Todos · Gastos · Ingresos via shallow `?kind=`;
-  rows link to `/expenditures?edit=<id>` / `/entries?edit=<id>`, which open that row's form).
+  rows open the edit sheet with `useEditMovement`; possible Gmail duplicates are settled there too).
+  `/expenditures` and `/entries` redirect to `/review` and `/movements?kind=income` unless they
+  carry `?edit=`; nothing links to the old pages any more.
   `pages/review.tsx` is the Gmail queue: one tap on a category confirms; the card hides at once
   and `hooks/useUndoableCommit` only sends the PATCH after the 5 s "Deshacer" window (flushed on
   leaving the screen / app going to background), so undo never needs a reverse API call.

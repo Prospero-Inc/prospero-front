@@ -12,8 +12,13 @@ import {
 } from '@/components/design'
 import { FilterIcon, MailIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
+import { PossibleDuplicateCard } from '@/components/movements/PossibleDuplicateCard'
 import { SwipeRow } from '@/components/movements/SwipeRow'
-import { type EditableMovement, useEditMovement } from '@/components/quick-add'
+import {
+  type EditableMovement,
+  useEditMovement,
+  useOpenQuickAdd
+} from '@/components/quick-add'
 import { LoadError } from '@/components/states/LoadError'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -77,6 +82,7 @@ export default function MovementsPage() {
   const router = useRouter()
   const locale = router.locale ?? 'es'
   const editMovement = useEditMovement()
+  const openQuickAdd = useOpenQuickAdd()
   const periodLabel = usePeriodLabel()
   const [sheet, setSheet] = useState<'period' | 'filters' | null>(null)
   const [isSearching, setIsSearching] = useState(false)
@@ -234,6 +240,16 @@ export default function MovementsPage() {
       pageDescription={t('movements.title')}
     >
       <Stack spacing="12px" maxW="lg" pb={4}>
+        {/* Phones have the tab bar's "+". */}
+        <Button
+          display={{ base: 'none', md: 'inline-flex' }}
+          alignSelf="flex-end"
+          variant="brand"
+          onClick={() => openQuickAdd()}
+        >
+          {t('quickAdd.title')}
+        </Button>
+
         <SegmentedControl
           label={t('movements.filterLabel')}
           value={filter}
@@ -325,6 +341,17 @@ export default function MovementsPage() {
               {t('movements.review')}
             </Button>
           </Flex>
+        )}
+
+        {(expenses.data ?? []).flatMap(item =>
+          item.possibleGmailDuplicate
+            ? [
+                <PossibleDuplicateCard
+                  key={item.possibleGmailDuplicate.id}
+                  duplicate={item.possibleGmailDuplicate}
+                />
+              ]
+            : []
         )}
 
         {(expenses.error && !expenses.data) ||
@@ -504,7 +531,8 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => ({
     ...(await serverSideTranslations(locale as string, [
       'common',
       'sidebar',
-      'mobileNav'
+      'mobileNav',
+      'expenditures'
     ]))
   }
 })

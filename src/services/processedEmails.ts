@@ -8,8 +8,8 @@ import { Params } from '@/types'
  * usuario confirma que en realidad es un movimiento distinto. 201 con la
  * transacción creada; 404 si no es del usuario o no es un `PossibleDuplicate`;
  * 409 si ya fue resuelto antes; 422 si el correo es viejo y no tiene snapshot
- * de monto/fecha. Invocada desde el botón "No son el mismo" en
- * `expenditures.tsx`, usando `possibleGmailDuplicate.id` de `GET /transactions`.
+ * de monto/fecha. Invocada desde el botón "No son el mismo" de
+ * `PossibleDuplicateCard`, usando `possibleGmailDuplicate.id` de `GET /transactions`.
  */
 const createProcessedEmailAnyway = async (
   _ignore: unknown,
@@ -34,7 +34,7 @@ const createProcessedEmailAnyway = async (
  * ownership/estado que `create-anyway`: 404 si no es del usuario o no es un
  * `PossibleDuplicate`; 409 si ya fue resuelto antes. No hay caso 422, no
  * depende del snapshot de monto/fecha. Invocada desde el botón "Es el mismo
- * movimiento" en `expenditures.tsx`.
+ * movimiento" de `PossibleDuplicateCard`.
  */
 const dismissProcessedEmail = async (
   _ignore: unknown,
