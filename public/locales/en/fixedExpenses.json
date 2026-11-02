@@ -18,6 +18,7 @@
     "editTitle": "Edit fixed expense",
     "delete": "Delete fixed expense",
     "dueDayValue": "Day {{day}} of each month",
+    "dueDayLast": "Last day of the month",
     "invalidAmount": "Enter an amount above 0, with up to 2 decimals.",
     "reminderHint": "Due-date reminders are coming soon; your choice is already saved.",
     "moreOptions": "More options",

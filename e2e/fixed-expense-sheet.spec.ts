@@ -111,3 +111,37 @@ test('deleting asks with the design sheet', async ({ page }) => {
     .poll(() => lastRequest(page, 'DELETE', '/api/fixed-expenses/5'))
     .toBeTruthy()
 })
+
+test('the 31st is "Último día del mes", and the list shows the real day', async ({
+  page
+}) => {
+  await page.route('**/api/proxy/read/fixed-expenses*', route =>
+    route.fulfill({
+      json: [
+        {
+          id: 8,
+          name: 'Internet',
+          amount: 35,
+          dueDate: '2000-01-31',
+          budgetCategory: 'Necesidad',
+          reminder: false,
+          paidThisCycle: false
+        }
+      ]
+    })
+  )
+  await page.goto('/fixed-expenses')
+
+  const row = page.getByRole('button', { name: 'Editar: Internet' })
+  const now = new Date()
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  await expect(row).toContainText(String(lastDay))
+
+  await row.click()
+  const sheet = page.getByRole('dialog', { name: 'Editar gasto fijo' })
+  await expect(sheet.getByText('Último día del mes').first()).toBeVisible()
+  await expect(
+    sheet.getByRole('option', { name: 'Último día del mes' })
+  ).toHaveCount(1)
+  await expect(sheet.getByRole('option', { name: 'Día 31' })).toHaveCount(0)
+})

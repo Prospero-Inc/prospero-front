@@ -10,7 +10,12 @@ import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { getTodayLocalDate, localApiService } from '@/lib'
 import { HttpError } from '@/lib/apiService'
-import { DueStatus, dueDayOf, resolveDueStatus } from '@/lib/fixedExpenseDue'
+import {
+  DueStatus,
+  dueDayOf,
+  occurrenceDayOf,
+  resolveDueStatus
+} from '@/lib/fixedExpenseDue'
 import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
 import { FixedExpenseData } from '@/services/fixedExpenses'
 import {
@@ -315,7 +320,9 @@ export default function FixedExpensesPage() {
               lineHeight="1"
               color="text.primary"
             >
-              {dueDayOf(fixedExpense.dueDate)}
+              {today
+                ? occurrenceDayOf(dueDayOf(fixedExpense.dueDate), today)
+                : dueDayOf(fixedExpense.dueDate)}
             </Text>
             <Text
               fontSize="11px"
