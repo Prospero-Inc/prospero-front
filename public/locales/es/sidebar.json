@@ -1,11 +1,9 @@
 {
   "dashboard": "Dashboard",
-  "entries": "Entradas",
-  "expenditures": "Gastos",
+  "movements": "Movimientos",
   "fixedExpenses": "Gastos fijos",
   "goals": "Metas",
   "budgetCalculator": "Calculadora de presupuesto",
   "settings": "Configuración",
-  "pendingBadgeEntries": "{{count}} ingresos pendientes de revisión",
-  "pendingBadgeExpenditures": "{{count}} gastos pendientes de revisión"
+  "pendingBadgeMovements": "{{count}} movimientos pendientes de revisión"
 }

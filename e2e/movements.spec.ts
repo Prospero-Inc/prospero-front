@@ -133,3 +133,84 @@ test('review: one tap confirms, "Deshacer" cancels before anything is sent', asy
       })
     )
 })
+
+test('review: "Editar antes de guardar" corrects in the sheet and stays in the queue', async ({
+  page
+}) => {
+  await page.route('**/api/proxy/read/transactions*', route =>
+    route.fulfill({ json: [expense(43, { description: 'Pizza' })] })
+  )
+  await page.route('**/api/proxy/read/salary*', route =>
+    route.fulfill({ json: [] })
+  )
+  await login(page)
+  await page.goto('/review')
+  const card = page.getByRole('article').filter({ hasText: 'Pizza' })
+  await card.getByRole('button', { name: 'Editar antes de guardar' }).click()
+
+  const sheet = page.getByRole('dialog', { name: 'Editar gasto' })
+  await expect(sheet).toBeVisible()
+  await expect(page).toHaveURL(/\/review$/)
+  await sheet.getByLabel('Monto').fill('20')
+  await sheet.getByRole('button', { name: 'Guardar cambios' }).click()
+  await expect(sheet).toBeHidden()
+
+  // No category sent: the API keeps it pending until it's chosen. (The fake
+  // backend is shared with the other device's run of this test.)
+  await expect
+    .poll(() => patches(page))
+    .toContainEqual(
+      expect.objectContaining({
+        path: '/api/transactions/43',
+        body: { amount: 20 }
+      })
+    )
+  await expect(card).toBeVisible()
+})
+
+test('the old list pages redirect to the new screens', async ({ page }) => {
+  await login(page)
+
+  await page.goto('/expenditures')
+  await expect(page).toHaveURL(/\/review$/)
+
+  await page.goto('/entries')
+  await expect(page).toHaveURL(/\/movements\?kind=income$/)
+})
+
+test('movements: a possible Gmail duplicate can be settled', async ({
+  page
+}) => {
+  await page.route('**/api/proxy/read/periods/transactions*', route =>
+    route.fulfill({
+      json: [
+        expense(44, {
+          category: 'Deseo',
+          reviewStatus: 'Confirmed',
+          possibleGmailDuplicate: {
+            id: 9,
+            senderEmail: 'avisos@bac.com',
+            processedAt: '2026-10-30T12:00:00.000Z'
+          }
+        })
+      ]
+    })
+  )
+  let dismissed = false
+  await page.route('**/api/proxy/dismiss-processed-email*', route => {
+    dismissed = route.request().url().includes('id=9')
+    return route.fulfill({ json: {} })
+  })
+  await login(page)
+  await page.goto('/movements')
+
+  const card = page.getByRole('article').filter({ hasText: 'avisos@bac.com' })
+  await card.getByRole('button', { name: 'Es el mismo movimiento' }).click()
+  await page
+    .getByRole('alertdialog')
+    .or(page.getByRole('dialog'))
+    .getByRole('button', { name: 'Descartar' })
+    .click()
+
+  await expect.poll(() => dismissed).toBe(true)
+})

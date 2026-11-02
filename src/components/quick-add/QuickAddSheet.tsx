@@ -205,7 +205,14 @@ export const QuickAddSheet = ({
   }, [isOpen, movement])
 
   const amount = parseAmount(amountInput)
-  const hasChoice = kind === 'expense' ? category !== null : incomeType !== null
+  // A detected expense can be corrected and still wait in the review queue:
+  // choosing its category is what confirms it (the API does that on PATCH).
+  const isUncategorized =
+    movement?.kind === 'expense' && movement.item.category === null
+  const hasChoice =
+    kind === 'expense'
+      ? category !== null || isUncategorized
+      : incomeType !== null
   const isOnline = useIsOnline()
   const canSave =
     amount !== null && hasChoice && !!date && !isSaving && isOnline

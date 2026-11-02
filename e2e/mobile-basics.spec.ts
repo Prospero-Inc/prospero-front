@@ -71,28 +71,26 @@ test.describe('login page', () => {
 test.describe('signed-in pages', () => {
   test.beforeEach(async ({ page }) => {
     await login(page)
-    await page.goto('/expenditures')
   })
 
   test('content uses a single 16 px side gutter', async ({ page }) => {
-    const box = await page
-      .getByRole('heading', { level: 2 })
-      .first()
-      .boundingBox()
+    await page.goto('/movements')
+    const box = await page.getByRole('group', { name: 'Mostrar' }).boundingBox()
     expect(box?.x).toBe(16)
   })
 
   test('buttons are at least 44 px tall', async ({ page }) => {
-    const tooSmall = (await buttonHeights(page)).filter(
-      ({ height }) => height < 44
-    )
-    expect(tooSmall).toEqual([])
+    await page.goto('/fixed-expenses')
+    await page.waitForLoadState('networkidle')
+    const buttons = await buttonHeights(page)
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(buttons.filter(({ height }) => height < 44)).toEqual([])
   })
 
   test('the amount field opens empty, with a decimal keyboard', async ({
     page
   }) => {
-    await page.getByRole('button', { name: 'Nuevo gasto' }).click()
+    await page.getByRole('button', { name: 'Agregar movimiento' }).click()
     const amount = page.getByLabel('Monto')
     await expect(amount).toHaveValue('')
     await expect(amount).toHaveAttribute('inputmode', 'decimal')
