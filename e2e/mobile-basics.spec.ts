@@ -80,10 +80,11 @@ test.describe('signed-in pages', () => {
   })
 
   test('buttons are at least 44 px tall', async ({ page }) => {
-    const tooSmall = (await buttonHeights(page)).filter(
-      ({ height }) => height < 44
-    )
-    expect(tooSmall).toEqual([])
+    await page.goto('/fixed-expenses')
+    await page.waitForLoadState('networkidle')
+    const buttons = await buttonHeights(page)
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(buttons.filter(({ height }) => height < 44)).toEqual([])
   })
 
   test('the amount field opens empty, with a decimal keyboard', async ({
