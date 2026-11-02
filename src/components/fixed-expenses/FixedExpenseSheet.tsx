@@ -23,6 +23,8 @@ import {
 } from 'react'
 
 const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, index) => index + 1)
+/** Every month reaches it: the backend clamps it to the month's last day. */
+const LAST_DAY = 31
 
 export interface EditableFixedExpense extends FixedExpenseData {
   id: number
@@ -176,7 +178,11 @@ export const FixedExpenseSheet = ({
 
         <PickerField
           label={t('form.labelDueDate')}
-          value={t('form.dueDayValue', { day: dueDay })}
+          value={
+            dueDay === LAST_DAY
+              ? t('form.dueDayLast')
+              : t('form.dueDayValue', { day: dueDay })
+          }
         >
           <Box
             as="select"
@@ -190,7 +196,9 @@ export const FixedExpenseSheet = ({
           >
             {DAYS_OF_MONTH.map(day => (
               <option key={day} value={day}>
-                {t('form.dueDayOption', { day })}
+                {day === LAST_DAY
+                  ? t('form.dueDayLast')
+                  : t('form.dueDayOption', { day })}
               </option>
             ))}
           </Box>
