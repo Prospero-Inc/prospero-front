@@ -2,7 +2,7 @@
 // Prospero's service worker, built by @serwist/next into public/sw.js (same
 // URL as the old next-pwa one, so existing push subscriptions keep working).
 // Standard VAPID Web Push, no Firebase. Payload: { title, body, url, tag },
-// `url` a same-origin path (e.g. "/expenditures").
+// `url` a same-origin path (e.g. "/review").
 import { defaultCache } from '@serwist/next/worker'
 import {
   NetworkOnly,

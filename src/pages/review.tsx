@@ -1,6 +1,7 @@
 import { formatRelativeDay } from '@/components/dashboard/periodText'
 import { BankBadge } from '@/components/design/settings'
 import { ProsperoLayout } from '@/components/layouts'
+import { useEditMovement } from '@/components/quick-add'
 import { LoadError } from '@/components/states/LoadError'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
@@ -93,6 +94,7 @@ export default function ReviewPage() {
   const incomes = useApi<SalaryListItem[]>('salary', {
     status: PENDING_STATUSES
   })
+  const editMovement = useEditMovement()
   const revalidateApi = useRevalidateApi()
   const scheduleCommit = useUndoableCommit()
   // Cards confirmed but still inside their undo window (or being sent).
@@ -181,7 +183,7 @@ export default function ReviewPage() {
       })
     )
 
-  // Only expenses: the backend has no way to delete a detected income.
+  // Only expenses here; a detected income is deleted from its edit sheet.
   const discard = (entry: ReviewItem) =>
     resolve(entry, t('review.discardedItem', { name: titleOf(entry) }), () =>
       localApiService.request({
@@ -274,10 +276,6 @@ export default function ReviewPage() {
             const { item } = entry
             const options =
               entry.kind === 'expense' ? CATEGORIES : INCOME_CATEGORIES
-            const editHref =
-              entry.kind === 'expense'
-                ? `/expenditures?edit=${item.id}`
-                : `/entries?edit=${item.id}`
             return (
               <Box
                 key={`${entry.kind}-${item.id}`}
@@ -373,15 +371,14 @@ export default function ReviewPage() {
                     </Button>
                   )}
                   <Button
-                    as={NextLink}
-                    href={editHref}
                     variant="unstyled"
-                    display="inline-flex"
-                    alignItems="center"
                     h="44px"
                     fontSize="13px"
                     fontWeight={600}
                     color="brand.text"
+                    onClick={() =>
+                      editMovement({ ...entry, title: titleOf(entry) })
+                    }
                   >
                     {t('review.editFirst')}
                   </Button>

@@ -14,7 +14,6 @@ import { useTranslation } from 'next-i18next'
 import { IconType } from 'react-icons'
 import { BsStopCircle } from 'react-icons/bs'
 
-import { EntryIcon } from '../icons'
 import { BagIcon } from '../icons/BagIcon'
 import { EgressIcon } from '../icons/EgressIcon'
 import { FixedExpenseIcon } from '../icons/FixedExpenseIcon'
@@ -31,26 +30,20 @@ interface LinkItemProps {
   name: string
   icon: IconType
   route: string
-  /** Si está presente, este item muestra un badge con
-   * `summary[badgeKey]` y usa `badgeAriaKey` para el texto accesible. */
-  badgeKey?: keyof ReviewQueueSummary
+  /** Si está presente, este item muestra un badge con ese conteo y usa
+   * `badgeAriaKey` para el texto accesible. */
+  badgeCount?: (_summary: ReviewQueueSummary) => number
   badgeAriaKey?: string
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: 'dashboard', icon: BsStopCircle, route: '/dashboard' },
   {
-    name: 'entries',
-    icon: EntryIcon,
-    route: '/entries',
-    badgeKey: 'pendingSalaries',
-    badgeAriaKey: 'pendingBadgeEntries'
-  },
-  {
-    name: 'expenditures',
+    name: 'movements',
     icon: EgressIcon,
-    route: '/expenditures',
-    badgeKey: 'pendingTransactions',
-    badgeAriaKey: 'pendingBadgeExpenditures'
+    route: '/movements',
+    badgeCount: summary =>
+      summary.pendingTransactions + summary.pendingSalaries,
+    badgeAriaKey: 'pendingBadgeMovements'
   },
   { name: 'fixedExpenses', icon: FixedExpenseIcon, route: '/fixed-expenses' },
   // Metas is out of the menu until the feature exists (plan, ola 4).
@@ -108,7 +101,7 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         )}
       </Flex>
       {LinkItems.map(link => {
-        const badgeCount = link.badgeKey ? summary[link.badgeKey] : undefined
+        const badgeCount = link.badgeCount?.(summary)
         const badgeAriaLabel =
           link.badgeAriaKey && badgeCount
             ? t(link.badgeAriaKey, { count: badgeCount })

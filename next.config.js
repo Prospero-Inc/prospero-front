@@ -54,6 +54,20 @@ const nextConfig = {
         source: '/profile/:step(2fa|verify-2fa)',
         destination: '/settings/security/2fa',
         permanent: false
+      },
+      // The old list pages: push notifications already on people's phones
+      // still open /expenditures, and that one always meant "review these".
+      {
+        source: '/expenditures',
+        missing: [{ type: 'query', key: 'edit' }],
+        destination: '/review',
+        permanent: false
+      },
+      {
+        source: '/entries',
+        missing: [{ type: 'query', key: 'edit' }],
+        destination: '/movements?kind=income',
+        permanent: false
       }
     ]
   }
