@@ -156,6 +156,8 @@
     "reviewHint": "When Gmail detects new spending or income",
     "income": "Detected income",
     "incomeHint": "When a deposit arrives",
+    "fixedExpenses": "Fixed expenses due",
+    "fixedExpensesHint": "On the due day, if not marked as paid",
     "needsGmail": "Connect Gmail to get this alert",
     "email": "Email backup",
     "emailToggle": "Email me",
