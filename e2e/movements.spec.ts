@@ -176,6 +176,10 @@ test('the old list pages redirect to the new screens', async ({ page }) => {
 
   await page.goto('/entries')
   await expect(page).toHaveURL(/\/movements\?kind=income$/)
+
+  // Links from before the edit sheet existed have nowhere else to go.
+  await page.goto('/expenditures?edit=1')
+  await expect(page).toHaveURL(/\/review\?edit=1$/)
 })
 
 test('movements: a possible Gmail duplicate can be settled', async ({

@@ -346,7 +346,37 @@
       "Extra": "Extra income"
     },
     "edit": "Edit",
-    "editRow": "Edit {{name}}"
+    "editRow": "Edit {{name}}",
+    "possibleDuplicate": {
+      "badge": "Gmail detected a possible duplicate",
+      "tooltip": "An email from {{senderEmail}} with the same amount and date arrived on {{processedAt}}. We haven't created a new expense yet to avoid duplicating it: confirm whether it's the same movement or a different one.",
+      "dismissAction": "Same movement",
+      "notSameAction": "Not the same movement",
+      "confirmDialog": "Are you sure this is a different movement? We'll create a new expense with the data we detected in the email.",
+      "dismissConfirmDialog": "Confirm this is the same movement you already recorded? We'll dismiss this notice without creating any new expense.",
+      "toast": {
+        "created": {
+          "title": "Expense created",
+          "description": "We created the expense with the data detected in the email"
+        },
+        "dismissed": {
+          "title": "Notice dismissed",
+          "description": "We marked the email as resolved, no new expense was created"
+        },
+        "alreadyResolved": {
+          "title": "Already resolved",
+          "description": "This possible duplicate was already resolved before"
+        },
+        "missingSnapshot": {
+          "title": "Not available",
+          "description": "This email predates us saving its data, so the expense can't be created automatically"
+        },
+        "error": {
+          "title": "Error",
+          "description": "We could not save the movement"
+        }
+      }
+    }
   },
   "welcome": {
     "pageTitle": "First steps · Prospero",

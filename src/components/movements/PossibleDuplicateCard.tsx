@@ -20,10 +20,9 @@ export const PossibleDuplicateCard = ({
 }: {
   duplicate: NonNullable<TransactionListItem['possibleGmailDuplicate']>
 }) => {
-  const { t } = useTranslation('expenditures', {
-    keyPrefix: 'possibleDuplicate'
+  const { t } = useTranslation('common', {
+    keyPrefix: 'movements.possibleDuplicate'
   })
-  const { t: tExpenditures } = useTranslation('expenditures')
   const { t: tCommon } = useTranslation('common')
   const { data: session } = useSession()
   const toast = useToast()
@@ -79,11 +78,11 @@ export const PossibleDuplicateCard = ({
               status: 'warning'
             }
           : {
-              title: tExpenditures('toast.error.title'),
+              title: t('toast.error.title'),
               description:
                 error instanceof Error
                   ? error.message
-                  : tExpenditures('toast.error.description'),
+                  : t('toast.error.description'),
               status: 'error'
             }
       )

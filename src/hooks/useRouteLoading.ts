@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
  * informa. */
 const SHOW_DELAY_MS = 150
 
-/** "/en/expenditures?period=initial" → "/expenditures": el pathname de
+/** "/en/movements?period=initial" → "/movements": el pathname de
  * página, comparable con `router.pathname`. */
 const toPathname = (url: string, locales: readonly string[] = []): string => {
   const path = url.split(/[?#]/)[0]
@@ -74,17 +74,6 @@ export const RouteLoadingContext = createContext<RouteLoadingState>({
   isLoading: false,
   targetPathname: null
 })
-
-/**
- * `true` mientras se recarga la pantalla actual (cambio de período, después
- * de guardar o marcar como pagado). Las páginas lo usan para mostrar el
- * skeleton de su lista en lugar de dejar la vieja quieta.
- */
-export const useIsReloadingPage = (): boolean => {
-  const router = useRouter()
-  const { isLoading, targetPathname } = useContext(RouteLoadingContext)
-  return isLoading && targetPathname === router.pathname
-}
 
 /** Página de destino mientras se navega (o `null`), para que el menú
  * resalte a dónde vas y no la pantalla que estás dejando. */

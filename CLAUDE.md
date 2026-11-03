@@ -78,8 +78,8 @@ already-authenticated session; it's unrelated to the login gate.
 - **Movimientos / Por revisar:** the "Movimientos" tab is `pages/movements.tsx` (expenses and
   income of a period in one day-grouped list, Todos · Gastos · Ingresos via shallow `?kind=`;
   rows open the edit sheet with `useEditMovement`; possible Gmail duplicates are settled there too).
-  `/expenditures` and `/entries` redirect to `/review` and `/movements?kind=income` unless they
-  carry `?edit=`; nothing links to the old pages any more.
+  `/expenditures` and `/entries` no longer exist: they redirect to `/review` and
+  `/movements?kind=income`, for push notifications already on phones.
   `pages/review.tsx` is the Gmail queue: one tap on a category confirms; the card hides at once
   and `hooks/useUndoableCommit` only sends the PATCH after the 5 s "Deshacer" window (flushed on
   leaving the screen / app going to background), so undo never needs a reverse API call.
@@ -145,7 +145,7 @@ detail of this design.
   protected pages *and* for not redirecting an errored session away from `/auth/login`, which
   would otherwise infinite-loop against the SSR guard below), so a dead session can't get a page
   render before the watcher fires.
-- `getServerSideProps` pages that need the session (`dashboard`, `entries`, `expenditures`,
+- `getServerSideProps` pages that need the session (`dashboard`,
   `settings`, `profile/index`) call the shared `getValidSession(req)` helper (`src/lib/session.ts`)
   instead of `next-auth/react`'s `getSession` directly — it wraps `getSession` and returns a
   ready-to-return `{ redirect: { destination: '/auth/login', ... } }` when `session.error` is set,
@@ -183,11 +183,11 @@ call happens:
   **The client component calling the proxy must pass its own `Authorization` header explicitly**
   (`useSession()` → `Bearer ${session?.accessToken}`) — the proxy route has no session of its
   own, it only forwards whatever header the browser sent it. Forgetting this is a real bug we hit
-  twice (entries/expenditures silently 401'd with no visible error until `createHandler`'s error
+  twice (pages silently 401'd with no visible error until `createHandler`'s error
   handling was also fixed to stop swallowing the real status/message — see git history).
   `apiService.ts`'s `HttpError` class carries the real upstream status end-to-end through this
   chain; don't go back to throwing plain `Error`s there.
-- **Main screens load data client-side with SWR** — `dashboard`, `expenditures`, `entries`,
+- **Main screens load data client-side with SWR** — `dashboard`, `movements`, `review`,
   `fixed-expenses` (and the sidebar's pending badge) use `useApi(path, query)` from
   `src/lib/useApi.ts`, which GETs `/api/proxy/read/<path>`: a read-only pass-through with a
   closed allowlist of backend paths (`pages/api/proxy/read/[...path].ts`). Those pages only have
@@ -236,7 +236,7 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
 ### Structure
 
 - `src/pages/` — routed pages: `auth/*` (login/register/forgot-password/verify-2fa),
-  `dashboard`, `entries` (income), `expenditures` (transactions), `fixed-expenses` (recurring
+  `dashboard`, `movements` (income and expenses), `review` (Gmail queue), `fixed-expenses` (recurring
   costs — CRUD plus a "mark as paid" action that generates a `Transaction`, see
   `prospero-backend/CLAUDE.md`'s `fixed-expenses` module), `goals` (placeholder — the spec marks
   detailed savings goals as post-MVP), `settings`, `budget-calculator`, `profile/*` (incl. 2FA

@@ -1,7 +1,6 @@
 import {
   Box,
   Flex,
-  SimpleGrid,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
@@ -31,34 +30,8 @@ const SkeletonPage = ({ children }: { children: ReactNode }) => (
   </Box>
 )
 
-const PrimaryButton = () => (
-  <Flex justify="flex-end">
-    <Skeleton h="44px" w={{ base: 'full', md: '180px' }} borderRadius="md" />
-  </Flex>
-)
-
 const SectionTitle = ({ w = '200px' }: { w?: string }) => (
   <Skeleton h="28px" w={w} mb={4} borderRadius="md" />
-)
-
-const Panel = ({ children }: { children: ReactNode }) => {
-  const bg = useColorModeValue('gray.50', 'gray.700')
-  return (
-    <Box bg={bg} borderRadius="md" p={4}>
-      {children}
-    </Box>
-  )
-}
-
-const Stats = ({ count }: { count: number }) => (
-  <SimpleGrid columns={{ base: 2, sm: count }} spacingX={6} spacingY={3}>
-    {Array.from({ length: count }).map((_, index) => (
-      <Stack key={index} spacing={2}>
-        <Skeleton h="14px" w="70px" />
-        <Skeleton h="24px" w="90px" />
-      </Stack>
-    ))}
-  </SimpleGrid>
 )
 
 /** Fila de lista: concepto + línea secundaria a la izquierda, monto a la
@@ -83,17 +56,6 @@ const ListRow = () => {
   )
 }
 
-/** Lista agrupada por día de Gastos/Ingresos. También la usan esas páginas
- * en el lugar de la lista mientras se recargan (p. ej. al cambiar de
- * período), ver `useIsReloadingPage`. */
-export const MovementListSkeleton: FC = () => (
-  <SkeletonPage>
-    <DayGroup rows={2} />
-    <DayGroup rows={1} />
-    <DayGroup rows={2} />
-  </SkeletonPage>
-)
-
 /** Filas simples (gastos fijos) para la misma situación. */
 export const RowsSkeleton: FC<{ rows?: number }> = ({ rows = 5 }) => (
   <SkeletonPage>
@@ -102,62 +64,6 @@ export const RowsSkeleton: FC<{ rows?: number }> = ({ rows = 5 }) => (
     ))}
   </SkeletonPage>
 )
-
-const DayGroup = ({ rows }: { rows: number }) => (
-  <Box mb={4}>
-    <Skeleton h="14px" w="110px" mb={2} />
-    {Array.from({ length: rows }).map((_, index) => (
-      <ListRow key={index} />
-    ))}
-  </Box>
-)
-
-/** Gastos e Ingresos: botón de alta, panel de filtros y lista por día. */
-const MovementsSkeleton: FC = () => (
-  <SkeletonPage>
-    <Stack spacing={6}>
-      <PrimaryButton />
-      <Box>
-        <SectionTitle w="160px" />
-        <Panel>
-          <Flex
-            direction={{ base: 'column', md: 'row' }}
-            justify="space-between"
-            gap={4}
-          >
-            <Stack spacing={2} w={{ base: 'full', md: 'xs' }}>
-              <Skeleton h="14px" w="60px" />
-              <Skeleton h="40px" borderRadius="md" />
-            </Stack>
-            <Stats count={4} />
-          </Flex>
-          <Skeleton h="40px" mt={4} borderRadius="md" />
-          <Flex gap={2} mt={3}>
-            {[90, 70, 70].map((width, index) => (
-              <Skeleton
-                key={index}
-                h="32px"
-                w={`${width}px`}
-                borderRadius="full"
-              />
-            ))}
-          </Flex>
-        </Panel>
-        <Box mt={6}>
-          <DayGroup rows={2} />
-          <DayGroup rows={1} />
-          <DayGroup rows={2} />
-        </Box>
-      </Box>
-    </Stack>
-  </SkeletonPage>
-)
-
-/*
- * Redesigned screens (docs/diseno-mobile.html): the same cards, radii and
- * heights as the real page, on the same surfaces, so the content fills in
- * place. Bones use the design's track/line colors, not Chakra's grays.
- */
 
 /** A placeholder bar on a design surface. */
 const Bone = ({
@@ -528,8 +434,6 @@ const PAGE_SKELETONS: Record<string, FC> = {
   '/movements': MovementsListSkeleton,
   '/review': ReviewSkeleton,
   '/more': MoreSkeleton,
-  '/expenditures': MovementsSkeleton,
-  '/entries': MovementsSkeleton,
   '/fixed-expenses': FixedExpensesSkeleton,
   '/settings/profile': ProfileSettingsSkeleton,
   '/settings/budget': BudgetSettingsSkeleton,
