@@ -20,7 +20,7 @@
     "dueDayValue": "Día {{day}} de cada mes",
     "dueDayLast": "Último día del mes",
     "invalidAmount": "Ingresá un monto mayor a 0, con hasta 2 decimales.",
-    "reminderHint": "Los avisos de vencimiento llegan pronto; tu elección ya queda guardada.",
+    "reminderHint": "Te avisamos el día que vence, si no lo marcaste como pagado.",
     "moreOptions": "Más opciones",
     "fewerOptions": "Menos opciones",
     "descriptionPlaceholder": "Ej. plan de 50 Mbps"

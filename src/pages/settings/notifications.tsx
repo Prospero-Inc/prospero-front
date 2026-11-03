@@ -29,7 +29,8 @@ import { useTranslation } from 'next-i18next'
 const DEFAULT_PREFERENCES: NotificationPreferences = {
   gmailReviewEmailEnabled: false,
   gmailReviewPushEnabled: true,
-  budgetAlertEmailEnabled: false
+  budgetAlertEmailEnabled: false,
+  fixedExpenseReminderEnabled: false
 }
 
 /** The push row's subtitle for each state of this browser. */
@@ -191,6 +192,12 @@ export default function NotificationSettingsPage() {
           isOn={gmailConnected && (gmail?.notifyIncomeEnabled ?? false)}
           isDisabled={!gmailConnected}
           onToggle={toggleIncome}
+        />
+        <SwitchRow
+          title={t('notifications.fixedExpenses')}
+          hint={t('notifications.fixedExpensesHint')}
+          isOn={preferences.fixedExpenseReminderEnabled}
+          onToggle={() => togglePreference('fixedExpenseReminderEnabled')}
         />
       </ListCard>
 

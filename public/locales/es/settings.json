@@ -156,6 +156,8 @@
     "reviewHint": "Cuando Gmail detecta gastos o ingresos nuevos",
     "income": "Ingresos detectados",
     "incomeHint": "Cuando llega un depósito",
+    "fixedExpenses": "Gastos fijos que vencen",
+    "fixedExpensesHint": "El día que vencen, si no los marcaste como pagados",
     "needsGmail": "Conectá Gmail para recibir este aviso",
     "email": "Respaldo por correo",
     "emailToggle": "Avisarme por correo",

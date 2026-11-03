@@ -126,6 +126,7 @@ const routes = {
     {
       gmailReviewEmailEnabled: false,
       gmailReviewPushEnabled: true,
+      fixedExpenseReminderEnabled: true,
       budgetAlertEmailEnabled: false
     }
   ],
