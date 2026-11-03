@@ -22,8 +22,8 @@ import {
 import { LoadError } from '@/components/states/LoadError'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { usePeriodLabel } from '@/components/ui/MovementFiltersBar'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
+import { usePeriodLabel } from '@/hooks/usePeriodLabel'
 import { formatMoney } from '@/lib/formatMoney'
 import { useApi } from '@/lib/useApi'
 import type { PeriodSummary } from '@/services/periods'
@@ -531,8 +531,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => ({
     ...(await serverSideTranslations(locale as string, [
       'common',
       'sidebar',
-      'mobileNav',
-      'expenditures'
+      'mobileNav'
     ]))
   }
 })

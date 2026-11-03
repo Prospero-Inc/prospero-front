@@ -11,8 +11,6 @@ import { BottomTabBar } from './BottomTabBar'
 /** Routes rendered inside the app shell (menus, tab bar). */
 const APP_SHELL_ROUTES = [
   '/dashboard',
-  '/expenditures',
-  '/entries',
   '/fixed-expenses',
   '/goals',
   '/budget-calculator',
