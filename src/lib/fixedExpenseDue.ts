@@ -13,17 +13,22 @@ export const dueDayOf = (dueDate: string): number =>
 export const dueDateFromDay = (day: number): string =>
   `2000-01-${String(day).padStart(2, '0')}`
 
+/** The day a due day falls on in `today`'s month: a day the month doesn't
+ * have (31 in a 30-day month) lands on its last day, like
+ * `resolveOccurrenceDate` in the backend. */
+export const occurrenceDayOf = (dueDay: number, today: Date): number =>
+  Math.min(
+    dueDay,
+    new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+  )
+
 export type DueStatus =
   | { kind: 'paid' }
   | { kind: 'overdue'; day: number }
   | { kind: 'today' }
   | { kind: 'upcoming'; daysLeft: number }
 
-/**
- * Estado de un gasto fijo respecto de hoy, dentro del mes en curso. Un día
- * que el mes no tiene (31 en un mes de 30) cae en el último día del mes,
- * igual que `resolveOccurrenceDate` en el backend.
- */
+/** Estado de un gasto fijo respecto de hoy, dentro del mes en curso. */
 export const resolveDueStatus = (
   dueDay: number,
   paidThisCycle: boolean,
@@ -31,12 +36,7 @@ export const resolveDueStatus = (
 ): DueStatus => {
   if (paidThisCycle) return { kind: 'paid' }
 
-  const daysInMonth = new Date(
-    today.getFullYear(),
-    today.getMonth() + 1,
-    0
-  ).getDate()
-  const occurrenceDay = Math.min(dueDay, daysInMonth)
+  const occurrenceDay = occurrenceDayOf(dueDay, today)
   const todayDay = today.getDate()
 
   if (occurrenceDay < todayDay) return { kind: 'overdue', day: occurrenceDay }

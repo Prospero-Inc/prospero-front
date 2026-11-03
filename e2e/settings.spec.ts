@@ -188,6 +188,21 @@ test('gmail: another bank warns that it stays manual', async ({ page }) => {
   ).toBeVisible()
 })
 
+test('notifications: fixed expense reminders can be turned off', async ({
+  page
+}) => {
+  await page.goto('/settings/notifications')
+  const reminders = page.getByRole('switch', {
+    name: 'Gastos fijos que vencen'
+  })
+  await expect(reminders).toHaveAttribute('aria-checked', 'true')
+  await reminders.click()
+  await expect(reminders).toHaveAttribute('aria-checked', 'false')
+  await expect
+    .poll(() => lastRequest(page, 'PATCH', '/api/notifications/preferences'))
+    .toMatchObject({ body: { fixedExpenseReminderEnabled: false } })
+})
+
 test('notifications: email is the fallback switch', async ({ page }) => {
   await page.goto('/settings/notifications')
   const email = page.getByRole('switch', { name: 'Avisarme por correo' })

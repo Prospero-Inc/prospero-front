@@ -28,7 +28,7 @@ const TABS: [Tab, Tab, Tab, Tab] = [
     key: 'movements',
     href: '/movements',
     icon: ListIcon,
-    matches: ['/movements', '/review', '/expenditures', '/entries']
+    matches: ['/movements', '/review']
   },
   {
     key: 'fixed',

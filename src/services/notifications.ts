@@ -6,12 +6,14 @@ export interface NotificationPreferences {
   gmailReviewEmailEnabled: boolean
   gmailReviewPushEnabled: boolean
   budgetAlertEmailEnabled: boolean
+  fixedExpenseReminderEnabled: boolean
 }
 
 export interface UpdateNotificationPreferencesData {
   gmailReviewEmailEnabled?: boolean
   gmailReviewPushEnabled?: boolean
   budgetAlertEmailEnabled?: boolean
+  fixedExpenseReminderEnabled?: boolean
 }
 
 export interface VapidPublicKeyResponse {
