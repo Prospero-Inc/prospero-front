@@ -24,6 +24,7 @@ const READABLE_PATHS = new Set([
   'financial-institutions/supported-parsers',
   'notifications/preferences',
   'shortcuts/tokens',
+  'shortcuts/status',
   'wallet-cards'
 ])
 
