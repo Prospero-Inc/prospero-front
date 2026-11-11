@@ -153,6 +153,19 @@ const routes = {
       }
     ]
   ],
+  // Already working: the last expense arrived two hours ago.
+  'GET /api/shortcuts/status': () => [
+    200,
+    {
+      lastTransaction: {
+        id: 90,
+        description: 'Puma',
+        amount: 25,
+        date: '2026-11-11T10:38:00.000Z',
+        createdAt: new Date(Date.now() - 2 * 3600_000).toISOString()
+      }
+    }
+  ],
   'POST /api/shortcuts/tokens': body => [
     201,
     {
@@ -169,9 +182,10 @@ const routes = {
         id: 1,
         userId: 1,
         name: 'BAC Visa',
-        defaultCategory: 'Deseo',
+        defaultCategory: null,
         financialInstitutionId: 7,
         institutionName: 'BAC Credomatic',
+        isNew: true,
         createdAt: '2026-11-03T15:00:00.000Z',
         updatedAt: '2026-11-03T15:00:00.000Z'
       },
@@ -179,9 +193,10 @@ const routes = {
         id: 2,
         userId: 1,
         name: 'Débito Agrícola',
-        defaultCategory: null,
+        defaultCategory: 'Necesidad',
         financialInstitutionId: null,
         institutionName: null,
+        isNew: false,
         createdAt: '2026-11-04T15:00:00.000Z',
         updatedAt: '2026-11-04T15:00:00.000Z'
       }
