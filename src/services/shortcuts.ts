@@ -26,6 +26,19 @@ export interface CreateShortcutTokenData {
   name: string
 }
 
+/** `GET /shortcuts/status`: the last expense the shortcut sent, if any —
+ * what tells the screen it's already working. */
+export interface ShortcutStatus {
+  lastTransaction: {
+    id: number
+    description: string | null
+    amount: number
+    date: string
+    /** When Prospero received it. */
+    createdAt: string
+  } | null
+}
+
 /** Activo: sin revocar y ya recibió al menos un gasto. */
 export const isShortcutActive = (tokens: ShortcutToken[] | undefined) =>
   (tokens ?? []).some(token => !token.revokedAt && token.lastUsedAt)

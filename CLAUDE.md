@@ -98,15 +98,19 @@ already-authenticated session; it's unrelated to the login gate.
   side is set per page with `ProsperoLayout`'s `topBarTrailing` (`'avatar'` default, `'none'`
   on Más, `{ closeHref }` for sub-screens like Por revisar, which also hides the tab bar via
   `NO_TAB_BAR_ROUTES` in `AppShell`).
-- **Atajo de iPhone:** `pages/settings/shortcut.tsx` (Más → Conexiones; `/settings/*` is already
-  covered by `APP_SHELL_ROUTES`/`NO_TAB_BAR_ROUTES` by prefix) sets up the Shortcuts "Transaction"
-  automation that posts each Apple Wallet payment to the backend's `POST /shortcuts/transactions`
-  with a `prs_` token: create the token (copied inside the tap via `components/shortcut/
-  copyToClipboard.ts`, shown once), install the shortcut from `NEXT_PUBLIC_SHORTCUT_ICLOUD_URL`
-  (build arg; unset = disabled button), set up the automation; then the tokens (revoke) and the
-  Wallet cards' default category. Step screenshots go in `public/assets/shortcut/paso-N.png`
-  (`SHORTCUT_SCREENSHOTS`). Reads `shortcuts/tokens` and `wallet-cards` through the read proxy;
-  `source: 'Shortcut'` shows as "iPhone" and the review queue highlights `suggestedCategory`.
+- **Atajo de iPhone:** `pages/settings/shortcut.tsx` (Más → Conexiones; design 18–20; `/settings/*`
+  is already covered by `APP_SHELL_ROUTES`/`NO_TAB_BAR_ROUTES` by prefix). Until
+  `GET /shortcuts/status` has a `lastTransaction`: white screen (`SettingsLayout surface`, which
+  `AppShell`/`MobileNav` read from the shell title context) with the vertical stepper in
+  `components/shortcut/ShortcutSetup` — token (copied inside the tap by `copyToClipboard.ts`,
+  then masked `prs_••••…a9F2`; whole and selectable with "Copiar" if the browser refuses),
+  install from `NEXT_PUBLIC_SHORTCUT_ICLOUD_URL` (build arg; unset = disabled button), the
+  Shortcuts path. "Ver con capturas" only shows once a screenshot in `screenshots.ts`
+  (`public/assets/shortcut/paso-N.png`) is marked available. Once working: "Funcionando", Wallet
+  cards (category chosen in `WalletCardSheet`, PATCH on "Guardar") and live tokens (revoke).
+  `source: 'Shortcut'` shows as "[Apple] iPhone" in Movimientos; in Por revisar it gets the
+  Apple badge, the card name and time, the `.sug` suggestion and "Recordar para …"
+  (`rememberMerchant` in the PATCH).
 
 #### Deploy
 

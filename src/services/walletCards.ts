@@ -14,6 +14,8 @@ export interface WalletCard {
   defaultCategory: BudgetCategory | null
   financialInstitutionId: number | null
   institutionName: string | null
+  /** No category chosen for it yet since it showed up ("Nueva"). */
+  isNew: boolean
   createdAt: string
   updatedAt: string
 }
@@ -55,19 +57,4 @@ const updateWalletCard = async (
   })
 }
 
-const deleteWalletCard = async (
-  _ignore: unknown,
-  params: Params | unknown
-): Promise<unknown> => {
-  const { lang, authorization, id } = params as Params & { id: string }
-  return await externalApiService.request({
-    method: HttpMethod.DELETE,
-    endPoint: `/wallet-cards/${id}`,
-    headers: {
-      'x-lang': `${lang}`,
-      Authorization: authorization
-    }
-  })
-}
-
-export { getWalletCards, updateWalletCard, deleteWalletCard }
+export { getWalletCards, updateWalletCard }

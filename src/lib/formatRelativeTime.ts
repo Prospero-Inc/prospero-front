@@ -7,14 +7,17 @@ const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 ]
 
 /** "hace 5 minutos", "ayer", "hace 2 meses"… (or "ahora" under a minute),
- * in the page's language. */
+ * in the page's language; `short` gives "hace 2 h". */
 export const formatRelativeTime = (
   iso: string,
   locale: string,
-  now: number = Date.now()
+  {
+    now = Date.now(),
+    style = 'long'
+  }: { now?: number; style?: Intl.RelativeTimeFormatStyle } = {}
 ): string => {
   const seconds = Math.round((new Date(iso).getTime() - now) / 1000)
-  const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style })
   const unit = UNITS.find(([, size]) => Math.abs(seconds) >= size)
   return unit
     ? format.format(Math.round(seconds / unit[1]), unit[0])
