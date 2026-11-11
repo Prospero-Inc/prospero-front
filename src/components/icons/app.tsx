@@ -296,3 +296,29 @@ export const FlagIcon = designIcon(
     <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
   </>
 )
+
+// Atajo de iPhone (docs/diseno-mobile.html, 18–20).
+
+export const BoltIcon = designIcon(
+  'BoltIcon',
+  <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+)
+
+export const CardIcon = designIcon(
+  'CardIcon',
+  <>
+    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+    <path d="M3 10h18M7 15h4" />
+  </>
+)
+
+export const StoreIcon = designIcon(
+  'StoreIcon',
+  <path d="M4 9 5.5 4h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6" />
+)
+
+export const AppleIcon = designIcon(
+  'AppleIcon',
+  <path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.8-3.5.8-.7 0-1.8-.8-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.7zM14.2 5.8c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.2z" />,
+  { filled: true }
+)

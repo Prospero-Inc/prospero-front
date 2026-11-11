@@ -17,6 +17,9 @@ interface ShellTitle {
   /** "‹ Más": a back link on the left with the title centered (design
    * .navbar), for screens opened from another one. */
   back?: TopBarBack
+  /** White screen on phones (design screens with `background:#fff`)
+   * instead of the gray canvas. */
+  surface?: boolean
 }
 
 export interface TopBarAction {
@@ -64,7 +67,8 @@ export const useSetAppShellTitle = (
   title: string,
   greeting?: string,
   trailing: TopBarTrailing = 'avatar',
-  back?: TopBarBack
+  back?: TopBarBack,
+  surface = false
 ) => {
   const { setValue } = useContext(TitleContext)
   const trailingKey = JSON.stringify(trailing)
@@ -75,8 +79,9 @@ export const useSetAppShellTitle = (
         title,
         greeting,
         trailing: JSON.parse(trailingKey),
-        back: JSON.parse(backKey) ?? undefined
+        back: JSON.parse(backKey) ?? undefined,
+        surface
       }),
-    [title, greeting, trailingKey, backKey, setValue]
+    [title, greeting, trailingKey, backKey, surface, setValue]
   )
 }

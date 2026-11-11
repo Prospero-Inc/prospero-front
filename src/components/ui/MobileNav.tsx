@@ -40,7 +40,13 @@ export const MobileNav = (props: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
-  const { title, greeting, trailing = 'avatar', back } = useAppShellTitle()
+  const {
+    title,
+    greeting,
+    trailing = 'avatar',
+    back,
+    surface
+  } = useAppShellTitle()
   const closeHref =
     typeof trailing === 'object' && 'closeHref' in trailing
       ? trailing.closeHref
@@ -72,7 +78,7 @@ export const MobileNav = (props: MobileProps) => {
       top={0}
       zIndex="sticky"
       alignItems="center"
-      bg={{ base: 'bg.canvas', md: 'bg.surface' }}
+      bg={{ base: surface ? 'bg.surface' : 'bg.canvas', md: 'bg.surface' }}
       borderBottomWidth={{ base: 0, md: '1px' }}
       borderBottomColor="border.subtle"
       justifyContent={{ base: 'space-between', md: 'flex-end' }}

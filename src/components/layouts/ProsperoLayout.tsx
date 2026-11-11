@@ -18,6 +18,8 @@ interface Props {
   topBarTrailing?: TopBarTrailing
   /** Back link on the left of the top bar (see AppShellTitle). */
   topBarBack?: TopBarBack
+  /** White phone screen instead of the gray canvas (see AppShellTitle). */
+  surface?: boolean
 }
 
 export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
@@ -27,11 +29,12 @@ export const ProsperoLayout: FC<PropsWithChildren<Props>> = ({
   imageFullUrl,
   greeting,
   topBarTrailing,
-  topBarBack
+  topBarBack,
+  surface = false
 }) => {
   // The shell (menus, tab bar) lives in _app so it persists across pages;
   // here only the title and the page container.
-  useSetAppShellTitle(title, greeting, topBarTrailing, topBarBack)
+  useSetAppShellTitle(title, greeting, topBarTrailing, topBarBack, surface)
 
   return (
     <>
