@@ -6,6 +6,7 @@ import { Box } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 
+import { useAppShellTitle } from './AppShellTitle'
 import { BottomTabBar } from './BottomTabBar'
 
 /** Routes rendered inside the app shell (menus, tab bar). */
@@ -44,9 +45,13 @@ const TAB_BAR_SPACE = 'calc(72px + env(safe-area-inset-bottom))'
 export const AppShell = ({ children }: { children: ReactNode }) => {
   const { pathname } = useRouter()
   const hasTabBar = hasTabBarOn(pathname)
+  const { surface } = useAppShellTitle()
   return (
     <QuickAddProvider>
-      <Box minH="100dvh" bg="bg.canvas">
+      <Box
+        minH="100dvh"
+        bg={{ base: surface ? 'bg.surface' : 'bg.canvas', md: 'bg.canvas' }}
+      >
         <SidebarContent display={{ base: 'none', md: 'block' }} />
         <Box ml={{ base: 0, md: 60 }}>
           <OfflineBanner />
