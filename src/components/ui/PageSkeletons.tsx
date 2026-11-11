@@ -440,6 +440,7 @@ const PAGE_SKELETONS: Record<string, FC> = {
   '/settings/gmail': SettingsListSkeleton,
   '/settings/notifications': SettingsListSkeleton,
   '/settings/security': SettingsListSkeleton,
+  '/settings/shortcut': SettingsListSkeleton,
   '/settings/security/2fa': TwoFactorSetupSkeleton,
   '/goals': GoalsSkeleton,
   '/budget-calculator': BudgetCalculatorSkeleton

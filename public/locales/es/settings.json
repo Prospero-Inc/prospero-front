@@ -212,5 +212,62 @@
     "invalidCode": "El código no es correcto. Usá el que muestra tu app ahora mismo.",
     "genericError": "No pudimos verificar el código. Probá de nuevo.",
     "enabled": "Verificación en dos pasos activada"
+  },
+  "shortcut": {
+    "title": "Atajo de iPhone",
+    "intro": "Cada vez que pagás con Apple Wallet, un atajo de iPhone manda el gasto a Prospero solo. Configuralo una vez en tres pasos.",
+    "notIphone": "Esto funciona en iPhone con iOS 17 o posterior. Desde acá podés generar el token y elegir la categoría de tus tarjetas; el atajo se instala en el iPhone.",
+    "step1": {
+      "title": "Generá tu token",
+      "body": "Es la llave con la que el atajo guarda gastos en tu cuenta. Lo copiamos al portapapeles para que lo pegues en el paso 2.",
+      "generate": "Generar y copiar token",
+      "generateAnother": "Generar otro token",
+      "defaultName": "iPhone · {{date}}",
+      "onceWarning": "Solo lo vas a ver esta vez. Si lo perdés, generá otro y revocá este.",
+      "tokenLabel": "Tu token",
+      "copy": "Copiar",
+      "copied": "Token copiado",
+      "copyFailed": "No pudimos copiarlo: seleccionalo y copialo a mano"
+    },
+    "step2": {
+      "title": "Instalá el atajo",
+      "body": "Abrí el enlace en el iPhone y tocá \"Agregar atajo\". Cuando te lo pida, pegá el token.",
+      "install": "Instalar el atajo",
+      "unavailable": "Enlace no disponible todavía"
+    },
+    "step3": {
+      "title": "Activalo al pagar",
+      "body": "En la app Atajos andá a Automatización → Nueva automatización → Transacción. Elegí tus tarjetas, marcá \"Ejecutar inmediatamente\" y elegí el atajo \"Prospero · Guardar gasto\"."
+    },
+    "screenshot": "Captura del paso {{number}}",
+    "screenshotPending": "Captura del paso {{number}} (pendiente)",
+    "tokens": {
+      "title": "Tokens",
+      "empty": "Todavía no generaste ningún token.",
+      "created": "Creado el {{date}}",
+      "lastUsed": "Último gasto recibido: {{when}}",
+      "neverUsed": "Todavía no recibió gastos",
+      "revoked": "Revocado",
+      "revoke": "Revocar",
+      "revokeLabel": "Revocar {{name}}",
+      "confirmRevoke": "¿Revocar este token?",
+      "confirmRevokeDescription": "El atajo que lo usa deja de guardar gastos. Para seguir, generá otro y pegalo en el atajo.",
+      "revokeConfirm": "Revocar",
+      "revokedToast": "Token revocado"
+    },
+    "cards": {
+      "title": "Tus tarjetas de Wallet",
+      "hint": "Elegí en qué categoría entran los gastos de cada tarjeta. \"Según el comercio\" usa lo que ya aprendimos de cada comercio y, si no lo conocemos, lo deja en Por revisar.",
+      "empty": "Todavía no detectamos tarjetas. Aparecen solas después del primer pago con el atajo.",
+      "categoryLabel": "Categoría de {{name}}",
+      "byMerchant": "Según el comercio",
+      "saved": "Listo: {{name}} → {{category}}",
+      "nameTaken": "Ya tenés otra tarjeta con ese nombre",
+      "delete": "Eliminar tarjeta",
+      "deleteLabel": "Eliminar {{name}}",
+      "confirmDelete": "¿Eliminar {{name}}?",
+      "confirmDeleteDescription": "Sus gastos quedan como están. Si volvés a pagar con ella, aparece de nuevo.",
+      "deletedToast": "Tarjeta eliminada"
+    }
   }
 }

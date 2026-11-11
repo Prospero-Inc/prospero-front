@@ -13,6 +13,7 @@ import {
   GlobeIcon,
   MailIcon,
   MoonIcon,
+  PhoneIcon,
   PieIcon,
   ShieldIcon,
   SignOutIcon
@@ -27,6 +28,7 @@ import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import { useApi } from '@/lib/useApi'
 import { cookiesPlugin } from '@/plugins'
 import type { GmailConnectionStatus } from '@/services/gmail'
+import { isShortcutActive, type ShortcutToken } from '@/services/shortcuts'
 import {
   Avatar,
   Box,
@@ -59,6 +61,7 @@ export default function MorePage() {
   const { data: session } = useSession()
   const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const { data: gmail } = useApi<GmailConnectionStatus>('gmail/connection')
+  const { data: shortcutTokens } = useApi<ShortcutToken[]>('shortcuts/tokens')
   const { isSubscribed } = usePushSubscription(session?.accessToken)
   const language = useDisclosure()
   const profile = data?.user
@@ -156,6 +159,26 @@ export default function MorePage() {
                 </>
               ) : gmail ? (
                 t('more.gmailDisconnected')
+              ) : (
+                chevron
+              )
+            }
+          />
+          <Row
+            href="/settings/shortcut"
+            icon={<IconBox icon={<PhoneIcon boxSize="18px" />} />}
+            label={t('more.shortcut')}
+            value={
+              isShortcutActive(shortcutTokens) ? (
+                <>
+                  <Box
+                    as="span"
+                    boxSize="9px"
+                    borderRadius="full"
+                    bg="money.income"
+                  />
+                  {t('more.shortcutActive')}
+                </>
               ) : (
                 chevron
               )
