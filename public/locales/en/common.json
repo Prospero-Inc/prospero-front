@@ -146,7 +146,8 @@
     "source": {
       "all": "All sources",
       "Manual": "Manual",
-      "Gmail": "Gmail"
+      "Gmail": "Gmail",
+      "Shortcut": "iPhone"
     },
     "clear": "Clear filters",
     "noMatches": "No movements match the filters.",
@@ -216,7 +217,9 @@
     "languageName": {
       "es": "Español",
       "en": "English"
-    }
+    },
+    "shortcut": "iPhone Shortcut",
+    "shortcutActive": "Active"
   },
   "quickAdd": {
     "title": "New movement",
@@ -308,7 +311,8 @@
     "discard": "Discard",
     "editFirst": "Edit before saving",
     "today": "today",
-    "yesterday": "yesterday"
+    "yesterday": "yesterday",
+    "suggested": "{{label}} (suggested)"
   },
   "movements": {
     "title": "Activity",
@@ -376,7 +380,8 @@
           "description": "We could not save the movement"
         }
       }
-    }
+    },
+    "iphone": "iPhone"
   },
   "welcome": {
     "pageTitle": "First steps · Prospero",
