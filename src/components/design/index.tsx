@@ -141,7 +141,7 @@ export const MovementRow = ({
 }: {
   icon: ReactNode
   title: string
-  subtitle: string
+  subtitle: ReactNode
   amount: string
   isIncome?: boolean
   trailing?: ReactNode
