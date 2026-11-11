@@ -51,6 +51,7 @@ jobs:
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SHORTCUT_ICLOUD_URL=${{ vars.NEXT_PUBLIC_SHORTCUT_ICLOUD_URL }}
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

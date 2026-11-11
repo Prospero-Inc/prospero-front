@@ -22,7 +22,9 @@ const READABLE_PATHS = new Set([
   'gmail/connection',
   'financial-institutions',
   'financial-institutions/supported-parsers',
-  'notifications/preferences'
+  'notifications/preferences',
+  'shortcuts/tokens',
+  'wallet-cards'
 ])
 
 const toQuery = (query: NextApiRequest['query']): Record<string, string> =>

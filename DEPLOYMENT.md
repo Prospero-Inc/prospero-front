@@ -28,6 +28,14 @@ Configúralos en Settings → Secrets and variables → Actions de este repo:
 | `NEXTAUTH_SECRET` | Secreto que NextAuth usa para firmar los JWT/cookies de sesión — cualquier string largo y aleatorio, ej. `openssl rand -hex 32` |
 | `AUTH_SECRET` | Mismo valor que `NEXTAUTH_SECRET` — algunos helpers de next-auth leen este nombre en su lugar; hay que poner los dos o falla la autenticación silenciosamente |
 
+## Variables (no secretas) en GitHub Actions
+
+En Settings → Secrets and variables → Actions → **Variables** de este repo:
+
+| Variable | Qué es |
+|---|---|
+| `NEXT_PUBLIC_SHORTCUT_ICLOUD_URL` | Enlace de iCloud del atajo "Prospero · Guardar gasto" (`https://www.icloud.com/shortcuts/...`), que abre el botón "Instalar el atajo" de Más → Atajo de iPhone. Es público, por eso va como variable y no como secreto. Igual que toda `NEXT_PUBLIC_*`, se incrusta en el bundle al compilar (build arg del `Dockerfile`): cambiarla requiere un nuevo deploy. Sin definir, el botón aparece deshabilitado con "Enlace no disponible todavía". |
+
 Si el puerto por el que esta app es alcanzable desde afuera es distinto
 al puerto en el que escucha por dentro (como el mapeo `4000:3000` del dev
 local), también necesitas `NEXTAUTH_URL_INTERNAL` — ver el comentario en
