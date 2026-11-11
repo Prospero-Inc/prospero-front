@@ -212,5 +212,62 @@
     "invalidCode": "That code isn't right. Use the one your app shows right now.",
     "genericError": "We couldn't verify the code. Try again.",
     "enabled": "Two-step verification turned on"
+  },
+  "shortcut": {
+    "title": "iPhone Shortcut",
+    "intro": "Every time you pay with Apple Wallet, an iPhone shortcut sends the expense to Prospero for you. Set it up once in three steps.",
+    "notIphone": "This works on iPhone with iOS 17 or later. From here you can create the token and pick each card's category; the shortcut itself is installed on the iPhone.",
+    "step1": {
+      "title": "Create your token",
+      "body": "It's the key the shortcut uses to save expenses to your account. We copy it to the clipboard so you can paste it in step 2.",
+      "generate": "Create and copy token",
+      "generateAnother": "Create another token",
+      "defaultName": "iPhone · {{date}}",
+      "onceWarning": "You'll only see it this once. If you lose it, create another one and revoke this one.",
+      "tokenLabel": "Your token",
+      "copy": "Copy",
+      "copied": "Token copied",
+      "copyFailed": "We couldn't copy it: select it and copy it by hand"
+    },
+    "step2": {
+      "title": "Install the shortcut",
+      "body": "Open the link on your iPhone and tap \"Add Shortcut\". When asked, paste the token.",
+      "install": "Install the shortcut",
+      "unavailable": "Link not available yet"
+    },
+    "step3": {
+      "title": "Run it when you pay",
+      "body": "In the Shortcuts app go to Automation → New Automation → Transaction. Pick your cards, choose \"Run Immediately\" and select the \"Prospero · Guardar gasto\" shortcut."
+    },
+    "screenshot": "Step {{number}} screenshot",
+    "screenshotPending": "Step {{number}} screenshot (coming soon)",
+    "tokens": {
+      "title": "Tokens",
+      "empty": "You haven't created any token yet.",
+      "created": "Created on {{date}}",
+      "lastUsed": "Last expense received: {{when}}",
+      "neverUsed": "No expenses received yet",
+      "revoked": "Revoked",
+      "revoke": "Revoke",
+      "revokeLabel": "Revoke {{name}}",
+      "confirmRevoke": "Revoke this token?",
+      "confirmRevokeDescription": "The shortcut using it stops saving expenses. To keep going, create another one and paste it in the shortcut.",
+      "revokeConfirm": "Revoke",
+      "revokedToast": "Token revoked"
+    },
+    "cards": {
+      "title": "Your Wallet cards",
+      "hint": "Choose which category each card's expenses go to. \"By merchant\" uses what we've already learned about each merchant and, if we don't know it, leaves it in To review.",
+      "empty": "No cards detected yet. They show up on their own after your first payment with the shortcut.",
+      "categoryLabel": "Category for {{name}}",
+      "byMerchant": "By merchant",
+      "saved": "Done: {{name}} → {{category}}",
+      "nameTaken": "You already have another card with that name",
+      "delete": "Delete card",
+      "deleteLabel": "Delete {{name}}",
+      "confirmDelete": "Delete {{name}}?",
+      "confirmDeleteDescription": "Its expenses stay as they are. If you pay with it again, it shows up again.",
+      "deletedToast": "Card deleted"
+    }
   }
 }
