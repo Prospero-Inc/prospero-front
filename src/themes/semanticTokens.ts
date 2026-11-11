@@ -63,6 +63,8 @@ export const semanticTokens = {
     'danger.border': { default: '#F3C4C5', _dark: '#5A2A2E' },
     // Unsupported-bank notice in "Agregar banco" (design .alert #FFF6E5).
     'notice.bg': { default: '#FFF6E5', _dark: '#3A2E14' },
+    // Atajo de iPhone: the Shortcuts path in step 3 (design .mini-steps).
+    'miniSteps.bg': { default: '#F7F7FB', _dark: '#24243A' },
 
     // Fills (bars, dots, icons) and their AA text variants.
     'money.income': { default: '#12B886', _dark: '#38D9A9' },

@@ -16,6 +16,8 @@ interface SettingsLayoutProps {
   isLoading?: boolean
   /** Fixed at thumb height on phones (design .bottom-cta). */
   bottomCta?: ReactNode
+  /** White phone screen instead of the gray canvas. */
+  surface?: boolean
   children: ReactNode
 }
 
@@ -29,6 +31,7 @@ export const SettingsLayout = ({
   back,
   isLoading = false,
   bottomCta,
+  surface = false,
   children
 }: SettingsLayoutProps) => {
   const { t } = useTranslation('common')
@@ -41,6 +44,7 @@ export const SettingsLayout = ({
       pageDescription={title}
       topBarTrailing={action ? { action } : 'none'}
       topBarBack={back ?? { href: '/more', label: t('more.title') }}
+      surface={surface}
     >
       {isLoading && PageSkeleton ? (
         <PageSkeleton />
