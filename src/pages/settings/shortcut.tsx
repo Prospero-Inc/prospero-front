@@ -110,7 +110,7 @@ export default function ShortcutSettingsPage() {
     <SettingsLayout
       title={t('shortcut.title')}
       isLoading={status === undefined && !statusError}
-      surface={!isLive}
+      surface={status !== undefined && !isLive}
     >
       {!isLive || showSteps ? (
         <ShortcutSetup onCreated={() => revalidateApi('shortcuts')} />
