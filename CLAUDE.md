@@ -98,6 +98,15 @@ already-authenticated session; it's unrelated to the login gate.
   side is set per page with `ProsperoLayout`'s `topBarTrailing` (`'avatar'` default, `'none'`
   on Más, `{ closeHref }` for sub-screens like Por revisar, which also hides the tab bar via
   `NO_TAB_BAR_ROUTES` in `AppShell`).
+- **Atajo de iPhone:** `pages/settings/shortcut.tsx` (Más → Conexiones; `/settings/*` is already
+  covered by `APP_SHELL_ROUTES`/`NO_TAB_BAR_ROUTES` by prefix) sets up the Shortcuts "Transaction"
+  automation that posts each Apple Wallet payment to the backend's `POST /shortcuts/transactions`
+  with a `prs_` token: create the token (copied inside the tap via `components/shortcut/
+  copyToClipboard.ts`, shown once), install the shortcut from `NEXT_PUBLIC_SHORTCUT_ICLOUD_URL`
+  (build arg; unset = disabled button), set up the automation; then the tokens (revoke) and the
+  Wallet cards' default category. Step screenshots go in `public/assets/shortcut/paso-N.png`
+  (`SHORTCUT_SCREENSHOTS`). Reads `shortcuts/tokens` and `wallet-cards` through the read proxy;
+  `source: 'Shortcut'` shows as "iPhone" and the review queue highlights `suggestedCategory`.
 
 #### Deploy
 
