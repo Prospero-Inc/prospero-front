@@ -131,6 +131,62 @@ const routes = {
     }
   ],
   'PATCH /api/notifications/preferences': body => [200, body],
+  // Atajo de iPhone: one token in use, one revoked; two Wallet cards.
+  'GET /api/shortcuts/tokens': () => [
+    200,
+    [
+      {
+        id: 2,
+        name: 'iPhone · 3 nov',
+        scope: 'transactions:create',
+        lastUsedAt: new Date(Date.now() - 5 * 60_000).toISOString(),
+        createdAt: '2026-11-03T15:00:00.000Z',
+        revokedAt: null
+      },
+      {
+        id: 1,
+        name: 'iPhone viejo',
+        scope: 'transactions:create',
+        lastUsedAt: null,
+        createdAt: '2026-10-20T15:00:00.000Z',
+        revokedAt: '2026-11-03T14:00:00.000Z'
+      }
+    ]
+  ],
+  'POST /api/shortcuts/tokens': body => [
+    201,
+    {
+      id: 3,
+      name: body?.name,
+      token: 'prs_fake0123456789abcdef',
+      createdAt: new Date().toISOString()
+    }
+  ],
+  'GET /api/wallet-cards': () => [
+    200,
+    [
+      {
+        id: 1,
+        userId: 1,
+        name: 'BAC Visa',
+        defaultCategory: 'Deseo',
+        financialInstitutionId: 7,
+        institutionName: 'BAC Credomatic',
+        createdAt: '2026-11-03T15:00:00.000Z',
+        updatedAt: '2026-11-03T15:00:00.000Z'
+      },
+      {
+        id: 2,
+        userId: 1,
+        name: 'Débito Agrícola',
+        defaultCategory: null,
+        financialInstitutionId: null,
+        institutionName: null,
+        createdAt: '2026-11-04T15:00:00.000Z',
+        updatedAt: '2026-11-04T15:00:00.000Z'
+      }
+    ]
+  ],
   'POST /api/auth/disable-2fa': body =>
     body?.token === '123456'
       ? [201, { msg: '2FA disabled' }]
@@ -209,6 +265,25 @@ createServer(async (req, res) => {
   const isDeleteById =
     req.method === 'DELETE' &&
     /^\/api\/(transactions|salary|fixed-expenses)\/\d+$/.test(path)
+  // Atajo de iPhone: revoke a token, edit or delete a Wallet card.
+  const isRevokeToken =
+    req.method === 'POST' &&
+    /^\/api\/shortcuts\/tokens\/\d+\/revoke$/.test(path)
+  const isWalletCard = /^\/api\/wallet-cards\/\d+$/.test(path)
+  if (
+    isRevokeToken ||
+    (isWalletCard && ['PATCH', 'DELETE'].includes(req.method))
+  ) {
+    const id = Number(path.split('/')[isRevokeToken ? 4 : 3])
+    res.statusCode = 200
+    return res.end(
+      JSON.stringify(
+        isRevokeToken
+          ? { id, revokedAt: new Date().toISOString() }
+          : { id, ...(body ?? {}) }
+      )
+    )
+  }
   const isPatchFixedExpense =
     req.method === 'PATCH' && /^\/api\/fixed-expenses\/\d+$/.test(path)
   const handler = isDeleteById
