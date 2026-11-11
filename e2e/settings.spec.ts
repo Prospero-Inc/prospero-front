@@ -53,6 +53,11 @@ test('each row of "Más" opens its own screen', async ({ page }) => {
     { row: /^Presupuesto/, url: '/settings/budget', title: 'Presupuesto' },
     { row: /^Gmail y bancos/, url: '/settings/gmail', title: 'Gmail y bancos' },
     {
+      row: /^Atajo de iPhone/,
+      url: '/settings/shortcut',
+      title: 'Atajo de iPhone'
+    },
+    {
       row: 'Notificaciones',
       url: '/settings/notifications',
       title: 'Notificaciones'
@@ -336,7 +341,8 @@ test('settings screens follow the mobile rules', async ({ page }) => {
     '/settings/security/2fa',
     '/settings/gmail',
     '/settings/notifications',
-    '/settings/security'
+    '/settings/security',
+    '/settings/shortcut'
   ]) {
     await page.goto(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
