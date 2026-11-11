@@ -5,6 +5,7 @@ FROM node:22.23.4-alpine AS base
 # client bundle by `next build`. Secrets (NEXTAUTH_SECRET) are passed at
 # runtime by docker-compose.yml so they never end up in an image layer.
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SHORTCUT_ICLOUD_URL
 ARG NEXTAUTH_URL
 
 RUN apk add --no-cache g++ make py3-pip libc6-compat
@@ -39,6 +40,7 @@ USER nextjs
 
 
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SHORTCUT_ICLOUD_URL=$NEXT_PUBLIC_SHORTCUT_ICLOUD_URL
 ENV NEXTAUTH_URL=$NEXTAUTH_URL
 
 # node_modules comes straight from the builder (already has everything
