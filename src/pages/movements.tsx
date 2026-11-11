@@ -10,7 +10,7 @@ import {
   MovementRow,
   SegmentedControl
 } from '@/components/design'
-import { FilterIcon, MailIcon } from '@/components/icons/app'
+import { AppleIcon, FilterIcon, MailIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { PossibleDuplicateCard } from '@/components/movements/PossibleDuplicateCard'
 import { SwipeRow } from '@/components/movements/SwipeRow'
@@ -39,7 +39,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { MdSwapVert } from 'react-icons/md'
 
 type Kind = 'expense' | 'income'
@@ -61,7 +61,7 @@ interface Row {
   id: number
   date: string
   title: string
-  subtitle: string
+  subtitle: ReactNode
   amount: number
   category: BudgetCategory | null
   source: string
@@ -135,11 +135,24 @@ export default function MovementsPage() {
     source: string
   }) =>
     item.institutionName ??
-    (item.source === 'Manual'
-      ? t('movements.manual')
-      : item.source === 'Shortcut'
-      ? t('movements.iphone')
-      : item.source)
+    (item.source === 'Manual' ? t('movements.manual') : item.source)
+
+  /** "Necesidades · BAC"; iPhone Shortcut rows as the design's .src-ip:
+   * "Necesidades · [Apple] iPhone". */
+  const expenseSubtitle = (item: TransactionListItem): ReactNode => {
+    const category = item.category
+      ? t(`welcome.split.${PLURAL[item.category]}`)
+      : null
+    if (item.source !== 'Shortcut')
+      return [category, sourceLabel(item)].filter(Boolean).join(' · ')
+    return (
+      <Box as="span" display="inline-flex" alignItems="center" gap="4px">
+        {category && `${category} ·`}
+        <AppleIcon boxSize="11px" />
+        {t('movements.iphone')}
+      </Box>
+    )
+  }
 
   // Pending ones live in the review queue, not in the list.
   const rows: Row[] = [
@@ -154,12 +167,7 @@ export default function MovementsPage() {
             item.description ||
             item.fixedExpenseName ||
             t('review.untitledExpense'),
-          subtitle: [
-            item.category ? t(`welcome.split.${PLURAL[item.category]}`) : null,
-            sourceLabel(item)
-          ]
-            .filter(Boolean)
-            .join(' · '),
+          subtitle: expenseSubtitle(item),
           amount: item.amount,
           category: item.category,
           source: item.source,

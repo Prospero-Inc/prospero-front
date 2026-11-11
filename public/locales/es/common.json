@@ -312,7 +312,9 @@
     "editFirst": "Editar antes de guardar",
     "today": "hoy",
     "yesterday": "ayer",
-    "suggested": "{{label}} (sugerida)"
+    "newMerchantQuestion": "Comercio nuevo. ¿Qué tipo de gasto es?",
+    "iphone": "iPhone",
+    "remember": "Recordar para <b>{{merchant}}</b>: la próxima vez se guarda solo"
   },
   "movements": {
     "title": "Movimientos",

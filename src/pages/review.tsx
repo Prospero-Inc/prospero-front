@@ -1,5 +1,6 @@
 import { formatRelativeDay } from '@/components/dashboard/periodText'
 import { BankBadge } from '@/components/design/settings'
+import { AppleIcon, CheckIcon } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
 import { useEditMovement } from '@/components/quick-add'
 import { LoadError } from '@/components/states/LoadError'
@@ -17,7 +18,7 @@ import type {
 import { Box, Button, Flex, Stack, Text, useToast } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
-import { useTranslation } from 'next-i18next'
+import { Trans, useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -39,6 +40,95 @@ type ReviewItem =
   | { kind: 'expense'; item: TransactionListItem }
   | { kind: 'income'; item: SalaryListItem }
 
+/** The row when it came from the iPhone Shortcut, else null. */
+const shortcutItem = (entry: ReviewItem): TransactionListItem | null =>
+  entry.kind === 'expense' && entry.item.source === 'Shortcut'
+    ? entry.item
+    : null
+
+/** "10:38 a. m.": dates are stored as the local wall clock in UTC fields. */
+const timeOf = (iso: string, locale: string) =>
+  new Intl.DateTimeFormat(locale === 'es' ? 'es-SV' : locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'UTC'
+  }).format(new Date(iso))
+
+/** design 20: black square with the Apple logo (iPhone Shortcut rows). */
+const AppleBadge = () => (
+  <Flex
+    boxSize="40px"
+    flexShrink={0}
+    borderRadius="12px"
+    bg="black"
+    color="white"
+    align="center"
+    justify="center"
+    aria-hidden
+  >
+    <AppleIcon boxSize="18px" />
+  </Flex>
+)
+
+/** design .learn/.chk: "Recordar para <comercio>", ticked by default. */
+const RememberMerchant = ({
+  merchant,
+  isOn,
+  onToggle
+}: {
+  merchant: string
+  isOn: boolean
+  onToggle: () => void
+}) => {
+  const { t } = useTranslation('common')
+  return (
+    <Flex
+      as="button"
+      type="button"
+      role="checkbox"
+      aria-checked={isOn}
+      onClick={onToggle}
+      w="full"
+      align="center"
+      gap="10px"
+      minH="44px"
+      mt="10px"
+      px="12px"
+      py="10px"
+      borderRadius="12px"
+      bg="choice.onBg"
+      fontSize="12.5px"
+      lineHeight="1.4"
+      color="text.primary"
+      textAlign="left"
+      _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
+    >
+      <Flex
+        boxSize="20px"
+        flexShrink={0}
+        borderRadius="6px"
+        align="center"
+        justify="center"
+        bg={isOn ? 'brand.solid' : 'transparent'}
+        borderWidth={isOn ? 0 : '2px'}
+        borderColor="radio.off"
+        color="white"
+        aria-hidden
+      >
+        {isOn && <CheckIcon boxSize="12px" />}
+      </Flex>
+      <Box as="span">
+        <Trans
+          t={t}
+          i18nKey="review.remember"
+          values={{ merchant }}
+          components={{ b: <Text as="b" fontWeight={700} /> }}
+        />
+      </Box>
+    </Flex>
+  )
+}
+
 const money = (value: number) =>
   `$${value.toLocaleString('en-US', {
     minimumFractionDigits: 2,
@@ -46,28 +136,36 @@ const money = (value: number) =>
   })}`
 
 /** `.rev .opts div`: 44 px outlined choice. */
+// design .rev .opts .sug: the suggested category, outlined in its color.
+const SUGGESTED_STYLE: Record<BudgetCategory, { border: string; bg: string }> =
+  {
+    Necesidad: { border: 'category.Necesidad', bg: 'brand.subtle' },
+    Deseo: { border: 'category.Deseo', bg: 'notice.bg' },
+    Ahorro: { border: 'category.Ahorro', bg: 'tint.Ahorro' }
+  }
+
 const OptionButton = ({
   label,
-  isSuggested = false,
-  suggestedLabel,
+  suggested,
   onClick
 }: {
   label: string
-  /** The iPhone Shortcut's guess (card or known merchant): brand border. */
-  isSuggested?: boolean
-  suggestedLabel?: string
+  /** Shown as the design's `.sug` (backend's suggestedCategory). */
+  suggested?: BudgetCategory
   onClick: () => void
 }) => (
   <Button
-    aria-label={isSuggested ? suggestedLabel : undefined}
+    data-suggested={suggested ? 'true' : undefined}
     variant="unstyled"
     flex="1 1 0"
     minW="calc(33.333% - 6px)"
     h="44px"
     borderRadius="12px"
     borderWidth="1.5px"
-    borderColor={isSuggested ? 'brand.solid' : 'border.subtle'}
-    bg={isSuggested ? 'brand.subtle' : undefined}
+    borderColor={
+      suggested ? SUGGESTED_STYLE[suggested].border : 'border.subtle'
+    }
+    bg={suggested ? SUGGESTED_STYLE[suggested].bg : undefined}
     fontSize="13px"
     fontWeight={650}
     color="text.primary"
@@ -172,6 +270,18 @@ export default function ReviewPage() {
     })
   }
 
+  // iPhone Shortcut rows whose "Recordar para …" was unticked.
+  const [forgetMerchant, setForgetMerchant] = useState<ReadonlySet<number>>(
+    new Set()
+  )
+  const toggleRemember = (id: number) =>
+    setForgetMerchant(current => {
+      const next = new Set(current)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
   const authorization = { Authorization: `Bearer ${session?.accessToken}` }
 
   const confirm = (entry: ReviewItem, choice: string) =>
@@ -184,7 +294,12 @@ export default function ReviewPage() {
             : `/proxy/update-salary?id=${entry.item.id}`,
         data:
           entry.kind === 'expense'
-            ? { category: choice }
+            ? {
+                category: choice,
+                ...(shortcutItem(entry)
+                  ? { rememberMerchant: !forgetMerchant.has(entry.item.id) }
+                  : {})
+              }
             : { incomeCategory: choice },
         headers: authorization
       })
@@ -281,6 +396,7 @@ export default function ReviewPage() {
           </Flex>
           {items.map(entry => {
             const { item } = entry
+            const shortcut = shortcutItem(entry)
             const options =
               entry.kind === 'expense' ? CATEGORIES : INCOME_CATEGORIES
             return (
@@ -292,7 +408,11 @@ export default function ReviewPage() {
                 p="14px"
               >
                 <Flex align="center" gap="12px">
-                  <BankBadge name={item.institutionName} />
+                  {shortcut ? (
+                    <AppleBadge />
+                  ) : (
+                    <BankBadge name={item.institutionName} />
+                  )}
                   <Box minW={0} flex={1}>
                     <Text
                       fontSize="14.5px"
@@ -308,16 +428,28 @@ export default function ReviewPage() {
                       mt="2px"
                       noOfLines={1}
                     >
-                      {t(
-                        entry.kind === 'expense'
-                          ? 'review.purchase'
-                          : 'review.possibleIncome'
+                      {shortcut ? (
+                        [
+                          t('review.iphone'),
+                          shortcut.walletCard?.name,
+                          timeOf(item.date, locale)
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')
+                      ) : (
+                        <>
+                          {t(
+                            entry.kind === 'expense'
+                              ? 'review.purchase'
+                              : 'review.possibleIncome'
+                          )}
+                          {' · '}
+                          {formatRelativeDay(item.date, locale, {
+                            today: t('review.today'),
+                            yesterday: t('review.yesterday')
+                          })}
+                        </>
                       )}
-                      {' · '}
-                      {formatRelativeDay(item.date, locale, {
-                        today: t('review.today'),
-                        yesterday: t('review.yesterday')
-                      })}
                     </Text>
                   </Box>
                   <Text
@@ -337,7 +469,9 @@ export default function ReviewPage() {
                 </Flex>
                 <Text fontSize="12px" color="text.secondary" mt="12px" mb="8px">
                   {t(
-                    entry.kind === 'expense'
+                    shortcut
+                      ? 'review.newMerchantQuestion'
+                      : entry.kind === 'expense'
                       ? 'review.expenseQuestion'
                       : 'review.incomeQuestion'
                   )}
@@ -353,16 +487,25 @@ export default function ReviewPage() {
                       <OptionButton
                         key={option}
                         label={label}
-                        isSuggested={
+                        suggested={
                           entry.kind === 'expense' &&
+                          entry.item.category === null &&
                           entry.item.suggestedCategory === option
+                            ? entry.item.suggestedCategory
+                            : undefined
                         }
-                        suggestedLabel={t('review.suggested', { label })}
                         onClick={() => confirm(entry, option)}
                       />
                     )
                   })}
                 </Flex>
+                {shortcut?.description && (
+                  <RememberMerchant
+                    merchant={shortcut.description}
+                    isOn={!forgetMerchant.has(shortcut.id)}
+                    onToggle={() => toggleRemember(shortcut.id)}
+                  />
+                )}
                 <Flex
                   justify={
                     entry.kind === 'expense' ? 'space-between' : 'flex-end'

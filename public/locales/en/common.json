@@ -312,7 +312,9 @@
     "editFirst": "Edit before saving",
     "today": "today",
     "yesterday": "yesterday",
-    "suggested": "{{label}} (suggested)"
+    "newMerchantQuestion": "New merchant. What kind of expense is it?",
+    "iphone": "iPhone",
+    "remember": "Remember for <b>{{merchant}}</b>: next time it saves on its own"
   },
   "movements": {
     "title": "Activity",
