@@ -48,19 +48,26 @@ const money = (value: number) =>
 /** `.rev .opts div`: 44 px outlined choice. */
 const OptionButton = ({
   label,
+  isSuggested = false,
+  suggestedLabel,
   onClick
 }: {
   label: string
+  /** The iPhone Shortcut's guess (card or known merchant): brand border. */
+  isSuggested?: boolean
+  suggestedLabel?: string
   onClick: () => void
 }) => (
   <Button
+    aria-label={isSuggested ? suggestedLabel : undefined}
     variant="unstyled"
     flex="1 1 0"
     minW="calc(33.333% - 6px)"
     h="44px"
     borderRadius="12px"
     borderWidth="1.5px"
-    borderColor="border.subtle"
+    borderColor={isSuggested ? 'brand.solid' : 'border.subtle'}
+    bg={isSuggested ? 'brand.subtle' : undefined}
     fontSize="13px"
     fontWeight={650}
     color="text.primary"
@@ -336,17 +343,25 @@ export default function ReviewPage() {
                   )}
                 </Text>
                 <Flex gap="8px" wrap="wrap">
-                  {options.map(option => (
-                    <OptionButton
-                      key={option}
-                      label={t(
-                        entry.kind === 'expense'
-                          ? `quickAdd.categories.${option}`
-                          : `review.incomeCategories.${option}`
-                      )}
-                      onClick={() => confirm(entry, option)}
-                    />
-                  ))}
+                  {options.map(option => {
+                    const label = t(
+                      entry.kind === 'expense'
+                        ? `quickAdd.categories.${option}`
+                        : `review.incomeCategories.${option}`
+                    )
+                    return (
+                      <OptionButton
+                        key={option}
+                        label={label}
+                        isSuggested={
+                          entry.kind === 'expense' &&
+                          entry.item.suggestedCategory === option
+                        }
+                        suggestedLabel={t('review.suggested', { label })}
+                        onClick={() => confirm(entry, option)}
+                      />
+                    )
+                  })}
                 </Flex>
                 <Flex
                   justify={
