@@ -44,10 +44,10 @@ import { MdSwapVert } from 'react-icons/md'
 
 type Kind = 'expense' | 'income'
 type Filter = 'all' | Kind
-type Source = 'all' | 'Manual' | 'Gmail'
+type Source = 'all' | 'Manual' | 'Gmail' | 'Shortcut'
 
 const FILTERS: Filter[] = ['all', 'expense', 'income']
-const SOURCES: Source[] = ['all', 'Manual', 'Gmail']
+const SOURCES: Source[] = ['all', 'Manual', 'Gmail', 'Shortcut']
 const CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 const PENDING = ['Detected', 'PendingReview']
 const PLURAL: Record<BudgetCategory, string> = {
@@ -135,7 +135,11 @@ export default function MovementsPage() {
     source: string
   }) =>
     item.institutionName ??
-    (item.source === 'Manual' ? t('movements.manual') : item.source)
+    (item.source === 'Manual'
+      ? t('movements.manual')
+      : item.source === 'Shortcut'
+      ? t('movements.iphone')
+      : item.source)
 
   // Pending ones live in the review queue, not in the list.
   const rows: Row[] = [
