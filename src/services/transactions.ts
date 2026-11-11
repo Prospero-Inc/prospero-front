@@ -4,7 +4,7 @@ import { Params } from '@/types'
 
 export type BudgetCategory = 'Necesidad' | 'Deseo' | 'Ahorro'
 export type PeriodOverride = 'Previous' | 'Current'
-export type MovementSource = 'Manual' | 'Gmail'
+export type MovementSource = 'Manual' | 'Gmail' | 'Shortcut'
 export type TransactionReviewStatus = 'Detected' | 'PendingReview' | 'Confirmed'
 
 export interface PossibleGmailDuplicate {
@@ -35,6 +35,9 @@ export interface TransactionListItem extends Omit<TransactionData, 'category'> {
   /** Banco del que se detectó (Gmail), si se conoce. */
   institutionName: string | null
   possibleGmailDuplicate: PossibleGmailDuplicate | null
+  /** Categoría que el atajo de iPhone sugiere (tarjeta o comercio ya
+   * aprendido) para una fila sin clasificar; ignorar si `category` ya está. */
+  suggestedCategory?: BudgetCategory | null
 }
 
 interface TransactionFilters {
