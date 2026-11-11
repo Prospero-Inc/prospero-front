@@ -38,6 +38,8 @@ export interface TransactionListItem extends Omit<TransactionData, 'category'> {
   /** Categoría que el atajo de iPhone sugiere (tarjeta o comercio ya
    * aprendido) para una fila sin clasificar; ignorar si `category` ya está. */
   suggestedCategory?: BudgetCategory | null
+  /** Wallet card it was paid with (iPhone Shortcut), if any. */
+  walletCard?: { id: number; name: string } | null
 }
 
 interface TransactionFilters {
@@ -79,8 +81,15 @@ const createTransaction = async (
   })
 }
 
+/** `PATCH /transactions/:id`. `rememberMerchant` (review queue, iPhone
+ * Shortcut rows; the API defaults to true) says whether confirming a
+ * category teaches it for that merchant. */
+export type UpdateTransactionData = Partial<TransactionData> & {
+  rememberMerchant?: boolean
+}
+
 const updateTransaction = async (
-  data: Partial<TransactionData>,
+  data: UpdateTransactionData,
   params: Params | unknown
 ) => {
   const { lang, authorization, id } = params as Params & { id: string }
