@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
 import { useUndoableCommit } from '@/hooks/useUndoableCommit'
-import { localApiService } from '@/lib'
+import { localApiService } from '@/lib/localApiService'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
 import type { IncomeCategory, SalaryListItem } from '@/services/salary'
 import type {

@@ -8,7 +8,7 @@ import {
   PasswordRules
 } from '@/components/auth/AuthScreen'
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
+import { localApiService } from '@/lib/localApiService'
 import { Box, Button, Flex, Input, useToast } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'

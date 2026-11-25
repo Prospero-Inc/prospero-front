@@ -1,5 +1,5 @@
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
+import { localApiService } from '@/lib/localApiService'
 import { useToast } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'

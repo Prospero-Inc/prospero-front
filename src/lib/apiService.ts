@@ -2,43 +2,19 @@ import { AxiosInstance, AxiosResponse } from 'axios'
 import axios from 'axios'
 
 import axiosInstance from './axiosInstance'
-import axiosLocal from './axiosInstanceLocal'
+import {
+  type IRequest,
+  type TParams,
+  HttpError,
+  formattedEndpoint,
+  toHttpError
+} from './http'
 
-type TMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-
-type TParams = {
-  [key: string]: string | number
-}
-
-export interface IRequest {
-  method: TMethod
-  endPoint: string
-  data?: unknown | null
-  params?: TParams
-  query?: TParams
-  headers?: Record<string, string>
-}
-
-const formattedEndpoint = (endPoint: string, params: TParams = {}): string => {
-  let formattedEndpoint = endPoint
-  for (const [key, value] of Object.entries(params))
-    formattedEndpoint = formattedEndpoint.replace(`:${key}`, String(value))
-
-  return formattedEndpoint
-}
-
-export class HttpError extends Error {
-  status: number
-
-  constructor(message: string, status: number) {
-    super(message)
-    this.status = status
-  }
-}
+export { HttpError } from './http'
+export type { IRequest } from './http'
 
 class ApiService {
   private static externalInstance: ApiService
-  private static localInstance: ApiService
   private axiosInstance: AxiosInstance
 
   private constructor(axiosInstance: AxiosInstance) {
@@ -68,13 +44,6 @@ class ApiService {
     return ApiService.externalInstance
   }
 
-  public static getLocalInstance(): ApiService {
-    if (!ApiService.localInstance)
-      ApiService.localInstance = new ApiService(axiosLocal)
-
-    return ApiService.localInstance
-  }
-
   public async request<T>({
     method,
     endPoint,
@@ -92,23 +61,8 @@ class ApiService {
 
       return response.data
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status ?? 500
-        const errorMessage = error.response?.data?.message
-        const errorArr = error.response?.data?.errors
-        // Handle message if it's a string or an array of strings
-        if (errorArr) throw new HttpError(errorArr.join(', '), status)
-
-        const formattedErrorMessage =
-          typeof errorMessage === 'string'
-            ? errorMessage
-            : Array.isArray(errorMessage)
-            ? errorMessage.join(', ')
-            : 'An error occurred. Please try again.'
-
-        console.error(`API error: ${formattedErrorMessage}`)
-        throw new HttpError(formattedErrorMessage, status)
-      }
+      if (axios.isAxiosError(error))
+        throw toHttpError(error.response?.status ?? 500, error.response?.data)
 
       // Handle non-Axios errors
       console.error('ERROR SERVER API SERVICE', error)
@@ -121,6 +75,6 @@ class ApiService {
 }
 
 const externalApiService = ApiService.getExternalInstance()
-const localApiService = ApiService.getLocalInstance()
 
-export { externalApiService, localApiService }
+export { externalApiService }
+export { localApiService } from './localApiService'

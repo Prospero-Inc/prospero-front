@@ -18,7 +18,7 @@ import {
 } from '@/components/settings/useSettingsRequest'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
-import { HttpError } from '@/lib/apiService'
+import { HttpError } from '@/lib/http'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
 import type {
   FinancialInstitution,
