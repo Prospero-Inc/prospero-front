@@ -55,3 +55,38 @@ test('precaches the icons, the manifest and the favicon', async ({ page }) => {
   })
   expect(missing).toEqual([])
 })
+
+test('changing the language does not register the service worker again', async ({
+  page
+}) => {
+  await page.addInitScript(() => {
+    const register = ServiceWorkerContainer.prototype.register
+    const counted = window as unknown as { swRegistrations: number }
+    counted.swRegistrations = 0
+    ServiceWorkerContainer.prototype.register = function (...args) {
+      counted.swRegistrations += 1
+      return register.apply(this, args)
+    }
+  })
+  await page.goto('/auth/login')
+  await page.getByLabel('Correo electrónico').fill('ana@example.com')
+  await page.getByLabel('Contraseña', { exact: true }).fill('Sup3r-secret!')
+  await page
+    .locator('form')
+    .getByRole('button', { name: 'Iniciar sesión' })
+    .click()
+  await page.waitForURL('**/dashboard')
+  await page.goto('/more')
+  const registrations = () =>
+    page.evaluate(
+      () => (window as unknown as { swRegistrations: number }).swRegistrations
+    )
+  await expect.poll(registrations).toBe(1)
+
+  await page.getByRole('button', { name: /Idioma/ }).click()
+  await page.getByRole('button', { name: /English/ }).click()
+  await page.waitForURL('**/en/more')
+  await expect(page.getByRole('button', { name: /Language/ })).toBeVisible()
+
+  expect(await registrations()).toBe(1)
+})
