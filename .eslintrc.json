@@ -68,6 +68,19 @@
         "allowTernary": true
       }
     ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          { "name": "@/config", "message": "Server-only (NextAuth config): use it only in src/pages/api, src/lib/session or getServerSideProps." },
+          { "name": "@/lib/session", "message": "Server-only: import it only from getServerSideProps pages listed in .eslintrc overrides." },
+          { "name": "next-auth/next", "message": "Server-only: pulls jose/openid-client into the client bundle." }
+        ],
+        "patterns": [
+          { "group": ["@/config/*"], "message": "Server-only (NextAuth config)." }
+        ]
+      }
+    ],
     "import-helpers/order-imports": [
       "error",
       {
@@ -86,5 +99,18 @@
         }
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // Server-only code; pages here use @/lib/session only inside getServerSideProps, which Next strips from the client bundle.
+      "files": [
+        "src/pages/api/**",
+        "src/config/**",
+        "src/lib/session.ts",
+        "src/lib/server/**",
+        "src/pages/settings/security/2fa.tsx"
+      ],
+      "rules": { "no-restricted-imports": "off" }
+    }
+  ]
 }
