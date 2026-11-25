@@ -18,16 +18,8 @@ import { FC, ReactNode } from 'react'
  */
 
 const SkeletonPage = ({ children }: { children: ReactNode }) => (
-  <Box
-    aria-hidden="true"
-    sx={{
-      '@media (prefers-reduced-motion: reduce)': {
-        '.chakra-skeleton': { animation: 'none' }
-      }
-    }}
-  >
-    {children}
-  </Box>
+  // The pulse and its reduced-motion fallback live in the Skeleton theme.
+  <Box aria-hidden="true">{children}</Box>
 )
 
 const SectionTitle = ({ w = '200px' }: { w?: string }) => (
@@ -85,8 +77,8 @@ const Bone = ({
     h={h}
     w={w}
     borderRadius={radius}
-    startColor={onBrand ? 'whiteAlpha.300' : 'track.bg'}
-    endColor={onBrand ? 'whiteAlpha.100' : 'border.subtle'}
+    startColor={onBrand ? 'whiteAlpha.300' : undefined}
+    endColor={onBrand ? 'whiteAlpha.100' : undefined}
     {...rest}
   />
 )
@@ -302,11 +294,7 @@ const MoreSkeleton: FC = () => (
   <ScreenStack>
     <Card radius="18px" p="14px">
       <Flex align="center" gap="12px">
-        <SkeletonCircle
-          size="48px"
-          startColor="track.bg"
-          endColor="border.subtle"
-        />
+        <SkeletonCircle size="48px" />
         <TwoLines w="45%" />
       </Flex>
     </Card>
@@ -324,11 +312,7 @@ const MoreSkeleton: FC = () => (
 const ProfileSettingsSkeleton: FC = () => (
   <ScreenStack>
     <Flex direction="column" align="center" gap="10px" pt="6px" pb="4px">
-      <SkeletonCircle
-        size="72px"
-        startColor="track.bg"
-        endColor="border.subtle"
-      />
+      <SkeletonCircle size="72px" />
       <Bone h="11px" w="150px" />
     </Flex>
     <ListRowsBone widths={['40%', '50%', '35%']} />
