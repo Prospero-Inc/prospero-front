@@ -39,7 +39,13 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { type ReactNode, useState } from 'react'
+import {
+  type ReactNode,
+  useDeferredValue,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { MdSwapVert } from 'react-icons/md'
 
 type Kind = 'expense' | 'income'
@@ -92,9 +98,30 @@ export default function MovementsPage() {
   const filter = pick(query.kind, FILTERS, 'all')
   const source = pick(query.source, SOURCES, 'all')
   const category = CATEGORIES.find(option => option === query.category)
-  const search = typeof query.q === 'string' ? query.q : ''
+  const urlSearch = typeof query.q === 'string' ? query.q : ''
+  // Typing stays local; the list filters a deferred copy and ?q= follows
+  // 300 ms after the last key, so each keystroke doesn't re-route.
+  const [search, setSearch] = useState(urlSearch)
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch)
+  if (urlSearch !== syncedSearch) {
+    // ?q= changed from outside (router ready, back button).
+    setSyncedSearch(urlSearch)
+    setSearch(urlSearch)
+  }
+  const deferredSearch = useDeferredValue(search)
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => () => clearTimeout(searchTimer.current), [])
+  const onSearchChange = (value: string) => {
+    setSearch(value)
+    clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(
+      () => setQuery({ q: value || undefined }),
+      300
+    )
+  }
 
   const setQuery = (next: Record<string, string | undefined>) => {
+    clearTimeout(searchTimer.current)
     const merged: Record<string, string | undefined> = {
       period,
       kind: filter === 'all' ? undefined : filter,
@@ -103,6 +130,7 @@ export default function MovementsPage() {
       q: search || undefined,
       ...next
     }
+    setSyncedSearch(merged.q ?? '')
     router.replace(
       {
         pathname: router.pathname,
@@ -209,8 +237,8 @@ export default function MovementsPage() {
     .filter(row => source === 'all' || row.source === source)
     .filter(row => !category || row.category === category)
     .filter(row => {
-      if (!search) return true
-      const needle = search.toLowerCase()
+      if (!deferredSearch) return true
+      const needle = deferredSearch.toLowerCase()
       return (
         row.title.toLowerCase().includes(needle) ||
         row.amount.toFixed(2).includes(needle)
@@ -251,7 +279,7 @@ export default function MovementsPage() {
       title={t('movements.title')}
       pageDescription={t('movements.title')}
     >
-      <Stack spacing="12px" maxW="lg" pb={4}>
+      <Stack className="stagger" spacing="12px" maxW="lg" pb={4}>
         {/* Phones have the tab bar's "+". */}
         <Button
           display={{ base: 'none', md: 'inline-flex' }}
@@ -302,7 +330,7 @@ export default function MovementsPage() {
           <Input
             autoFocus
             value={search}
-            onChange={event => setQuery({ q: event.target.value || undefined })}
+            onChange={event => onSearchChange(event.target.value)}
             placeholder={t('movementFilters.searchPlaceholder')}
             aria-label={t('movementFilters.searchLabel')}
             h="44px"

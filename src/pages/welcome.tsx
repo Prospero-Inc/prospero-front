@@ -9,7 +9,8 @@ import {
 } from '@/components/welcome/split'
 import { HttpMethod } from '@/enums'
 import type { PayFrequency, Profile } from '@/interfaces'
-import { getTodayLocalDate, localApiService } from '@/lib'
+import { getTodayLocalDate } from '@/lib/getTodayLocalDate'
+import { localApiService } from '@/lib/localApiService'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
 import {
   Box,

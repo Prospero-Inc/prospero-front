@@ -7,8 +7,8 @@ import {
 } from '@/components/auth/AuthScreen'
 import { AlertIcon, CheckIcon, MailIcon } from '@/components/icons/app'
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib'
-import { HttpError } from '@/lib/apiService'
+import { HttpError } from '@/lib/http'
+import { localApiService } from '@/lib/localApiService'
 import {
   Box,
   Button,

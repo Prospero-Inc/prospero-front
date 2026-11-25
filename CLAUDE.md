@@ -41,8 +41,8 @@ NextAuth (`src/pages/api/auth/[...nextauth].ts`, config in `src/config/authConfi
 the NestJS API's JWT — session token is a NextAuth JWT, not a raw backend token. `src/middleware.ts`
 gates all non-API/non-static routes: redirects `/` → `/dashboard`, sends unauthenticated users to
 `/auth/login`, and redirects already-authenticated users away from
-`/auth/{login,register,forgot-password,verify-2fa}`. It also hand-rolls CORS preflight handling
-for a hardcoded `allowedOrigins` list — update that list if a new client origin needs access.
+`/auth/{login,register,forgot-password,verify-2fa}`. There is no CORS handling: the browser
+only ever calls this app's own origin.
 
 Login is two-step when the account has 2FA enabled: `LoginView` first calls
 `POST /proxy/login`; a plain success returns `{ accessToken, accessTokenExpiresIn, refreshToken,
@@ -53,8 +53,9 @@ with it and rejects the sign-in if the backend does. A `{ requires2FA, preAuthTo
 `sessionStorage` (`PRE_AUTH_TOKEN_STORAGE_KEY` in `src/interfaces/auth.interface.ts`) and routes to
 `/auth/verify-2fa` (`VerifyTwoFactorView`), which exchanges the OTP + preAuthToken via
 `POST /proxy/login-verify-2fa` for the real token set before calling `signIn` the same way. Don't
-confuse this with `/profile/verify-2fa` — that page verifies a code when *enabling* 2FA from an
-already-authenticated session; it's unrelated to the login gate.
+confuse this with `/settings/security/2fa` — that page enables 2FA from an
+already-authenticated session (the old `/profile/2fa` and `/profile/verify-2fa` URLs redirect
+there); it's unrelated to the login gate.
 
 #### App shell and UI conventions (mobile wave 4)
 
@@ -146,7 +147,8 @@ detail of this design.
 - `authConfig.ts`'s `jwt` callback is the refresh engine (NextAuth v4's documented refresh-token
   rotation recipe): on a fresh `signIn` it seeds `token.accessToken`/`refreshToken`/
   `accessTokenExpires` from the `user` object `authorize` returned; on every subsequent call it
-  either returns the token as-is (still before `accessTokenExpires`) or calls
+  either returns the token as-is (more than `REFRESH_MARGIN_MS` — 360 s: one 300 s
+  `SessionProvider` poll plus 60 s — before `accessTokenExpires`) or calls
   `refreshAccessToken(token)`, which `POST`s `/proxy/refresh-token` with the current
   `refreshToken`, rotates all three fields from the response, and — on failure (dead/revoked
   refresh token) — sets `token.error = 'RefreshAccessTokenError'` instead of throwing, so NextAuth's
@@ -158,15 +160,20 @@ detail of this design.
   protected pages *and* for not redirecting an errored session away from `/auth/login`, which
   would otherwise infinite-loop against the SSR guard below), so a dead session can't get a page
   render before the watcher fires.
-- `getServerSideProps` pages that need the session (`dashboard`,
-  `settings`, `profile/index`) call the shared `getValidSession(req)` helper (`src/lib/session.ts`)
-  instead of `next-auth/react`'s `getSession` directly — it wraps `getSession` and returns a
-  ready-to-return `{ redirect: { destination: '/auth/login', ... } }` when `session.error` is set,
-  so each page just does `const { session, redirect } = await getValidSession(req); if (redirect)
-  return redirect`. `fixed-expenses.tsx` and `profile/2fa.tsx` still call `getSession` directly and
-  haven't been migrated to this helper — same gap, lower priority since those pages weren't in
-  scope for the refresh-token rollout.
-- Explicit "cerrar sesión" actions (`settings.tsx`, `MobileNav.tsx`) call
+- `refreshAccessToken` de-duplicates concurrent refreshes of the same refresh token through a
+  `globalThis` map (not a module-level one: each Pages Router entry gets its own module
+  instance) — keep it; it's what stops two callers from redeeming one rotating token.
+- In the browser, `localApiService` retries a request that carried an `Authorization` header
+  **once** after a 401: it reads the current session with `getSession()` (whose `jwt` callback
+  renews the token) and resends only if the token changed. That covers `useApi` reads and the
+  mutations alike — don't add per-call retries on top.
+- The only page with a session-dependent `getServerSideProps` is `settings/security/2fa.tsx`;
+  it uses the shared `getValidSession(req, res)` helper (`src/lib/session.ts`, server-only —
+  import it as `@/lib/session`, never through `@/lib`), which wraps `getServerSession` and returns
+  a ready-to-return `{ redirect: { destination: '/auth/login', ... } }` when `session.error` is
+  set: `const { session, redirect } = await getValidSession(req, res); if (redirect) return
+  redirect`. Any new SSR page that needs the session must use it.
+- Explicit "cerrar sesión" actions (`more.tsx`, `settings/security.tsx`, `MobileNav.tsx`) call
   `signOutAndUnsubscribePush(session?.accessToken, opts)` (`src/lib/signOutAndUnsubscribePush.ts`),
   which best-effort unsubscribes this browser from Web Push (bounded by a timeout, errors
   swallowed) and then calls NextAuth's `signOut()` — so the next user of the same browser
@@ -200,8 +207,9 @@ call happens:
   handling was also fixed to stop swallowing the real status/message — see git history).
   `apiService.ts`'s `HttpError` class carries the real upstream status end-to-end through this
   chain; don't go back to throwing plain `Error`s there.
-- **Main screens load data client-side with SWR** — `dashboard`, `movements`, `review`,
-  `fixed-expenses` (and the sidebar's pending badge) use `useApi(path, query)` from
+- **Every screen loads its data client-side with SWR** — `dashboard`, `movements`, `review`,
+  `fixed-expenses`, `more`, the `settings/*` screens (and the sidebar's pending badge) use
+  `useApi(path, query)` from
   `src/lib/useApi.ts`, which GETs `/api/proxy/read/<path>`: a read-only pass-through with a
   closed allowlist of backend paths (`pages/api/proxy/read/[...path].ts`). Those pages only have
   `getStaticProps` for translations (the middleware guards them), so navigating, switching
@@ -211,9 +219,11 @@ call happens:
   request failed. The SWR cache is **in memory only** and scoped to the signed-in user
   (`components/ui/UserScopedSWR.tsx` in `_app`) — never persist it. First load shows the page's
   skeleton (`getPageSkeleton`), not its empty state.
-- **`getServerSideProps`** remains on `profile/*` and `settings.tsx`: it calls the same
-  `src/services/*` functions **directly** (no proxy hop on the server), and those pages still
-  `router.replace(router.asPath)` after a mutation.
+- **`getServerSideProps`** remains only on `settings/security/2fa.tsx` (it creates a fresh 2FA
+  secret per visit, calling `src/services/2fa.ts` directly — no proxy hop on the server) and on
+  `auth/reset-password/[token].tsx` (translations only). Every other page is SSG
+  (`getStaticProps` for translations); `/settings` redirects to `/more` and `/profile` to
+  `/settings/profile` (`next.config.js` `redirects`).
 
 ### Web Push notifications
 
@@ -227,15 +237,18 @@ Standard Web Push (VAPID, **not** Firebase). Pieces:
   `defaultCache` for static assets, but every cache that would hold user data (`next-data`,
   `apis`, `pages*`, `others`) is `NetworkOnly`, and those caches are deleted on activate. Offline
   navigations fall back to the precached `/_offline` page. Precache from `public/` is limited to
-  `icons/`, `manifest.json`, `favicon.ico` (never `assets/`). `skipWaiting: false`:
+  `icons/`, `manifest.json`, `favicon.ico` (never `assets/`), listed in `next.config.js`'s
+  `additionalPrecacheEntries` with an md5-of-content revision computed at build time — Serwist
+  ignores `globPublicPatterns` once `additionalPrecacheEntries` is set, so don't move them back
+  there. A new file the app shell needs offline must be added to that list. `skipWaiting: false`:
   `components/ui/ServiceWorkerUpdater.tsx` registers the worker and, when a new one is waiting,
   shows a "new version" toast; accepting posts SKIP_WAITING and reloads once it takes control.
   `@serwist/next` is ESM-only — `next.config.js` `require`s it, which needs Node 22.12+.
 - `src/lib/webPush.ts` — browser-side logic: support/iOS/standalone detection, VAPID key
   decoding, subscribe/unsubscribe against the proxies, typed `PushSubscriptionError` codes.
 - `src/hooks/usePushSubscription.ts` — React state over that lib (availability, permission,
-  `isSubscribed`, `enable`/`disable`); consumed by `components/views/settings/PushDeviceToggle.tsx`
-  inside `NotificationPreferences`.
+  `isSubscribed`, `enable`/`disable`); consumed by `pages/settings/notifications.tsx`
+  (this device's toggle) and `pages/more.tsx` (the row's summary).
 - Proxies `push-vapid-public-key` (GET, no auth; `publicKey: null` means the server has no VAPID
   configured), `push-subscribe` and `push-unsubscribe` (POST, Bearer) → `services/notifications.ts`.
 - Product rule: while the user has push active on any device, the backend sends the Gmail
@@ -248,18 +261,21 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
 
 ### Structure
 
-- `src/pages/` — routed pages: `auth/*` (login/register/forgot-password/verify-2fa),
-  `dashboard`, `movements` (income and expenses), `review` (Gmail queue), `fixed-expenses` (recurring
-  costs — CRUD plus a "mark as paid" action that generates a `Transaction`, see
-  `prospero-backend/CLAUDE.md`'s `fixed-expenses` module), `goals` (placeholder — the spec marks
-  detailed savings goals as post-MVP), `settings`, `budget-calculator`, `profile/*` (incl. 2FA
-  setup/verify flows). All except `goals` and the `auth/*` pages use `getServerSideProps`
-  (needed for the auth token + per-user data).
-- `src/components/views/` — page-level feature components (`auth`, `budgetCalculator`,
-  `profile`), separate from `components/ui` (design-system primitives) and `components/layouts`.
+- `src/pages/` — routed pages: `auth/*` (login/register/forgot-password/verify-2fa/
+  verify-account/reset-password), `dashboard`, `movements` (income and expenses), `review` (Gmail
+  queue), `fixed-expenses` (recurring costs — CRUD plus a "mark as paid" action that generates a
+  `Transaction`, see `prospero-backend/CLAUDE.md`'s `fixed-expenses` module), `more` ("Más"),
+  `settings/*` (profile, budget, notifications, gmail, shortcut, security, security/2fa),
+  `welcome`, `budget-calculator`, `goals` ("Metas: próximamente" — the spec marks savings goals
+  as post-MVP; nothing hardcoded is shown), `_offline`, `500`. All are static (`getStaticProps`
+  for translations) and fetch per-user data in the browser — see "API proxy pattern" for the two
+  exceptions.
+- `src/components/views/` — the `auth` screens' view components; the other features live in
+  their own folder under `src/components/` (`dashboard`, `movements`, `settings`, `quick-add`, …),
+  separate from `components/ui` (design-system primitives) and `components/layouts`.
 - `src/services/` — backend-calling functions, either wrapped by a proxy route or called
   directly from `getServerSideProps`: `2fa.ts`, `budgetCalculator.ts`, `userService.ts`,
-  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`,
+  `request-profile.ts` (`updateProfile`), `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`,
   `notifications.ts` (preferences + Web Push subscriptions), among others.
 - `src/lib/` — shared non-React helpers (`apiService`, `createHandler`, `session`, `webPush`,
   `signOutAndUnsubscribePush`, …).

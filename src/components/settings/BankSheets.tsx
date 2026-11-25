@@ -16,7 +16,7 @@ import {
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
-import { HttpError } from '@/lib/apiService'
+import { HttpError } from '@/lib/http'
 import type {
   FinancialInstitution,
   SupportedParser

@@ -6,8 +6,8 @@ import {
   LoginResponse,
   PRE_AUTH_TOKEN_STORAGE_KEY
 } from '@/interfaces'
-import { localApiService } from '@/lib'
-import { HttpError } from '@/lib/apiService'
+import { HttpError } from '@/lib/http'
+import { localApiService } from '@/lib/localApiService'
 import { cookiesPlugin } from '@/plugins'
 import { Stack, useToast } from '@chakra-ui/react'
 import {

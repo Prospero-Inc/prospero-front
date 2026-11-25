@@ -113,3 +113,67 @@ body {
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* ---- iOS-style motion (transform/opacity only) ---- */
+:root {
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Skeleton placeholder pulse (see themes/skeleton.ts). */
+@keyframes ios-skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.chakra-skeleton {
+  animation: ios-skeleton-pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chakra-skeleton {
+    animation: none !important;
+  }
+}
+
+/* Press feedback: buttons, tappable rows and tab bar links shrink a touch
+   under the finger. :where() keeps specificity at zero, so components that
+   set their own transform/transition (swipe rows, the tab bar "+") win. */
+:where(button, [role='button'], nav a):not(:disabled, [aria-disabled='true']) {
+  transition: transform 160ms var(--ease-ios);
+}
+:where(button, [role='button'], nav a):not(
+    :disabled,
+    [aria-disabled='true']
+  ):active {
+  transform: scale(0.97);
+}
+
+/* Staggered entrance of a screen's cards/rows once its data has rendered:
+   add className="stagger" to the stack holding them. */
+@keyframes ios-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.stagger > * {
+  animation: ios-rise 420ms var(--ease-ios) backwards;
+}
+.stagger > :nth-child(2) { animation-delay: 45ms; }
+.stagger > :nth-child(3) { animation-delay: 90ms; }
+.stagger > :nth-child(4) { animation-delay: 135ms; }
+.stagger > :nth-child(5) { animation-delay: 180ms; }
+.stagger > :nth-child(6) { animation-delay: 225ms; }
+.stagger > :nth-child(n + 7) { animation-delay: 270ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    animation: none;
+  }
+  :where(button, [role='button'], nav a):active {
+    transform: none !important;
+  }
+}

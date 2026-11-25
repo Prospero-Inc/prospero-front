@@ -52,9 +52,40 @@ const tokens = () => ({
   }
 })
 
+// Token-renewal tests log in as `expiring.<x>@…` (the access token expires
+// in 330 s, inside the front's 360 s renewal margin) or `dying.<x>@…`
+// (expires in 368 s, but this backend rejects it 3 s after issuing it, as if
+// the phone had slept past its expiry). Their tokens carry the tag so each
+// test finds its own requests; refreshing one yields
+// `fake-access-token-renewed-<tag>`.
+const TAGGED = /^(expiring|dying)\.[\w-]+$/
+const DYING_AFTER_MS = 3000
+const taggedTokens = tag => ({
+  ...tokens(),
+  accessToken: `fake-access-token-${tag}-${Date.now()}`,
+  accessTokenExpiresIn: tag.startsWith('expiring') ? 330 : 368,
+  refreshToken: `fake-refresh-${tag}-${Date.now()}`
+})
+const loginTokens = body => {
+  const tag = String(body?.email ?? '').split('@')[0]
+  return TAGGED.test(tag) ? taggedTokens(tag) : tokens()
+}
+const refreshTokens = body => {
+  const tag = /^fake-refresh-(.+)-\d+$/.exec(body?.refreshToken ?? '')?.[1]
+  return tag && TAGGED.test(tag)
+    ? { ...tokens(), accessToken: `fake-access-token-renewed-${tag}` }
+    : tokens()
+}
+const isDeadToken = authorization => {
+  const match = /^Bearer fake-access-token-dying\..+-(\d+)$/.exec(
+    authorization ?? ''
+  )
+  return match !== null && Date.now() - Number(match[1]) > DYING_AFTER_MS
+}
+
 const routes = {
-  'POST /api/auth/login': () => [201, tokens()],
-  'POST /api/auth/refresh': () => [201, tokens()],
+  'POST /api/auth/login': body => [201, loginTokens(body)],
+  'POST /api/auth/refresh': body => [201, refreshTokens(body)],
   'POST /api/auth/logout': () => [200, {}],
   'GET /api/auth/profile': () => [200, { msg: 'Profile', user }],
   'PATCH /api/auth/profile': body => [
@@ -250,6 +281,11 @@ createServer(async (req, res) => {
   const body = await readBody(req)
   const query = Object.fromEntries(new URL(req.url, 'http://x').searchParams)
   requests.push({ method: req.method, path, query, body, headers: req.headers })
+
+  if (isDeadToken(req.headers.authorization)) {
+    res.statusCode = 401
+    return res.end(JSON.stringify({ message: 'Unauthorized' }))
+  }
 
   // Review queue confirmations: PATCH /api/transactions/:id, /api/salary/:id
   const isPatchById =

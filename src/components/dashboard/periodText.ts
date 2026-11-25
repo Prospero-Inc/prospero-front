@@ -1,3 +1,4 @@
+import { getTodayLocalDate } from '@/lib/getTodayLocalDate'
 import type { PeriodSummary } from '@/services/periods'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -41,19 +42,22 @@ export const formatPeriodRange = (
     : `${month(start)} ${day(start)} – ${month(end)} ${day(end)}`
 }
 
-/** "hoy", "ayer" or "29 oct", relative to today (UTC dates). */
+/**
+ * "hoy", "ayer" or "29 oct". The movement's day (its UTC date part) is
+ * compared with the device's local today: at 20:00 in El Salvador the UTC
+ * date is already tomorrow.
+ */
 export const formatRelativeDay = (
   isoDate: string,
   locale: string,
   labels: { today: string; yesterday: string }
 ): string => {
+  const day = isoDate.slice(0, 10)
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (day === getTodayLocalDate()) return labels.today
+  if (day === getTodayLocalDate(yesterday)) return labels.yesterday
   const date = new Date(isoDate)
-  const today = new Date()
-  const utcDay = (d: Date) =>
-    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
-  const diff = Math.round((utcDay(today) - utcDay(date)) / DAY_MS)
-  if (diff === 0) return labels.today
-  if (diff === 1) return labels.yesterday
   return new Intl.DateTimeFormat(locale, {
     day: 'numeric',
     month: 'short',

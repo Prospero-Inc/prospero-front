@@ -5,11 +5,11 @@ import {
   AppShellTitleProvider,
   usesAppShell
 } from '@/components/layouts/shell'
-import { SessionWatcher } from '@/components/ui'
 import { ConfirmProvider } from '@/components/ui/ConfirmSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
 import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
+import { SessionWatcher } from '@/components/ui/SessionWatcher'
 import { UserScopedSWR } from '@/components/ui/UserScopedSWR'
 import {
   PendingRouteContext,
@@ -18,12 +18,13 @@ import {
 } from '@/hooks/useRouteLoading'
 import { theme } from '@/themes'
 import { ChakraProvider } from '@chakra-ui/react'
+import { MotionConfig, motion } from 'framer-motion'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 /** Visible at least this long so a fast load doesn't flash the logo. */
 const SPLASH_MIN_VISIBLE_MS = 350
@@ -67,12 +68,28 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   // (ver `middleware.ts`) antes de renderizar: acá antes se cambiaba del
   // lado del cliente después del primer render, lo que hacía "saltar" de
   // idioma y forzaba inglés a quien entraba por primera vez.
-  const page = PageSkeleton ? (
+  // Fade + slight rise on every screen change, but not on the first paint
+  // (that's the splash's job) nor on same-page updates (key = pathname).
+  const hasNavigated = useRef(false)
+  useEffect(() => {
+    hasNavigated.current = true
+  }, [])
+  const content = PageSkeleton ? (
     <ProsperoLayout title={t('routeLoading')} pageDescription="">
       <PageSkeleton />
     </ProsperoLayout>
   ) : (
     <Component {...pageProps} />
+  )
+  const page = (
+    <motion.div
+      key={router.pathname}
+      initial={hasNavigated.current ? { opacity: 0, y: 8 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.26, ease: [0.32, 0.72, 0, 1] }}
+    >
+      {content}
+    </motion.div>
   )
   // The shell is mounted once and stays while moving between app screens
   // (same element in the same place), so only the page inside re-renders.
@@ -80,47 +97,49 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     PageSkeleton && targetPathname ? targetPathname : router.pathname
 
   return (
-    <ChakraProvider
-      theme={theme}
-      toastOptions={{
-        defaultOptions: {
-          isClosable: true,
-          duration: 3000
-        }
-      }}
-    >
-      <Head>
-        {/* viewport-fit=cover: draw under the notch/home bar on iPhone; the
+    <MotionConfig reducedMotion="user">
+      <ChakraProvider
+        theme={theme}
+        toastOptions={{
+          defaultOptions: {
+            isClosable: true,
+            duration: 3000
+          }
+        }}
+      >
+        <Head>
+          {/* viewport-fit=cover: draw under the notch/home bar on iPhone; the
             safe-area insets in globals.css keep content clear of them. */}
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
-      </Head>
-      {/* 5 min: the access token lasts 15, and each poll is a request. */}
-      <SessionProvider session={session} refetchInterval={300}>
-        <SessionWatcher />
-        <ServiceWorkerUpdater />
-        <RouteProgress isLoading={isLoading} />
-        <UserScopedSWR>
-          <RouteLoadingContext.Provider value={routeLoading}>
-            <PendingRouteContext.Provider
-              value={PageSkeleton ? targetPathname : null}
-            >
-              <ConfirmProvider>
-                <AppShellTitleProvider>
-                  {usesAppShell(shellPathname) ? (
-                    <AppShell>{page}</AppShell>
-                  ) : (
-                    page
-                  )}
-                </AppShellTitleProvider>
-              </ConfirmProvider>
-            </PendingRouteContext.Provider>
-          </RouteLoadingContext.Provider>
-        </UserScopedSWR>
-      </SessionProvider>
-    </ChakraProvider>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+          />
+        </Head>
+        {/* 5 min: the access token lasts 15, and each poll is a request. */}
+        <SessionProvider session={session} refetchInterval={300}>
+          <SessionWatcher />
+          <ServiceWorkerUpdater />
+          <RouteProgress isLoading={isLoading} />
+          <UserScopedSWR>
+            <RouteLoadingContext.Provider value={routeLoading}>
+              <PendingRouteContext.Provider
+                value={PageSkeleton ? targetPathname : null}
+              >
+                <ConfirmProvider>
+                  <AppShellTitleProvider>
+                    {usesAppShell(shellPathname) ? (
+                      <AppShell>{page}</AppShell>
+                    ) : (
+                      page
+                    )}
+                  </AppShellTitleProvider>
+                </ConfirmProvider>
+              </PendingRouteContext.Provider>
+            </RouteLoadingContext.Provider>
+          </UserScopedSWR>
+        </SessionProvider>
+      </ChakraProvider>
+    </MotionConfig>
   )
 }
 

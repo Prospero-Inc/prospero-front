@@ -8,14 +8,15 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useMovementFormatters } from '@/components/ui/MovementSummary'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { HttpMethod } from '@/enums'
-import { getTodayLocalDate, localApiService } from '@/lib'
-import { HttpError } from '@/lib/apiService'
 import {
   DueStatus,
   dueDayOf,
   occurrenceDayOf,
   resolveDueStatus
 } from '@/lib/fixedExpenseDue'
+import { getTodayLocalDate } from '@/lib/getTodayLocalDate'
+import { HttpError } from '@/lib/http'
+import { localApiService } from '@/lib/localApiService'
 import { useApi, useRevalidateApi, useUpdateApiCache } from '@/lib/useApi'
 import { FixedExpenseData } from '@/services/fixedExpenses'
 import {

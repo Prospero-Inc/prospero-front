@@ -1,5 +1,5 @@
 import { HttpMethod } from '@/enums'
-import { localApiService } from '@/lib/apiService'
+import { localApiService } from '@/lib/localApiService'
 import type {
   PushOkResponse,
   PushSubscriptionData,

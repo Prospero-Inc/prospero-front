@@ -1,7 +1,7 @@
 import { Button, Flex, Text, useToast } from '@chakra-ui/react'
 import { Serwist } from '@serwist/window'
 import { useTranslation } from 'next-i18next'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 const TOAST_ID = 'sw-update'
 
@@ -12,8 +12,14 @@ const TOAST_ID = 'sw-update'
  * Production only: there is no service worker in `next dev`.
  */
 export const ServiceWorkerUpdater = () => {
+  // In refs, so changing language (a new `t`) doesn't register the worker
+  // again: the effect runs once and reads the current ones.
   const toast = useToast()
+  const toastRef = useRef(toast)
+  toastRef.current = toast
   const { t } = useTranslation('common')
+  const tRef = useRef(t)
+  tRef.current = t
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') return
@@ -21,13 +27,16 @@ export const ServiceWorkerUpdater = () => {
 
     const serwist = new Serwist('/sw.js', { scope: '/', type: 'classic' })
 
+    // Reload once the new worker controls the page, so code and cache match.
+    const reload = () => window.location.reload()
     const activateUpdate = () => {
-      // Reload once the new worker controls the page, so code and cache match.
-      serwist.addEventListener('controlling', () => window.location.reload())
+      serwist.addEventListener('controlling', reload)
       serwist.messageSkipWaiting()
     }
 
-    serwist.addEventListener('waiting', () => {
+    const offerUpdate = () => {
+      const t = tRef.current
+      const toast = toastRef.current
       if (toast.isActive(TOAST_ID)) return
       toast({
         id: TOAST_ID,
@@ -57,12 +66,17 @@ export const ServiceWorkerUpdater = () => {
           </Flex>
         )
       })
-    })
+    }
+    serwist.addEventListener('waiting', offerUpdate)
 
     serwist.register().catch(error => {
       console.error('Service worker registration failed', error)
     })
-  }, [toast, t])
+    return () => {
+      serwist.removeEventListener('waiting', offerUpdate)
+      serwist.removeEventListener('controlling', reload)
+    }
+  }, [])
 
   return null
 }

@@ -37,21 +37,6 @@ export interface SupportedParser {
   label: string
 }
 
-const getSupportedParsers = async (
-  _ignore: unknown,
-  params: Params | unknown
-): Promise<unknown> => {
-  const { lang, authorization } = params as Params
-  return await externalApiService.request({
-    method: HttpMethod.GET,
-    endPoint: '/financial-institutions/supported-parsers',
-    headers: {
-      'x-lang': `${lang}`,
-      Authorization: authorization
-    }
-  })
-}
-
 const getFinancialInstitutions = async (
   _filters: unknown,
   params: Params | unknown
@@ -149,7 +134,6 @@ const deleteInstitutionSender = async (
 }
 
 export {
-  getSupportedParsers,
   getFinancialInstitutions,
   createFinancialInstitution,
   updateFinancialInstitution,

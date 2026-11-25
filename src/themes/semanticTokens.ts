@@ -23,6 +23,8 @@ export const semanticTokens = {
     'brand.subtle': { default: '#EBEBFE', _dark: '#2A2A55' },
     'hero.bg': { default: '#5352ED', _dark: '#3E3DC4' },
     'track.bg': { default: '#EEEEF5', _dark: '#2C2C40' },
+    // Loading placeholders: clearly darker than the card/canvas they sit on.
+    'skeleton.bg': { default: '#E2E2EE', _dark: '#34344E' },
     'tab.inactive': { default: '#6E7085', _dark: '#9C9EB4' },
     'tab.active': { default: '#5352ED', _dark: '#A9A8FF' },
     'tabbar.bg': {

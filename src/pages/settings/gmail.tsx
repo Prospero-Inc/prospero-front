@@ -18,8 +18,8 @@ import {
 } from '@/components/settings/useSettingsRequest'
 import { useConfirm } from '@/components/ui/ConfirmSheet'
 import { HttpMethod } from '@/enums'
-import { HttpError } from '@/lib/apiService'
-import { useApi } from '@/lib/useApi'
+import { HttpError } from '@/lib/http'
+import { useApi, useRevalidateApi } from '@/lib/useApi'
 import type {
   FinancialInstitution,
   SupportedParser
@@ -153,6 +153,7 @@ export default function GmailSettingsPage() {
     error,
     mutate: mutateConnection
   } = useApi<GmailConnectionStatus>('gmail/connection')
+  const revalidateApi = useRevalidateApi()
   const { data: institutionsData, mutate: mutateInstitutions } = useApi<
     FinancialInstitution[]
   >('financial-institutions')
@@ -222,7 +223,11 @@ export default function GmailSettingsPage() {
     setBusy('sync')
     try {
       await request('/proxy/sync-gmail-now', HttpMethod.POST)
-      await mutateConnection()
+      // The sync may add movements: don't wait for SWR's deduping window.
+      await Promise.all([
+        mutateConnection(),
+        revalidateApi('periods', 'transactions', 'salary', 'review-queue')
+      ])
       toast({ title: t('gmail.toast.synced'), status: 'success' })
     } catch (syncError) {
       if (syncError instanceof HttpError && syncError.status === 409)
