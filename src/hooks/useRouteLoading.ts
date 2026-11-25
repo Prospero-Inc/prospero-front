@@ -24,11 +24,12 @@ export interface RouteLoadingState {
 }
 
 /**
- * Todas las páginas cargan sus datos en `getServerSideProps`: al tocar un
- * link, Next espera esa respuesta antes de cambiar de pantalla. Este hook
- * expone a dónde se está yendo durante esa espera, para mostrar enseguida
- * el skeleton de esa pantalla. Las navegaciones shallow (filtros) se
- * ignoran: no cargan datos.
+ * Las páginas son estáticas y piden sus datos en el navegador (SWR), pero al
+ * tocar un link Next igual espera el JS de la página y su JSON de
+ * `getStaticProps` (traducciones) antes de cambiar de pantalla; la primera
+ * vez, en una red lenta, se nota. Este hook expone a dónde se está yendo
+ * durante esa espera, para mostrar enseguida el skeleton de esa pantalla.
+ * Las navegaciones shallow (filtros) se ignoran: no cargan nada.
  */
 export const useRouteLoading = (): RouteLoadingState => {
   const router = useRouter()

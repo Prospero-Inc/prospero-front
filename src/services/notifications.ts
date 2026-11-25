@@ -38,21 +38,6 @@ export interface PushOkResponse {
   ok: true
 }
 
-const getNotificationPreferences = async (
-  _ignore: unknown,
-  params: Params | unknown
-): Promise<unknown> => {
-  const { lang, authorization } = params as Params
-  return await externalApiService.request({
-    method: HttpMethod.GET,
-    endPoint: '/notifications/preferences',
-    headers: {
-      'x-lang': `${lang}`,
-      Authorization: authorization
-    }
-  })
-}
-
 const updateNotificationPreferences = async (
   data: UpdateNotificationPreferencesData,
   params: Params | unknown
@@ -114,7 +99,6 @@ const unsubscribePush = async (
 }
 
 export {
-  getNotificationPreferences,
   getVapidPublicKey,
   subscribePush,
   unsubscribePush,

@@ -118,6 +118,11 @@ const getSelfBaseUrl = () =>
 // cover that "shortly after, not literally concurrent" case.
 const IN_FLIGHT_GRACE_PERIOD_MS = 10_000
 
+// Renew this long before the access token expires: one `SessionProvider`
+// poll (`refetchInterval={300}` in `_app`) plus 60 s, so the token the
+// browser holds between two polls is never already expired.
+const REFRESH_MARGIN_MS = (300 + 60) * 1000
+
 declare global {
   // eslint-disable-next-line no-var
   var __prosperoInFlightRefreshes: Map<string, Promise<JWT>> | undefined
@@ -282,7 +287,8 @@ export const config: AuthOptions = {
       // "Rollout / compatibility") — `Date.now() < (undefined ?? 0)` is
       // `false`, so those fall straight into `refreshAccessToken`, which
       // fails (no refresh token to send) and self-heals via `token.error`.
-      if (Date.now() < (token.accessTokenExpires ?? 0)) return token
+      if (Date.now() < (token.accessTokenExpires ?? 0) - REFRESH_MARGIN_MS)
+        return token
 
       return refreshAccessToken(token)
     },
