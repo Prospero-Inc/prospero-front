@@ -91,6 +91,49 @@ test('movements lists expenses and income together, filterable', async ({
   await expect(incomeRow).toBeHidden()
 })
 
+test('movements: search filters as you type and keeps ?q= in the URL', async ({
+  page
+}) => {
+  await page.route('**/api/proxy/read/periods/transactions*', route =>
+    route.fulfill({
+      json: [
+        expense(1, {
+          description: 'Súper Selectos',
+          category: 'Necesidad',
+          reviewStatus: 'Confirmed'
+        }),
+        expense(2, {
+          description: 'Pizza Hut',
+          category: 'Deseo',
+          reviewStatus: 'Confirmed'
+        })
+      ]
+    })
+  )
+  await page.route('**/api/proxy/read/periods/salary*', route =>
+    route.fulfill({ json: [] })
+  )
+  await login(page)
+  const superRow = page.getByRole('button', { name: 'Editar Súper Selectos' })
+  const pizzaRow = page.getByRole('button', { name: 'Editar Pizza Hut' })
+
+  // A ?q= from the URL is respected on load.
+  await page.goto('/movements?q=pizza')
+  await expect(pizzaRow).toBeVisible()
+  await expect(superRow).toBeHidden()
+  const field = page.getByLabel('Buscar movimientos')
+  await expect(field).toHaveValue('pizza')
+
+  await field.fill('súper')
+  await expect(superRow).toBeVisible()
+  await expect(pizzaRow).toBeHidden()
+  await expect(page).toHaveURL(/[?&]q=s%C3%BAper/)
+
+  await field.fill('')
+  await expect(pizzaRow).toBeVisible()
+  await expect(page).not.toHaveURL(/[?&]q=/)
+})
+
 test('review: one tap confirms, "Deshacer" cancels before anything is sent', async ({
   page
 }) => {
