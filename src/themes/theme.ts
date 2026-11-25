@@ -7,6 +7,7 @@ import { linkTheme } from './link'
 import { semanticTokens } from './semanticTokens'
 import { shadows } from './shadows'
 import { buttonTheme, inputTheme, numberInputTheme, selectTheme } from './sizes'
+import { skeletonTheme } from './skeleton'
 
 export const theme = extendTheme({
   colors,
@@ -25,6 +26,7 @@ export const theme = extendTheme({
         bg: 'primary.500'
       }
     },
+    Skeleton: skeletonTheme,
     Button: buttonTheme,
     Input: inputTheme,
     Select: selectTheme,
