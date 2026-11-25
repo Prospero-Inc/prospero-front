@@ -16,7 +16,7 @@ import {
 import { HttpMethod } from '@/enums'
 import { useIsOnline } from '@/hooks/useIsOnline'
 import type { PayFrequency, Profile } from '@/interfaces'
-import { localApiService } from '@/lib'
+import { localApiService } from '@/lib/localApiService'
 import { useApi, useRevalidateApi } from '@/lib/useApi'
 import { Box, Button, Flex, Stack, Text, useToast } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'

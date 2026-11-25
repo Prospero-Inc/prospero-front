@@ -91,6 +91,49 @@ test('movements lists expenses and income together, filterable', async ({
   await expect(incomeRow).toBeHidden()
 })
 
+test('movements: search filters as you type and keeps ?q= in the URL', async ({
+  page
+}) => {
+  await page.route('**/api/proxy/read/periods/transactions*', route =>
+    route.fulfill({
+      json: [
+        expense(1, {
+          description: 'Súper Selectos',
+          category: 'Necesidad',
+          reviewStatus: 'Confirmed'
+        }),
+        expense(2, {
+          description: 'Pizza Hut',
+          category: 'Deseo',
+          reviewStatus: 'Confirmed'
+        })
+      ]
+    })
+  )
+  await page.route('**/api/proxy/read/periods/salary*', route =>
+    route.fulfill({ json: [] })
+  )
+  await login(page)
+  const superRow = page.getByRole('button', { name: 'Editar Súper Selectos' })
+  const pizzaRow = page.getByRole('button', { name: 'Editar Pizza Hut' })
+
+  // A ?q= from the URL is respected on load.
+  await page.goto('/movements?q=pizza')
+  await expect(pizzaRow).toBeVisible()
+  await expect(superRow).toBeHidden()
+  const field = page.getByLabel('Buscar movimientos')
+  await expect(field).toHaveValue('pizza')
+
+  await field.fill('súper')
+  await expect(superRow).toBeVisible()
+  await expect(pizzaRow).toBeHidden()
+  await expect(page).toHaveURL(/[?&]q=s%C3%BAper/)
+
+  await field.fill('')
+  await expect(pizzaRow).toBeVisible()
+  await expect(page).not.toHaveURL(/[?&]q=/)
+})
+
 test('review: one tap confirms, "Deshacer" cancels before anything is sent', async ({
   page
 }) => {
@@ -132,6 +175,44 @@ test('review: one tap confirms, "Deshacer" cancels before anything is sent', asy
         body: expect.objectContaining({ category: 'Necesidad' })
       })
     )
+})
+
+test('review: confirming many cards in a row re-reads the lists once', async ({
+  page
+}) => {
+  // The queue as the backend sees it: a card leaves once its PATCH lands.
+  const ids = [61, 62, 63, 64, 65, 66, 67, 68]
+  const sent = new Set<number>()
+  let reads = 0
+  page.on('request', request => {
+    const match = /update-transaction\?id=(\d+)/.exec(request.url())
+    if (match) sent.add(Number(match[1]))
+  })
+  await page.route('**/api/proxy/read/transactions*', route => {
+    reads += 1
+    return route.fulfill({
+      json: ids.filter(id => !sent.has(id)).map(id => expense(id))
+    })
+  })
+  await page.route('**/api/proxy/read/salary*', route =>
+    route.fulfill({ json: [] })
+  )
+  await login(page)
+  await page.goto('/review')
+  const cards = page.getByRole('article')
+  await expect(cards).toHaveCount(ids.length)
+  const readsBefore = reads
+
+  for (let i = 0; i < ids.length; i += 1)
+    await cards.first().getByRole('button', { name: 'Necesidad' }).click()
+  await expect(cards).toHaveCount(0)
+
+  // All sent after the undo window, then one quiet re-fetch.
+  await expect.poll(() => sent.size, { timeout: 15_000 }).toBe(ids.length)
+  await expect.poll(() => reads - readsBefore, { timeout: 5_000 }).toBe(1)
+  await page.waitForTimeout(2_500)
+  expect(reads - readsBefore).toBeLessThanOrEqual(2)
+  await expect(cards).toHaveCount(0)
 })
 
 test('review: "Editar antes de guardar" corrects in the sheet and stays in the queue', async ({

@@ -5,11 +5,11 @@ import {
   AppShellTitleProvider,
   usesAppShell
 } from '@/components/layouts/shell'
-import { SessionWatcher } from '@/components/ui'
 import { ConfirmProvider } from '@/components/ui/ConfirmSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
 import { ServiceWorkerUpdater } from '@/components/ui/ServiceWorkerUpdater'
+import { SessionWatcher } from '@/components/ui/SessionWatcher'
 import { UserScopedSWR } from '@/components/ui/UserScopedSWR'
 import {
   PendingRouteContext,

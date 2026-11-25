@@ -9,8 +9,8 @@ import { ShieldIcon } from '@/components/icons/app'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { HttpMethod } from '@/enums'
 import { LoginSuccessResponse, PRE_AUTH_TOKEN_STORAGE_KEY } from '@/interfaces'
-import { localApiService } from '@/lib'
-import { HttpError } from '@/lib/apiService'
+import { HttpError } from '@/lib/http'
+import { localApiService } from '@/lib/localApiService'
 import {
   Box,
   Button,

@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import useSWR, { useSWRConfig } from 'swr'
 
-import { localApiService } from './apiService'
+import { localApiService } from './localApiService'
 
 // Client-side data for the main screens (dashboard, expenses, income, fixed
 // expenses): SWR over /api/proxy/read/*, so navigating and saving no longer

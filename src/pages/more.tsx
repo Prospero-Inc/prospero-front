@@ -19,6 +19,7 @@ import {
   SignOutIcon
 } from '@/components/icons/app'
 import { ProsperoLayout } from '@/components/layouts'
+import { isShortcutActive } from '@/components/shortcut/isShortcutActive'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { CookiesEnum } from '@/enums'
@@ -28,7 +29,7 @@ import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import { useApi } from '@/lib/useApi'
 import { cookiesPlugin } from '@/plugins'
 import type { GmailConnectionStatus } from '@/services/gmail'
-import { isShortcutActive, type ShortcutToken } from '@/services/shortcuts'
+import type { ShortcutToken } from '@/services/shortcuts'
 import {
   Avatar,
   Box,
