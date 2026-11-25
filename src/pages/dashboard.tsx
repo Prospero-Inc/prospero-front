@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   if (!period)
     return layout(
-      <Stack spacing="12px" maxW="lg" pb={4}>
+      <Stack className="stagger" spacing="12px" maxW="lg" pb={4}>
         <LoadError
           what={t('states.what.period')}
           onRetry={() => periodQuery.mutate()}
@@ -71,7 +71,7 @@ const Dashboard = () => {
   // First use: no income this period yet (design 13, "Inicio vacío").
   if (period.income === 0)
     return layout(
-      <Stack spacing="12px" maxW="lg" pb={4}>
+      <Stack className="stagger" spacing="12px" maxW="lg" pb={4}>
         <FirstSteps />
         {reviewQueue && <ReviewAlertCard summary={reviewQueue} />}
         {period.recentTransactions.length > 0 ? (
@@ -83,7 +83,7 @@ const Dashboard = () => {
     )
 
   return layout(
-    <Stack spacing="12px" maxW="lg" pb={4}>
+    <Stack className="stagger" spacing="12px" maxW="lg" pb={4}>
       <HomeHero period={period} />
       {reviewQueue && <ReviewAlertCard summary={reviewQueue} />}
       <SplitCard budget={period.budget} income={period.income} />

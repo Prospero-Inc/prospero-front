@@ -251,7 +251,7 @@ export default function MovementsPage() {
       title={t('movements.title')}
       pageDescription={t('movements.title')}
     >
-      <Stack spacing="12px" maxW="lg" pb={4}>
+      <Stack className="stagger" spacing="12px" maxW="lg" pb={4}>
         {/* Phones have the tab bar's "+". */}
         <Button
           display={{ base: 'none', md: 'inline-flex' }}

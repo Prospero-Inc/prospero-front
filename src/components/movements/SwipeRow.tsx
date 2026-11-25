@@ -126,6 +126,7 @@ export const SwipeRow = ({
         onPointerCancel={finish}
         onClick={onClick}
         onKeyDown={onKeyDown}
+        _active={{ bg: 'bg.subtle' }}
         _focusVisible={{ boxShadow: 'outline', outline: 'none' }}
       >
         {children}
