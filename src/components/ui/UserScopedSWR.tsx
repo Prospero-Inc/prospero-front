@@ -14,7 +14,15 @@ export const UserScopedSWR = ({ children }: { children: ReactNode }) => {
   return (
     <SWRConfig
       key={session?.user?.email ?? 'signed-out'}
-      value={{ provider: () => new Map(), revalidateOnFocus: true }}
+      value={{
+        provider: () => new Map(),
+        revalidateOnFocus: true,
+        // Saving always re-fetches with an explicit mutate (useRevalidateApi),
+        // which skips deduping; these only spare repeated reads on navigation
+        // and on going back to the app.
+        dedupingInterval: 30_000,
+        focusThrottleInterval: 60_000
+      }}
     >
       {children}
     </SWRConfig>
