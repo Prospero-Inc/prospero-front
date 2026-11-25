@@ -32,3 +32,26 @@ test('shows the offline page when a screen cannot load', async ({
   ).toBeVisible()
   await context.setOffline(false)
 })
+
+test('precaches the icons, the manifest and the favicon', async ({ page }) => {
+  await page.goto('/auth/login')
+  await activeServiceWorker(page)
+
+  const missing = await page.evaluate(async () => {
+    const urls = [
+      '/manifest.json',
+      '/favicon.ico',
+      '/icons/icon-192.png',
+      '/icons/icon-512.png',
+      '/icons/icon-maskable-192.png',
+      '/icons/icon-maskable-512.png',
+      '/icons/apple-touch-icon.png'
+    ]
+    // Precache entries carry a ?__WB_REVISION__ query.
+    const cached = await Promise.all(
+      urls.map(url => caches.match(url, { ignoreSearch: true }))
+    )
+    return urls.filter((_, index) => !cached[index])
+  })
+  expect(missing).toEqual([])
+})

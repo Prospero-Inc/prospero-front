@@ -227,7 +227,10 @@ Standard Web Push (VAPID, **not** Firebase). Pieces:
   `defaultCache` for static assets, but every cache that would hold user data (`next-data`,
   `apis`, `pages*`, `others`) is `NetworkOnly`, and those caches are deleted on activate. Offline
   navigations fall back to the precached `/_offline` page. Precache from `public/` is limited to
-  `icons/`, `manifest.json`, `favicon.ico` (never `assets/`). `skipWaiting: false`:
+  `icons/`, `manifest.json`, `favicon.ico` (never `assets/`), listed in `next.config.js`'s
+  `additionalPrecacheEntries` with an md5-of-content revision computed at build time — Serwist
+  ignores `globPublicPatterns` once `additionalPrecacheEntries` is set, so don't move them back
+  there. A new file the app shell needs offline must be added to that list. `skipWaiting: false`:
   `components/ui/ServiceWorkerUpdater.tsx` registers the worker and, when a new one is waiting,
   shows a "new version" toast; accepting posts SKIP_WAITING and reloads once it takes control.
   `@serwist/next` is ESM-only — `next.config.js` `require`s it, which needs Node 22.12+.
