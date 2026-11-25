@@ -22,10 +22,12 @@ import { Trans, useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MdDoneAll } from 'react-icons/md'
 
 const PENDING_STATUSES = 'Detected,PendingReview'
+/** Quiet time after the last confirmation before re-fetching the lists. */
+const REFRESH_DEBOUNCE_MS = 1500
 const CATEGORIES: BudgetCategory[] = ['Necesidad', 'Deseo', 'Ahorro']
 const INCOME_CATEGORIES: IncomeCategory[] = [
   'Payroll',
@@ -219,6 +221,31 @@ export default function ReviewPage() {
   const setReviewedKey = toggle(setReviewed)
   const locale = router.locale ?? 'es'
 
+  // Cards already sent, kept hidden until the lists are re-fetched. One
+  // re-fetch after a burst of confirmations instead of 4 GETs per card,
+  // which reached the backend's 60 req/min limit at ~15 cards a minute.
+  const sentKeys = useRef<string[]>([])
+  const refreshTimer = useRef<ReturnType<typeof setTimeout>>()
+  const isMounted = useRef(true)
+  useEffect(() => {
+    isMounted.current = true
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+  const scheduleRefresh = (cardKey: string) => {
+    sentKeys.current.push(cardKey)
+    clearTimeout(refreshTimer.current)
+    // Left the screen: refresh at once so the next one shows fresh data.
+    const delay = isMounted.current ? REFRESH_DEBOUNCE_MS : 0
+    refreshTimer.current = setTimeout(async () => {
+      const keys = sentKeys.current
+      sentKeys.current = []
+      await revalidateApi('periods', 'transactions', 'salary', 'review-queue')
+      keys.forEach(key => setHiddenKey(key, false)) // gone from the lists
+    }, delay)
+  }
+
   const items: ReviewItem[] = [
     ...(expenses.data ?? []).map(item => ({ kind: 'expense' as const, item })),
     ...(incomes.data ?? []).map(item => ({ kind: 'income' as const, item }))
@@ -264,8 +291,7 @@ export default function ReviewPage() {
           setReviewedKey(cardKey, false)
           return
         }
-        await revalidateApi('periods', 'transactions', 'salary', 'review-queue')
-        setHiddenKey(cardKey, false) // gone from the refetched list anyway
+        scheduleRefresh(cardKey)
       }
     })
   }

@@ -134,6 +134,44 @@ test('review: one tap confirms, "Deshacer" cancels before anything is sent', asy
     )
 })
 
+test('review: confirming many cards in a row re-reads the lists once', async ({
+  page
+}) => {
+  // The queue as the backend sees it: a card leaves once its PATCH lands.
+  const ids = [61, 62, 63, 64, 65, 66, 67, 68]
+  const sent = new Set<number>()
+  let reads = 0
+  page.on('request', request => {
+    const match = /update-transaction\?id=(\d+)/.exec(request.url())
+    if (match) sent.add(Number(match[1]))
+  })
+  await page.route('**/api/proxy/read/transactions*', route => {
+    reads += 1
+    return route.fulfill({
+      json: ids.filter(id => !sent.has(id)).map(id => expense(id))
+    })
+  })
+  await page.route('**/api/proxy/read/salary*', route =>
+    route.fulfill({ json: [] })
+  )
+  await login(page)
+  await page.goto('/review')
+  const cards = page.getByRole('article')
+  await expect(cards).toHaveCount(ids.length)
+  const readsBefore = reads
+
+  for (let i = 0; i < ids.length; i += 1)
+    await cards.first().getByRole('button', { name: 'Necesidad' }).click()
+  await expect(cards).toHaveCount(0)
+
+  // All sent after the undo window, then one quiet re-fetch.
+  await expect.poll(() => sent.size, { timeout: 15_000 }).toBe(ids.length)
+  await expect.poll(() => reads - readsBefore, { timeout: 5_000 }).toBe(1)
+  await page.waitForTimeout(2_500)
+  expect(reads - readsBefore).toBeLessThanOrEqual(2)
+  await expect(cards).toHaveCount(0)
+})
+
 test('review: "Editar antes de guardar" corrects in the sheet and stays in the queue', async ({
   page
 }) => {
