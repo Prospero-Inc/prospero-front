@@ -41,8 +41,8 @@ NextAuth (`src/pages/api/auth/[...nextauth].ts`, config in `src/config/authConfi
 the NestJS API's JWT — session token is a NextAuth JWT, not a raw backend token. `src/middleware.ts`
 gates all non-API/non-static routes: redirects `/` → `/dashboard`, sends unauthenticated users to
 `/auth/login`, and redirects already-authenticated users away from
-`/auth/{login,register,forgot-password,verify-2fa}`. It also hand-rolls CORS preflight handling
-for a hardcoded `allowedOrigins` list — update that list if a new client origin needs access.
+`/auth/{login,register,forgot-password,verify-2fa}`. There is no CORS handling: the browser
+only ever calls this app's own origin.
 
 Login is two-step when the account has 2FA enabled: `LoginView` first calls
 `POST /proxy/login`; a plain success returns `{ accessToken, accessTokenExpiresIn, refreshToken,
@@ -262,7 +262,7 @@ iOS/iPadOS Safari only exposes push to the Home-Screen-installed app (iOS 16.4+)
   `profile`), separate from `components/ui` (design-system primitives) and `components/layouts`.
 - `src/services/` — backend-calling functions, either wrapped by a proxy route or called
   directly from `getServerSideProps`: `2fa.ts`, `budgetCalculator.ts`, `userService.ts`,
-  `request-profile.ts`, `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`,
+  `request-profile.ts` (`updateProfile`), `login.ts`, `salary.ts`, `transactions.ts`, `fixedExpenses.ts`,
   `notifications.ts` (preferences + Web Push subscriptions), among others.
 - `src/lib/` — shared non-React helpers (`apiService`, `createHandler`, `session`, `webPush`,
   `signOutAndUnsubscribePush`, …).

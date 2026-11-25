@@ -1,6 +1,5 @@
 export * from './axiosInstance'
 export * from './apiService'
-export * from './fetcher'
 export * from './getLocalizedUrl'
 export * from './getTodayLocalDate'
 export * from './formatMoney'
