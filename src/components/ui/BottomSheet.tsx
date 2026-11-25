@@ -14,6 +14,23 @@ import {
 import { useTranslation } from 'next-i18next'
 import type { ReactNode } from 'react'
 
+const OFF_SCREEN = { bottom: { y: '100%' }, right: { x: '100%' } }
+
+/** iOS-like sheet: critically damped spring in, quick ease-out on close. */
+const sheetMotion = (placement: 'bottom' | 'right') => ({
+  variants: {
+    enter: {
+      x: 0,
+      y: 0,
+      transition: { type: 'spring', stiffness: 400, damping: 40, mass: 1 }
+    },
+    exit: {
+      ...OFF_SCREEN[placement],
+      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] }
+    }
+  }
+})
+
 interface BottomSheetProps {
   isOpen: boolean
   onClose: () => void
@@ -64,6 +81,7 @@ export const BottomSheet = ({
         borderTopRadius={isBottom ? '28px' : undefined}
         maxH={isBottom ? '92dvh' : undefined}
         pt="10px"
+        motionProps={sheetMotion(placement)}
       >
         {isBottom && (
           <Box
