@@ -68,6 +68,14 @@ there); it's unrelated to the login gate.
   `text.secondary`, `money.incomeText`, `money.expenseText`, `status.pending`,
   `category.<Necesidad|Deseo|Ahorro>`, `bg.*`, `border.subtle`) instead of raw palette values or
   new `useColorModeValue` pairs; text tones are AA-checked in both modes.
+- **Dark/light mode:** Más → "Apariencia" (Automático · Claro · Oscuro), kept by
+  `hooks/useAppearance` (Chakra only stores the resolved light/dark). Keep
+  `useSystemColorMode: false`: iOS reports both modes while the installed app goes to the
+  background (Notification Center), which flipped the app; `components/ui/AppearanceSync`
+  applies "Automático" on start and on returning to the foreground instead.
+- **Movement icons:** `components/design/merchantKind.ts` picks fuel / food / coffee /
+  grocery / ride from the merchant name (whole words), else the category icon; the category
+  always sets the color. Use `movementIcon`/`CategoryIconBox`, not a local category map.
 - **Confirmations:** never `window.confirm` — `const confirm = useConfirm()` (`ConfirmSheet`,
   provider in `_app`) and `if (!(await confirm({ title, destructive: true }))) return`.
 - **Building blocks:** `BottomSheet` (bottom on phones, right on desktop), `Amount` (tabular

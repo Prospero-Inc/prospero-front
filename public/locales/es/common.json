@@ -209,7 +209,12 @@
     "twoFaOff": "Desactivado",
     "calculator": "Calculadora de presupuesto",
     "language": "Idioma",
-    "darkMode": "Modo oscuro",
+    "appearance": "Apariencia",
+    "appearanceName": {
+      "system": "Automático",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
     "signOut": "Cerrar sesión",
     "gmailConnected": "Conectado",
     "gmailDisconnected": "Sin conectar",

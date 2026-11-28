@@ -1,13 +1,14 @@
-import { CartIcon, CupIcon, MailIcon, PiggyIcon } from '@/components/icons/app'
+import { movementIcon } from '@/components/design'
+import { MailIcon } from '@/components/icons/app'
 import { formatMoney } from '@/lib/formatMoney'
 import type { PeriodRecentTransaction, PeriodSummary } from '@/services/periods'
 import type { ReviewQueueSummary } from '@/services/reviewQueue'
 import type { BudgetCategory } from '@/services/transactions'
-import { Box, Button, Flex, type IconProps, Link, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Link, Text } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import type { ComponentType, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import { formatPeriodRange, formatRelativeDay } from './periodText'
 
@@ -248,12 +249,6 @@ export const SplitCard = ({
   )
 }
 
-const CATEGORY_ICON: Record<BudgetCategory, ComponentType<IconProps>> = {
-  Necesidad: CartIcon,
-  Deseo: CupIcon,
-  Ahorro: PiggyIcon
-}
-
 const CATEGORY_LABEL: Record<BudgetCategory, string> = {
   Necesidad: 'needs',
   Deseo: 'wants',
@@ -288,9 +283,10 @@ export const RecentCard = ({
       {latest ? (
         <Flex align="center" gap="12px" py="10px">
           {(() => {
-            const CategoryIcon = latest.category
-              ? CATEGORY_ICON[latest.category]
-              : CartIcon
+            const CategoryIcon = movementIcon(
+              latest.category,
+              latest.description ?? ''
+            )
             return (
               <Box
                 w="40px"

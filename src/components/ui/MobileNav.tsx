@@ -1,5 +1,6 @@
 import { ChevronRightIcon, CloseIcon } from '@/components/icons/app'
 import { useAppShellTitle } from '@/components/layouts/shell/AppShellTitle'
+import { useAppearance } from '@/hooks/useAppearance'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
 import {
   FlexProps,
@@ -37,7 +38,8 @@ type MobileProps = FlexProps
  */
 export const MobileNav = (props: MobileProps) => {
   const router = useRouter()
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { colorMode } = useColorMode()
+  const { setAppearance } = useAppearance()
   const { t } = useTranslation('mobileNav')
   const { data: session, status } = useSession()
   const {
@@ -58,7 +60,7 @@ export const MobileNav = (props: MobileProps) => {
   if (status === 'loading') return null
 
   const handleChangeColorMode = () => {
-    toggleColorMode()
+    setAppearance(colorMode === 'light' ? 'dark' : 'light')
   }
   const handleClick = () => {
     router.push('/settings/profile')

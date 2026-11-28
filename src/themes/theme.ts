@@ -18,7 +18,8 @@ export const theme = extendTheme({
   fonts,
   config: {
     initialColorMode: 'system',
-    useSystemColorMode: true
+    // "Automático" is applied by AppearanceSync, not by live system changes.
+    useSystemColorMode: false
   },
   components: {
     Toast: {

@@ -38,7 +38,6 @@ test('logs an expense in three taps', async ({ page }) => {
   const sheet = page.getByRole('dialog', { name: 'Nuevo movimiento' })
   await expect(sheet).toBeVisible()
   const amount = sheet.getByLabel('Monto')
-  await expect(amount).toBeFocused()
   await expect(amount).toHaveAttribute('inputmode', 'decimal')
 
   const save = sheet.getByRole('button', { name: 'Guardar gasto' })

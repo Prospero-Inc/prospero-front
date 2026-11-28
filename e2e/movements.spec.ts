@@ -91,6 +91,61 @@ test('movements lists expenses and income together, filterable', async ({
   await expect(incomeRow).toBeHidden()
 })
 
+test('movements: income waits for the expenses instead of showing alone', async ({
+  page
+}) => {
+  let releaseExpenses = (): void => undefined
+  const expensesHeld = new Promise<void>(resolve => {
+    releaseExpenses = resolve
+  })
+  await page.route('**/api/proxy/read/periods/transactions*', async route => {
+    await expensesHeld
+    await route.fulfill({
+      json: [
+        expense(1, {
+          description: 'Súper Selectos',
+          category: 'Necesidad',
+          reviewStatus: 'Confirmed'
+        })
+      ]
+    })
+  })
+  await page.route('**/api/proxy/read/periods/salary*', route =>
+    route.fulfill({
+      json: [
+        {
+          id: 7,
+          amount: 400,
+          date: '2026-10-29T00:00:00.000Z',
+          type: 'Payroll',
+          status: 'Classified',
+          incomeCategory: 'Payroll',
+          description: 'Nómina',
+          source: 'Manual',
+          institutionName: null,
+          possibleGmailDuplicate: null
+        }
+      ]
+    })
+  )
+  await login(page)
+  const incomeArrived = page.waitForResponse(
+    '**/api/proxy/read/periods/salary*'
+  )
+  await page.goto('/movements')
+  await incomeArrived
+
+  const incomeRow = page.getByRole('button', { name: 'Editar Nómina' })
+  const expenseRow = page.getByRole('button', { name: 'Editar Súper Selectos' })
+  // Absence check: give React a moment to (wrongly) render the income alone.
+  await page.waitForTimeout(500)
+  await expect(incomeRow).toBeHidden()
+
+  releaseExpenses()
+  await expect(expenseRow).toBeVisible()
+  await expect(incomeRow).toBeVisible()
+})
+
 test('movements: search filters as you type and keeps ?q= in the URL', async ({
   page
 }) => {
