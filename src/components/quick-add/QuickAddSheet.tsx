@@ -160,7 +160,6 @@ export const QuickAddSheet = ({
   const revalidateApi = useRevalidateApi()
   const updateApiCache = useUpdateApiCache()
   const dateLabel = useDateLabel()
-  const amountRef = useRef<HTMLInputElement>(null)
   const dateRef = useRef<HTMLInputElement>(null)
 
   const [kind, setKind] = useState<Kind>('expense')
@@ -429,7 +428,6 @@ export const QuickAddSheet = ({
             : 'quickAdd.edit.titleIncome'
           : 'quickAdd.title'
       )}
-      initialFocusRef={amountRef}
       footer={
         <Box w="full">
           <Button
@@ -493,7 +491,6 @@ export const QuickAddSheet = ({
         )}
 
         <AmountField
-          inputRef={amountRef}
           label={t('quickAdd.amount')}
           value={amountInput}
           onChange={setAmountInput}
