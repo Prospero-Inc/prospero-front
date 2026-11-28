@@ -112,6 +112,31 @@ export const BusIcon = designIcon(
   </>
 )
 
+export const FuelIcon = designIcon(
+  'FuelIcon',
+  <>
+    <path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10" />
+    <path d="M14 13h2a2 2 0 0 1 2 2v2a1.5 1.5 0 0 0 3 0V9.5L18 6" />
+  </>
+)
+
+export const FoodIcon = designIcon(
+  'FoodIcon',
+  <>
+    <path d="M4 3v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V3M7 3v18" />
+    <path d="M20 15V3a5 5 0 0 0-4 5v6a1 1 0 0 0 1 1h3zm0 0v6" />
+  </>
+)
+
+export const CarIcon = designIcon(
+  'CarIcon',
+  <>
+    <path d="M5 17H4a1 1 0 0 1-1-1v-4l2.2-5A2 2 0 0 1 7 6h10a2 2 0 0 1 1.8 1l2.2 5v4a1 1 0 0 1-1 1h-1M9.5 17h5M3 12h18" />
+    <circle cx="7.5" cy="17" r="2" />
+    <circle cx="16.5" cy="17" r="2" />
+  </>
+)
+
 export const ArrowDownIcon = designIcon(
   'ArrowDownIcon',
   <>

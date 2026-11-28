@@ -441,6 +441,7 @@ export default function MovementsPage() {
                         icon={
                           <CategoryIconBox
                             category={row.category}
+                            name={row.title}
                             isIncome={row.kind === 'income'}
                           />
                         }

@@ -1,7 +1,10 @@
 import {
   ArrowDownIcon,
+  CarIcon,
   CartIcon,
   CupIcon,
+  FoodIcon,
+  FuelIcon,
   PiggyIcon
 } from '@/components/icons/app'
 import type { BudgetCategory } from '@/services/transactions'
@@ -13,6 +16,8 @@ import {
   Text
 } from '@chakra-ui/react'
 import type { ComponentType, ReactNode } from 'react'
+
+import { type MerchantKind, merchantKind } from './merchantKind'
 
 // Building blocks of docs/diseno-mobile.html, with its sizes and colors:
 // segmented control (.seg), chips (.chip), category icon (.cat), list row
@@ -101,16 +106,37 @@ const CATEGORY_ICON: Record<BudgetCategory, ComponentType<IconProps>> = {
 }
 
 /** 40 px tinted square with the category's icon (or ↓ for income). */
+const MERCHANT_ICON: Record<MerchantKind, ComponentType<IconProps>> = {
+  food: FoodIcon,
+  coffee: CupIcon,
+  fuel: FuelIcon,
+  grocery: CartIcon,
+  ride: CarIcon
+}
+
+/** An expense's icon: its merchant's when the name is recognized, else its
+ * category's (Necesidad when it has none yet). */
+export const movementIcon = (
+  category: BudgetCategory | null | undefined,
+  name: string
+): ComponentType<IconProps> => {
+  const merchant = merchantKind(name)
+  return merchant
+    ? MERCHANT_ICON[merchant]
+    : CATEGORY_ICON[category ?? 'Necesidad']
+}
+
+/** The icon comes from `movementIcon`; the category always picks the color. */
 export const CategoryIconBox = ({
   category,
+  name = '',
   isIncome = false
 }: {
   category?: BudgetCategory | null
+  name?: string
   isIncome?: boolean
 }) => {
-  const MovementIcon = isIncome
-    ? ArrowDownIcon
-    : CATEGORY_ICON[category ?? 'Necesidad']
+  const MovementIcon = isIncome ? ArrowDownIcon : movementIcon(category, name)
   return (
     <Box
       w="40px"
