@@ -2,8 +2,7 @@ import {
   Group,
   IconBox,
   ListCard as List,
-  ListRow as Row,
-  Toggle
+  ListRow as Row
 } from '@/components/design/settings'
 import {
   BellIcon,
@@ -23,6 +22,7 @@ import { isShortcutActive } from '@/components/shortcut/isShortcutActive'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { CookiesEnum } from '@/enums'
+import { APPEARANCES, useAppearance } from '@/hooks/useAppearance'
 import { usePushSubscription } from '@/hooks/usePushSubscription'
 import { Profile } from '@/interfaces'
 import { signOutAndUnsubscribePush } from '@/lib/signOutAndUnsubscribePush'
@@ -30,15 +30,7 @@ import { useApi } from '@/lib/useApi'
 import { cookiesPlugin } from '@/plugins'
 import type { GmailConnectionStatus } from '@/services/gmail'
 import type { ShortcutToken } from '@/services/shortcuts'
-import {
-  Avatar,
-  Box,
-  Flex,
-  Stack,
-  Text,
-  useColorMode,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Avatar, Box, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { GetStaticProps } from 'next'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
@@ -58,13 +50,14 @@ const percent = (value: number) => Math.round(value * 100)
 export default function MorePage() {
   const { t } = useTranslation('common')
   const router = useRouter()
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { appearance, setAppearance } = useAppearance()
   const { data: session } = useSession()
   const { data, error } = useApi<{ user: Profile }>('auth/profile')
   const { data: gmail } = useApi<GmailConnectionStatus>('gmail/connection')
   const { data: shortcutTokens } = useApi<ShortcutToken[]>('shortcuts/tokens')
   const { isSubscribed } = usePushSubscription(session?.accessToken)
   const language = useDisclosure()
+  const appearanceSheet = useDisclosure()
   const profile = data?.user
   const currentLanguage = router.locale === 'en' ? 'en' : 'es'
 
@@ -238,12 +231,10 @@ export default function MorePage() {
             value={t(`more.languageName.${currentLanguage}`)}
           />
           <Row
-            onClick={toggleColorMode}
-            role="switch"
-            aria-checked={colorMode === 'dark'}
+            onClick={appearanceSheet.onOpen}
             icon={<IconBox icon={<MoonIcon boxSize="18px" />} />}
-            label={t('more.darkMode')}
-            value={<Toggle isOn={colorMode === 'dark'} />}
+            label={t('more.appearance')}
+            value={t(`more.appearanceName.${appearance}`)}
           />
         </List>
 
@@ -282,6 +273,32 @@ export default function MorePage() {
               label={t(`more.languageName.${lang}`)}
               value={
                 lang === currentLanguage ? (
+                  <CheckIcon boxSize="18px" color="brand.text" />
+                ) : undefined
+              }
+            />
+          ))}
+        </List>
+      </BottomSheet>
+
+      <BottomSheet
+        isOpen={appearanceSheet.isOpen}
+        onClose={appearanceSheet.onClose}
+        title={t('more.appearance')}
+      >
+        <List>
+          {APPEARANCES.map(value => (
+            <Row
+              key={value}
+              onClick={() => {
+                appearanceSheet.onClose()
+                setAppearance(value)
+              }}
+              aria-current={value === appearance ? 'true' : undefined}
+              icon={<IconBox icon={<MoonIcon boxSize="18px" />} />}
+              label={t(`more.appearanceName.${value}`)}
+              value={
+                value === appearance ? (
                   <CheckIcon boxSize="18px" color="brand.text" />
                 ) : undefined
               }

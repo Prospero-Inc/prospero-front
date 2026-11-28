@@ -209,7 +209,12 @@
     "twoFaOff": "Off",
     "calculator": "Budget calculator",
     "language": "Language",
-    "darkMode": "Dark mode",
+    "appearance": "Appearance",
+    "appearanceName": {
+      "system": "Automatic",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "signOut": "Sign out",
     "gmailConnected": "Connected",
     "gmailDisconnected": "Not connected",
