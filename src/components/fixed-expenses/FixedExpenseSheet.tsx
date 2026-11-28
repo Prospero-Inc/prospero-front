@@ -14,13 +14,7 @@ import type { FixedExpenseData } from '@/services/fixedExpenses'
 import type { BudgetCategory } from '@/services/transactions'
 import { Box, Button, Collapse, Input, Stack, Text } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
-import {
-  type ChangeEvent,
-  type FormEvent,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react'
 
 const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, index) => index + 1)
 /** Every month reaches it: the backend clamps it to the month's last day. */
@@ -53,7 +47,6 @@ export const FixedExpenseSheet = ({
   onDelete: (_fixedExpense: EditableFixedExpense) => void
 }) => {
   const { t } = useTranslation('fixedExpenses')
-  const amountRef = useRef<HTMLInputElement>(null)
   const [amountInput, setAmountInput] = useState('')
   const [name, setName] = useState('')
   const [category, setCategory] = useState<BudgetCategory | null>(null)
@@ -109,7 +102,6 @@ export const FixedExpenseSheet = ({
       isOpen={isOpen}
       onClose={onClose}
       title={t(isEditing ? 'form.editTitle' : 'form.createTitle')}
-      initialFocusRef={amountRef}
       footer={
         <Box w="full">
           <Button
@@ -148,7 +140,6 @@ export const FixedExpenseSheet = ({
         spacing="10px"
       >
         <AmountField
-          inputRef={amountRef}
           label={t('form.labelAmount')}
           value={amountInput}
           onChange={setAmountInput}
