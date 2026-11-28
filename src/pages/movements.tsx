@@ -22,7 +22,10 @@ import {
 import { LoadError } from '@/components/states/LoadError'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { getPageSkeleton } from '@/components/ui/PageSkeletons'
+import {
+  getPageSkeleton,
+  MovementGroupsSkeleton
+} from '@/components/ui/PageSkeletons'
 import { usePeriodLabel } from '@/hooks/usePeriodLabel'
 import { formatMoney } from '@/lib/formatMoney'
 import { useApi } from '@/lib/useApi'
@@ -153,6 +156,11 @@ export default function MovementsPage() {
   const incomes = useApi<SalaryListItem[]>(ready ? 'periods/salary' : null, {
     period
   })
+  // Both requests already go out in parallel; showing either one alone
+  // made the income pop in before the expenses, so the list waits for both.
+  const isListLoading = [expenses, incomes].some(
+    list => list.data === undefined && !list.error
+  )
   const periods = useApi<PeriodSummary[]>('periods')
   const { data: review } = useApi<ReviewQueueSummary>('review-queue/summary')
   const pendingCount =
@@ -405,6 +413,8 @@ export default function MovementsPage() {
             }}
             isRetrying={expenses.isValidating || incomes.isValidating}
           />
+        ) : isListLoading ? (
+          <MovementGroupsSkeleton />
         ) : rows.length === 0 ? (
           <EmptyState
             icon={MdSwapVert}
@@ -431,6 +441,7 @@ export default function MovementsPage() {
                         icon={
                           <CategoryIconBox
                             category={row.category}
+                            name={row.title}
                             isIncome={row.kind === 'income'}
                           />
                         }

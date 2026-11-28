@@ -4,8 +4,7 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  Stack,
-  useColorModeValue
+  Stack
 } from '@chakra-ui/react'
 import { FC, ReactNode } from 'react'
 
@@ -24,37 +23,6 @@ const SkeletonPage = ({ children }: { children: ReactNode }) => (
 
 const SectionTitle = ({ w = '200px' }: { w?: string }) => (
   <Skeleton h="28px" w={w} mb={4} borderRadius="md" />
-)
-
-/** Fila de lista: concepto + línea secundaria a la izquierda, monto a la
- * derecha. */
-const ListRow = () => {
-  const borderColor = useColorModeValue('gray.100', 'gray.600')
-  return (
-    <Flex
-      justify="space-between"
-      align="center"
-      gap={4}
-      py={3}
-      borderBottomWidth="1px"
-      borderColor={borderColor}
-    >
-      <Stack spacing={2} flex="1">
-        <Skeleton h="16px" w={{ base: '70%', md: '45%' }} />
-        <Skeleton h="14px" w="90px" />
-      </Stack>
-      <Skeleton h="18px" w="60px" />
-    </Flex>
-  )
-}
-
-/** Filas simples (gastos fijos) para la misma situación. */
-export const RowsSkeleton: FC<{ rows?: number }> = ({ rows = 5 }) => (
-  <SkeletonPage>
-    {Array.from({ length: rows }).map((_, index) => (
-      <ListRow key={index} />
-    ))}
-  </SkeletonPage>
 )
 
 /** A placeholder bar on a design surface. */
@@ -176,15 +144,8 @@ const DashboardSkeleton: FC = () => (
   </ScreenStack>
 )
 
-/** Movimientos: segmented control, chips and lists grouped by day. */
-const MovementsListSkeleton: FC = () => (
-  <ScreenStack>
-    <Bone h="46px" radius="14px" />
-    <Flex gap="8px">
-      <Bone h="36px" w="110px" radius="18px" />
-      <Bone h="36px" w="96px" radius="18px" />
-      <Bone h="36px" w="86px" radius="18px" />
-    </Flex>
+const MovementGroupsBones = () => (
+  <>
     {[2, 3, 1].map((rows, group) => (
       <Stack key={group} spacing="12px">
         <GroupLabel w={group === 0 ? '50px' : '90px'} />
@@ -195,7 +156,29 @@ const MovementsListSkeleton: FC = () => (
         </Card>
       </Stack>
     ))}
+  </>
+)
+
+/** Movimientos: segmented control, chips and lists grouped by day. */
+const MovementsListSkeleton: FC = () => (
+  <ScreenStack>
+    <Bone h="46px" radius="14px" />
+    <Flex gap="8px">
+      <Bone h="36px" w="110px" radius="18px" />
+      <Bone h="36px" w="96px" radius="18px" />
+      <Bone h="36px" w="86px" radius="18px" />
+    </Flex>
+    <MovementGroupsBones />
   </ScreenStack>
+)
+
+/** Only the day groups, for when the movements arrive after the page. */
+export const MovementGroupsSkeleton: FC = () => (
+  <SkeletonPage>
+    <Stack spacing="12px">
+      <MovementGroupsBones />
+    </Stack>
+  </SkeletonPage>
 )
 
 /** Por revisar: progress and the `.rev` cards. */

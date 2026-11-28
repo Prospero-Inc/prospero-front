@@ -5,6 +5,7 @@ import {
   AppShellTitleProvider,
   usesAppShell
 } from '@/components/layouts/shell'
+import { AppearanceSync } from '@/components/ui/AppearanceSync'
 import { ConfirmProvider } from '@/components/ui/ConfirmSheet'
 import { getPageSkeleton } from '@/components/ui/PageSkeletons'
 import { RouteProgress } from '@/components/ui/RouteProgress'
@@ -117,6 +118,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         </Head>
         {/* 5 min: the access token lasts 15, and each poll is a request. */}
         <SessionProvider session={session} refetchInterval={300}>
+          <AppearanceSync />
           <SessionWatcher />
           <ServiceWorkerUpdater />
           <RouteProgress isLoading={isLoading} />
